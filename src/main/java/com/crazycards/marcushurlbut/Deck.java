@@ -40,7 +40,13 @@ public class Deck {
                     imgPathSuffix = "diamonds.png";
                     break;
                 
-                
+                case SPADE:
+                    imgPathSuffix = "spades.png";
+                    break;
+
+                case CLUB:
+                    imgPathSuffix = "clubs.png";
+                    break;
             
                 default:
                     break;
