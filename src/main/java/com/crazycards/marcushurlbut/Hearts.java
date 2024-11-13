@@ -3,10 +3,10 @@ package com.crazycards.marcushurlbut;
 import java.util.*;
 
 public class Hearts {
-    static Deck deck = new Deck();
+    public static Deck deck = new Deck();
     static int playerCount = 0;
     static int roundNumber = 1;
-    static Player[] players = new Player[4];
+    public static Player[] players = new Player[4];
 
     static int PLAYER_1 = 0;
     static int PLAYER_2 = 1;
@@ -14,11 +14,16 @@ public class Hearts {
     static int PLAYER_4 = 3;
 
 
-    public static void initializePlayers(int numOfPlayers) {}
+    public static void initialize() {
+        for (int i = 0; i < 4; i++) {
+            players[i] = new Player();  // Initialize player with a name
+        }
+        deck = new Deck();
+    }
     public static void setScoreboard(String nameOfPlayer, int score) {}
     
 
-    public static void start() {
+    public static void startGame() {
         // Shuffle cards
         deck.shuffleDeck();
 
@@ -26,13 +31,13 @@ public class Hearts {
         dealDeck();
 
         // Passing phase
-        handlePassingPhase(roundNumber);
+        // handlePassingPhase(roundNumber);
 
         // Begin round - start with club of 2's
-        int playerInitiative = 2;
+        // int playerInitiative = 2;
 
         // Start main game loop
-        handleRound(playerInitiative);
+        // handleRound(playerInitiative);
 
         // End round when all cards have been played
 

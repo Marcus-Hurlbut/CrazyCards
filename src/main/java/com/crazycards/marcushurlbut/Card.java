@@ -24,8 +24,8 @@ enum Name {
 }
 
 public class Card {
-    Suit suit;
-    Name name;
-    int value;
-    String imgPath;
+    public Suit suit;
+    public Name name;
+    public int value;
+    public String imgPath;
 }
