@@ -38,13 +38,12 @@ public class HeartsAPI {
         Hearts.deck.dealDeck(Hearts.players);
 
         HashMap<Integer, Card> hand_by_id = Hearts.players[playerID].getHand();
-        Collection<Card> hand = hand_by_id.values();
-        Iterator<Card> iterator = hand.iterator();
+        List<Map.Entry<Integer, Card>> sortedCards = new ArrayList<>(hand_by_id.entrySet());
+        sortedCards.sort(Map.Entry.comparingByKey());
 
         List<String> sHand = new ArrayList<>();
-        
-        while (iterator.hasNext()) {
-            Card card = iterator.next();
+        for (Map.Entry<Integer, Card> entry : sortedCards) {
+            Card card = entry.getValue();
             sHand.add(card.imgPath);
         }
 
