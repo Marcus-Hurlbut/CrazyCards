@@ -26,12 +26,7 @@ public class Deck {
         for (int n = 0; n < 52; n++) {
             int playerIndex = n % 4;
             Card topCard = deck.pop();
-            if (playerIndex == 0) {
-                players[playerIndex].addCardToHand(topCard);
-            }
-            if (playerIndex == 0) {
-                System.out.println("Added card to hand: " + topCard.value);
-            }
+            players[playerIndex].addCardToHand(topCard);
         }
     }
 

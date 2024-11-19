@@ -20,28 +20,11 @@ public class Hearts {
         }
         deck = new Deck();
     }
-    public static void setScoreboard(String nameOfPlayer, int score) {}
     
 
     public static void startGame() {
-        // Shuffle cards
         deck.shuffleDeck();
-
-        // Deal cards out
         dealDeck();
-
-        // Passing phase
-        // handlePassingPhase(roundNumber);
-
-        // Begin round - start with club of 2's
-        // int playerInitiative = 2;
-
-        // Start main game loop
-        // handleRound(playerInitiative);
-
-        // End round when all cards have been played
-
-        // Check if anyone has over 100 points
     }
 
     public static void dealDeck() {
@@ -77,7 +60,7 @@ public class Hearts {
         // getPlayersCardOption();
     }
 
-    public static String printHello() {
-        return "Hello";
+    public static void playTurn(int playerID, String card) {
+
     }
 }

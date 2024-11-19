@@ -8,7 +8,6 @@ enum Suit {
 }
 
 enum Name {
-    ACE,
     TWO,
     THREE,
     FOUR,
@@ -20,7 +19,8 @@ enum Name {
     TEN,
     JACK,
     QUEEN,
-    KING
+    KING,
+    ACE
 }
 
 public class Card {

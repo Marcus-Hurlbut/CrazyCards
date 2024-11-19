@@ -16,7 +16,7 @@ public class Player {
         this.username = username;
     }
 
-    private int getCardID(Card card) {
+    public int getCardID(Card card) {
         int offset = 0;
         switch (card.suit) {
             case HEART:
@@ -47,8 +47,6 @@ public class Player {
 
     public void addCardToHand(Card card) {
         int id = getCardID(card);
-
-        System.out.println("Adding card to hand: " + card.value + " - ID:" + id);
         hand.put(id, card);
     }
 
@@ -58,7 +56,6 @@ public class Player {
     }
 
     public HashMap<Integer, Card> getHand() {
-        System.out.println("Player.getHand: " + hand);
         return hand;
     }
 }

@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,16 +20,8 @@ import com.crazycards.marcushurlbut.Hearts;
 
 @RestController
 public class HeartsAPI {
-    
-    @GetMapping("/printHello")
-    public String printHello() {
-        System.out.println("[!] it executed");
-        return Hearts.printHello();
-    }
-
     @GetMapping("/startHearts")
     public ResponseEntity<Map<String, Object>> start(@RequestParam("playerID") int playerID) {
-        System.out.println("test");
         Map<String, Object> result = new HashMap<>();
 
         Hearts.initialize();
@@ -41,14 +32,20 @@ public class HeartsAPI {
         List<Map.Entry<Integer, Card>> sortedCards = new ArrayList<>(hand_by_id.entrySet());
         sortedCards.sort(Map.Entry.comparingByKey());
 
-        List<String> sHand = new ArrayList<>();
+        Map<Integer, Card> cardMap = new HashMap<>();
         for (Map.Entry<Integer, Card> entry : sortedCards) {
             Card card = entry.getValue();
-            sHand.add(card.imgPath);
+            int id = Hearts.players[playerID].getCardID(card);
+            cardMap.put(id, card);
         }
 
-        result.put("cards", sHand);
-        System.out.println("[API CALL] cards: " + sHand);
+        result.put("cards", cardMap);
+        System.out.println("[API CALL] cards: " + result);
         return ResponseEntity.ok(result);
     }
+
+    // public ResponseEntity<Map<String, Object>> playCard(@RequestParam("playerID") int playerID, @RequestParam("cardID") String cardID)  {
+        
+    //     return ResponseEntity.ok(Object());
+    // }
 }
