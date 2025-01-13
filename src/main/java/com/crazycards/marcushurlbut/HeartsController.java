@@ -33,46 +33,6 @@ public class HeartsController {
 
     public HeartsController instance = this;
 
-    @SuppressWarnings("unchecked")
-    @MessageMapping("/playTurn")
-    // @SendTo("/topic/playTurn")
-    public void playTurn(Message message) throws Exception {
-        UUID playerID = UUID.fromString(message.getPlayerID());
-        UUID gameID = UUID.fromString(message.getRoomID());
-        String strCardIDs = message.getCardIDs();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<String> cardsList = objectMapper.readValue(strCardIDs, List.class);
-        List<Integer> cardIDs = cardsList.stream().map(Integer::parseInt).collect(Collectors.toList());
-        Integer cardID = cardIDs.get(0);
-
-        System.out.println("[/topic/playTurn] - playerID: " + message.getPlayerID() + " CardID: " + cardID);
-        
-        Hearts hearts = GameManager.retreiveGame(gameID);
-        Boolean success = hearts.playTurn(playerID, cardID);
-        GameManager.updateGame(gameID, hearts);
-
-        String destination = "/topic/playTurn/" + playerID.toString(); 
-        messagingTemplate.convertAndSend(destination, json);
-    }
-
-    @MessageMapping("/getHand")
-    // @SendTo("/topic/getHand")
-    public void getHand(Message message) throws Exception {
-        UUID playerID = UUID.fromString(message.getPlayerID());
-        UUID gameID = UUID.fromString(message.getRoomID());
-
-        Hearts hearts = GameManager.retreiveGame(gameID);
-        int index = hearts.playerIDtoInt.get(playerID);
-        
-        HashMap<Integer, Card> playerHand = hearts.players[index].getHand();
-        String json = toJSON(playerHand);
-
-        // System.out.println("[/topic/getHand] cards: " + json);
-        String destination = "/topic/getHand/" + playerID.toString(); 
-        messagingTemplate.convertAndSend(destination, json);
-    }
-
     @MessageMapping("/newLobby")
     @SendTo("/topic/newLobby")
     public Message newLobby(Player player) throws Exception {
@@ -86,7 +46,6 @@ public class HeartsController {
     }
 
     @MessageMapping("/joinLobby")
-    // @SendTo("/topic/joinLobby/{ID}")
     public void joinLobby(Message message) throws Exception {
         UUID playerID = UUID.fromString(message.getPlayerID());
         int roomID = Integer.parseInt(message.getRoomID());
@@ -124,6 +83,49 @@ public class HeartsController {
                 notifyGameStart(gameID, roomID);
             }, 500, TimeUnit.MILLISECONDS);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    @MessageMapping("/playTurn")
+    public void playTurn(Message message) throws Exception {
+        UUID playerID = UUID.fromString(message.getPlayerID());
+        UUID gameID = UUID.fromString(message.getRoomID());
+        String strCardIDs = message.getCardIDs();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<String> cardsList = objectMapper.readValue(strCardIDs, List.class);
+        List<Integer> cardIDs = cardsList.stream().map(Integer::parseInt).collect(Collectors.toList());
+        Integer cardID = cardIDs.get(0);
+
+        System.out.println("[/topic/playTurn] - playerID: " + message.getPlayerID() + " CardID: " + cardID);
+        
+        Hearts hearts = GameManager.retreiveGame(gameID);
+        Boolean validTurn = hearts.playTurn(playerID, cardID);
+        GameManager.updateGame(gameID, hearts);
+
+        String destination = "/topic/playTurn/" + playerID.toString();
+        messagingTemplate.convertAndSend(destination, toJSON(validTurn));
+
+        if (hearts.passingPhaseComplete == false) {
+            notifyPassingPhase(gameID, true);
+        }
+    }
+
+    @MessageMapping("/getHand")
+    // @SendTo("/topic/getHand")
+    public void getHand(Message message) throws Exception {
+        UUID playerID = UUID.fromString(message.getPlayerID());
+        UUID gameID = UUID.fromString(message.getRoomID());
+
+        Hearts hearts = GameManager.retreiveGame(gameID);
+        int index = hearts.playerIDtoInt.get(playerID);
+        
+        HashMap<Integer, Card> playerHand = hearts.players[index].getHand();
+        String json = toJSON(playerHand);
+
+        // System.out.println("[/topic/getHand] cards: " + json);
+        String destination = "/topic/getHand/" + playerID.toString(); 
+        messagingTemplate.convertAndSend(destination, json);
     }
 
     @SuppressWarnings("unchecked")
@@ -175,16 +177,16 @@ public class HeartsController {
 
         if (passingPhaseOver) {
             hearts = GameManager.retreiveGame(gameID);
-            hearts.passingPhaseComplete = true;
+            hearts.onEndOfPassingPhase();
             GameManager.updateGame(gameID, hearts);
-            notifyPassingPhaseOver(gameID);
+            notifyPassingPhase(gameID, false);
         }
     }
 
-    public void notifyPassingPhaseOver(UUID gameID) {
+    public void notifyPassingPhase(UUID gameID, boolean inPassPhase) {
         try {
-            String destination = "/topic/notifyPassingPhaseOver/" + gameID.toString();
-            messagingTemplate.convertAndSend(destination, toJSON(true));
+            String destination = "/topic/notifyPassingPhase/" + gameID.toString();
+            messagingTemplate.convertAndSend(destination, toJSON(inPassPhase));
         } catch (Exception e) {
             e.printStackTrace();
         }

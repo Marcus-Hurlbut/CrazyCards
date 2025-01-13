@@ -25,15 +25,15 @@ public class Hearts {
     public UUID gameID;
     boolean active = false;
 
-    public int playerInitiative = -1;
     public int playerInTurn = -1;
     public PassingPhase roundPassingType;
     public boolean passingPhaseComplete = false;
 
-    int cardsPlayed = 0;
-    public Card startingCard;
+    int cardsPlayedThisTrick = 0;
+    public Card startingTrickCard  = new Card(Suit.CLUB, Name.TWO, 2, "2_of_clubs.png");
     public List<Card> voidCardPile = new ArrayList<Card>(4);
     public boolean newRound = false;
+    public boolean newTrick = false;
 
     static int PLAYER_1 = 0;
     static int PLAYER_2 = 1;
@@ -56,25 +56,32 @@ public class Hearts {
         deck.shuffleDeck();
         deck.dealDeck(players);
         setPassingPhase(roundNumber);
-        setPlayerInitiative();
+    }
+
+    public void onEndOfPassingPhase() {
+        passingPhaseComplete = true;
+        setPlayerInitiative(true);
     }
 
     public int getPlayerInitiative() {
-        if (playerInitiative >= 0) {
-            return playerInitiative;
+        if (playerInTurn >= 0) {
+            return playerInTurn;
         }
         System.err.println("Problem getting player initiative - not initialized");
         return -1;
     }
 
-    public void setPlayerInitiative() {
-        int playerID = 0;
-        for (Player player : players) {
-            if (player.hand.containsKey(CardID.CLUB_TWO.ordinal())) {
-                playerInitiative = playerID;
-                break;
+    public void setPlayerInitiative(boolean isNewRound) {
+        int intPlayerID = 0;
+
+        if (isNewRound) {
+            for (Player player : players) {
+                if (player.hand.containsKey(CardID.CLUB_TWO.ordinal())) {
+                    playerInTurn = intPlayerID;
+                    break;
+                }
+                intPlayerID++;
             }
-            playerID++;
         }
     }
 
@@ -85,17 +92,17 @@ public class Hearts {
     }
 
     public boolean isEndOfTrick() {
-        return cardsPlayed >= players.length;
+        return cardsPlayedThisTrick >= players.length;
     }
 
     public boolean isSuitValid(Suit suit) {
-        return suit == startingCard.suit;
+        return suit == startingTrickCard.suit;
     }
 
     public boolean isPlayerVoidSuit(int playerID) {
         HashMap<Integer, Card> hand = players[playerID].hand;
         for (Card card : hand.values()) {
-            if (card.suit == startingCard.suit) {
+            if (card.suit == startingTrickCard.suit) {
                 return false;
             }
         }
@@ -112,13 +119,13 @@ public class Hearts {
         return false;
     }
 
-    public void addCardToInPlay(int playerID, Card card) {
-        voidCardPile.set(playerID, card);
-        cardsPlayed++;
+    public void addCardToVoidPile(int intPlayerID, Card card) {
+        voidCardPile.set(intPlayerID, card);
+        cardsPlayedThisTrick++;
     }
 
-    public boolean shootingTheMoon(int playerID) {
-        HashMap<Integer, Card> tricks = players[playerID].tricks;
+    public boolean shootingTheMoon(Player player) {
+        HashMap<Integer, Card> tricks = player.tricks;
         Set<Integer> cardSet = tricks.keySet();
 
         List<Integer> cardsRequired = Arrays.asList(
@@ -132,37 +139,54 @@ public class Hearts {
         return cardSet.containsAll(cardsRequired);
     }
 
+    public int deducePoints(Player player) {
+        int points = 0;
+        for (Card card: player.tricks.values()) {
+            // Queen of spades is 13 points
+            if (card.name == Name.QUEEN && card.suit == Suit.SPADE) {
+                points += 13;
+            }
+            else if (card.suit == Suit.HEART) {
+                points++;
+            }
+        }
+        return points;
+    }
+
     public void calculateScore() {
         int playerID = 0;
+
         for (Player player : players) {
             int points = 0;
-            for (Card card: player.tricks.values()) {
-                if (shootingTheMoon(playerID)) {
-                    points -= 26;
-                }
-                else if (card.name == Name.QUEEN && card.suit == Suit.SPADE) {
-                    points += 13;
-                }
-                else if (card.suit == Suit.HEART) {
-                    points++;
-                }
+
+            if (shootingTheMoon(player)) {
+                points -= 26;
+            } else {
+                points = deducePoints(player);
             }
-            int current = players[playerID].getScore();
-            players[playerID].setScore(current + points);
+
+            int currentScore = players[playerID].getScore();
+            players[playerID].setScore(currentScore + points);
 
             playerID++;
         }
     }
 
+    public boolean isGameOver() {
+        return Arrays.stream(players).anyMatch(player -> player.getScore() > 99);
+    }
+
     public int calculateTrickWinner() {
-        int highest = Integer.MIN_VALUE;
+        int highestValue = Integer.MIN_VALUE;
         for (int i = 0; i < voidCardPile.size(); i++) {
-            int cardIndex = voidCardPile.get(i).name.ordinal();
-            if (cardIndex > highest) {
-                highest = i;
+            Card cardPlayed = voidCardPile.get(i);
+            int cardValue = cardPlayed.name.ordinal();
+
+            if (cardValue > highestValue && cardPlayed.suit == startingTrickCard.suit) {
+                highestValue = i;
             }
         }
-        return highest;
+        return highestValue;
     }
 
     public boolean isEndOfRound() {
@@ -228,40 +252,85 @@ public class Hearts {
         return targetID;
     }
 
-    public Boolean playTurn(UUID playerID, int cardID) {
-        Card card;
-        int playerIDindex = playerIDtoInt.get(playerID);
-        card = players[playerIDindex].hand.get(cardID);
+    public void addTrickToWinner(UUID playerID, List<Card> trickCards) {
+        trickCards.forEach(card -> {
+            int index = playerIDtoInt.get(playerID);
+            players[index].tricks.put(getCardID(card), card);
+        });
+    }
 
-        if (!passingPhaseComplete) {
+    public Boolean playTurn(UUID playerID, int cardID) {
+        int playerIDindex = playerIDtoInt.get(playerID);
+        Card card = players[playerIDindex].hand.get(cardID);
+
+        // Validate player's turn
+        if (!passingPhaseComplete || playerIDindex != playerInTurn) {
             return false;
         }
-
-        // Reset round fields
-        if (newRound && playerIDindex == playerInitiative) {
-            cardsPlayed = 0;
+        // First turn of new Round
+        if (newRound && playerIDindex == playerInTurn) {
             newRound = false;
-            startingCard = card;
+            startingTrickCard = card;
+        }
+        // First turn of new trick
+        else if(newTrick && playerIDindex == playerInTurn) {
+            newTrick = false;
+            startingTrickCard = card;
         }
 
         if (playerIDindex == playerInTurn && validateCardToPlay(playerIDindex, card)) {
-            addCardToInPlay(playerIDindex, card);
+            // Add Card to play pile
+            addCardToVoidPile(playerIDindex, card);
 
             if (isEndOfTrick()) {
-                playerInitiative = calculateTrickWinner();
+                playerInTurn = calculateTrickWinner();
+                addTrickToWinner(players[playerInTurn].ID, voidCardPile);
+                voidCardPile = new ArrayList<Card>();
+                cardsPlayedThisTrick = 0;
             }
 
+            // End of round requires a re-shuffle & new pass phase
             if (isEndOfRound()) {
                 newRound = true;
                 calculateScore();
-                // playerInitiative = 
+                setPlayerInitiative(true);
+                passingPhaseComplete = false;
             }
 
-            // if (isGameOver()) {
-                
-            // }
+            if (isGameOver()) {
+                System.out.print("Game ended!");
+            }
             return true;
         }
         return false;
+    }
+
+    public int getCardID(Card card) {
+        int offset = 0;
+        switch (card.suit) {
+            case HEART:
+                offset = 0;
+                break;
+
+            case DIAMOND:
+                offset = 13;
+                break;
+            
+            case SPADE:
+                offset = 26;
+                break;
+
+            case CLUB:
+                offset = 39;
+                break;
+        
+            default:
+                break;
+        }
+
+        if (card.name.ordinal() == 0) {
+            return offset;
+        }
+        return (card.name.ordinal() + offset);
     }
 }
