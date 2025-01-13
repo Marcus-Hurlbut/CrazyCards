@@ -9,13 +9,11 @@
 
 <script>
 import CrazyCards from './components/CrazyCards.vue'
-// import HeartsComponent from './components/Hearts.vue'
 
 export default {
   name: 'App',
   components: {
-    CrazyCards,
-    // HeartsComponent
+    CrazyCards
   }
 }
 </script>

@@ -2,17 +2,20 @@ package com.crazycards.marcushurlbut;
 import java.util.*;
 
 public class Player {
-    String accountID;
+    UUID ID;
     String username;
     HashMap<Integer, Card> hand = new HashMap<Integer, Card>();
-    
+    HashMap<Integer, Card> tricks = new HashMap<Integer, Card>();
+    HashMap<Integer, Card> passedCards = new HashMap<Integer, Card>();
+    boolean didPassCards = false;
+    boolean didReceiveCards = false;
+    private int score;
 
-    public Player() {
-        this.accountID = "DEFAULT";
-        this.username = "DEFAULT";
+    public Player(UUID ID) {
+        this.ID = ID;
     }
-    public Player(String accountID, String username) {
-        this.accountID = accountID;
+    public Player(UUID ID, String username) {
+        this.ID = ID;
         this.username = username;
     }
 
@@ -24,15 +27,15 @@ public class Player {
                 break;
 
             case DIAMOND:
-                offset = 12;
+                offset = 13;
                 break;
             
             case SPADE:
-                offset = 25;
+                offset = 26;
                 break;
 
             case CLUB:
-                offset = 38;
+                offset = 39;
                 break;
         
             default:
@@ -56,6 +59,32 @@ public class Player {
     }
 
     public HashMap<Integer, Card> getHand() {
-        return hand;
+        List<Map.Entry<Integer, Card>> sortedHand = new ArrayList<>(hand.entrySet());
+        sortedHand.sort(Map.Entry.comparingByKey());
+
+        HashMap<Integer, Card> cardMap = new HashMap<>();
+        for (Map.Entry<Integer, Card> entry : sortedHand) {
+            Card card = entry.getValue();
+            int id = getCardID(card);
+            cardMap.put(id, card);
+        }
+
+        return cardMap;
+    }
+
+    public int getScore() {
+        return this.score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public String getUsername() {
+        return this.username;
+    }
+
+    public UUID getPlayerID() {
+        return this.ID;
     }
 }

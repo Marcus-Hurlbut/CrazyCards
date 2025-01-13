@@ -28,4 +28,13 @@ public class Card {
     public Name name;
     public int value;
     public String imgPath;
+
+    Card() {}
+
+    public Card(Suit suit, Name name, int value, String imgPath) {
+        this.suit = suit;
+        this.name = name;
+        this.value = value;
+        this.imgPath = imgPath;
+    }
 }

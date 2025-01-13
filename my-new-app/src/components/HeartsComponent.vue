@@ -1,18 +1,25 @@
 <template>
   <div class="startHearts">
-    <h1>{{ msg }}</h1>
+    <h1>{{ playerID }}</h1>
     
     <!-- This part is shown before the game starts -->
-    <div v-if="!gameStarted" class="startHeartsContent">
+    <!-- <div v-if="!gameStarted" class="startHeartsContent">
       <h3>Welcome to Hearts</h3>
       <p>
         Press start to begin<br>
       </p>
       <button @click="start">Start</button>
-    </div>
+    </div> -->
 
     <!-- This part is shown after the user clicks Start -->
     <div v-if="gameStarted" class="gameArea">
+      <div v-if="passPhase" class="passingPhaseTitle">
+        <h3>Passing Phase</h3>
+        <p>
+          Select 3 Cards to Pass
+        </p>
+      </div>
+
       <!-- Player 2 (top) -->
       <div class="player player-top">
         <h3>Player 2</h3>
@@ -45,7 +52,8 @@
             <img 
               :src="require(`@/assets/card-images/PNG-cards/${card.imgPath}`)" 
               :alt="'Card ' + (index + 1)"
-              @click="playTurn(card.id)"
+              @click="passPhase ? toggleCardSelection(card.id) : playTurn(card.id)"
+              :class="{'selected-card': this.selectedCards.includes(card.id)}"
             />
           </div>
         </div>
@@ -59,144 +67,165 @@
       </div>
     </div>
   </div>
-
-  <button @click="getHand(0)" class="small-button">Your Hand</button>
-  <button @click="getHand(1)" class="small-button">Player 2 Hand</button>
-  <button @click="getHand(2)" class="small-button">Player 3 Hand</button>
-  <button @click="getHand(3)" class="small-button">Player 4 Hand</button>
-
 </template>
   
 <script>
-// import axios from 'axios';
-// import SockJS from 'sockjs-client';
-import { Stomp } from '@stomp/stompjs';
+// import { Stomp } from '@stomp/stompjs';
+import { mapActions } from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
   name: 'HeartsComponent',
+  computed: {
+    ...mapState(['isLobbyCreated', 'otherPlayers', 'username', 'stompClient', 'gameID', 'playerID']),
+  },
   props: {
     msg: String
   },
   data() {
     return {
-      gameStarted: false, // Controls whether the game area is shown
+      gameID: null,
+      gameStarted: false,
       playerCards: {},
+      playerPassCards: [],
+      selectedCards: [],
       stompClient: null,
       connected: false,
-      gameMessages: [], // Stores incoming messages from WebSocket
+      gameMessages: [],
       connecting: false,
-      currentPlayerID: 0
+      passPhase: true
     };
   },
+  mounted() {
+    this.stompClient = this.$store.getters.stompClient;
+    this.gameID = this.$store.getters.gameID;
+    this.playerID = this.$store.getters.playerID;
+    this.gameStarted = true;
+    this.passPhase = true
+
+    this.subscribePlayTurn();
+    this.subscribeGetHand();
+    this.subscribePassCards();
+    this.subscribeNotifyPassingPhaseOver()
+
+    this.publishGetHand();
+  },
   methods: {
-    start() {
-      this.gameStarted = true; // Set to true to display the game area
-      this.connectWebSocket(); // Connect to the WebSocket
-    },
-    // async startHeartsAPI() {
-    //   try {
-    //     const playerID = 0; // Get playerID dynamically if needed
-    //     const response = await axios.get(`http://localhost:8080/startHearts?playerID=${playerID}`);
-    //     console.log('response.data', response.data.cards);
-    //     this.playerCards = response.data.cards;
-    //   } catch (error) {
-    //     console.error("There was an error calling the API:", error);
-    //   }
-    // },
-    connectWebSocket() {
-      if (this.connected || this.connecting) return; // NEW: Avoid multiple connections // NEW
-      this.connecting = true; // NEW: Set connecting flag to true // NEW
+    ...mapActions(['storeGameID']),
 
-      const socketUrl = 'ws://localhost:8080/gs-guide-websocket';
-      
-      // Provide WebSocket factory function to Stomp.over
-      this.stompClient = Stomp.over(() => new WebSocket(socketUrl));
+    subscribeGetHand() {
+      let subscription = '/topic/getHand/' + this.playerID.toString();
+      this.stompClient.subscribe(subscription, message => {
+        let hand = JSON.parse(message.body);
+        console.log(`[topic/getHand/${this.playerID}]: `, hand);
+        this.playerCards = {}
 
-      this.stompClient.connect({}, frame => {
-        console.log('Websocket Connected: ', frame);
-        this.connected = true; // Set connected flag to true once connected
-        this.connecting = false;
-
-        // Subscribe to starting game result
-        this.stompClient.subscribe('/topic/startGame', message => {
-          console.log('Game started: ', message);
-        });
-
-
-        // Subscribe to playing turn result
-        this.stompClient.subscribe('/topic/playTurn', message => {
-          console.log('Message received: ', message);
-          this.handleGameUpdate(message.body);
-        });
-
-        this.stompClient.subscribe('/topic/getHand', message => {
-          let body = JSON.parse(message.body);
-          let hand = JSON.parse(body.content);
-          console.log('hand: ', hand);
-          // this.playerCards = str.match(/[\w]+\.png/g);
-          this.playerCards = {}
-
-          for (const [id, card] of Object.entries(hand)) {
-            console.log(`Assigning imgPath for card ID ${id}:`, card.imgPath);
-            this.playerCards[id] = {
-              id: id,         // Card ID
-              suit: card.suit, // Card suit
-              value: card.value, // Card value
-              imgPath: card.imgPath, // Image path
-            };
-          }
-
-          console.log('Starting cards received: ', this.playerCards);
-        });
-
-        this.startGame(); // NEW: Start the game after successful connection // NEW
-      }, error => {
-        console.error("WebSocket connection error:", error);
-        this.connecting = false; // NEW: Reset connecting flag on error // NEW
+        for (const [id, card] of Object.entries(hand)) {
+          this.playerCards[id] = {
+            id: id,
+            suit: card.suit,
+            value: card.value,
+            imgPath: card.imgPath,
+          };
+        }
+        console.log('Starting cards received: ', this.playerCards);
       });
     },
-    startGame() {
-      if (this.connected) {
-        const playerID = 0;
-        console.log('Starting game..');
+    subscribePassCards() {
+      let subscription = '/topic/passCards/' + this.playerID.toString();
+      this.stompClient.subscribe(subscription, message => {
+        let passedCards = JSON.parse(message.body);
 
-        this.stompClient.publish({
-          destination: "/app/startGame",
-          body: JSON.stringify({'content': playerID})
-        })
-      } else {
-        console.log("WebSocket is not connected, unable to send message: /app/startGame");
+        if (passedCards === false) {
+          console.log("Still waiting on passed cards - subscribing to topic notifyPassCardsReceived");
+          this.subscribeNotifyPassCardsReceived();
+        } else {
+          console.log('Passed Cards received: ', passedCards);
+
+          for (const [id, card] of Object.entries(passedCards)) {
+            this.playerCards[id] = {
+              id: id,
+              suit: card.suit,
+              value: card.value,
+              imgPath: card.imgPath,
+            };
+        }
+        }
+      });
+    },
+    subscribePlayTurn() {
+      this.stompClient.subscribe('/topic/playTurn', message => {
+        console.log('Message received: ', message);
+        this.gameMessages.push(message.body);
+      });
+    },
+    subscribeNotifyPassingPhaseOver() {
+      this.stompClient.subscribe(`/topic/notifyPassingPhaseOver/${this.gameID.toString()}`, message => {
+        let success = JSON.parse(message.body);
+        console.log('Notified of passing phase ended: ', success);
+        this.passPhase = false;
+      });
+    },
+    subscribeNotifyPassCardsReceived() {
+      this.stompClient.subscribe(`topic/notifyPassCardsReceived/${this.playerID.toString()}`, message => {
+        let body = JSON.parse(message.body);
+        let hand = JSON.parse(body.content);
+        console.log(`[topic/notifyPassCardsReceived/${this.playerID}]: `, hand);
+        this.playerCards = {}
+
+        for (const [id, card] of Object.entries(hand)) {
+          console.log(`Assigning imgPath for card ID ${id}:`, card.imgPath);
+          this.playerCards[id] = {
+            id: id,         
+            suit: card.suit,
+            value: card.value,
+            imgPath: card.imgPath,
+          };
+        }
+      });
+    },
+    toggleCardSelection(cardID) {
+      if (this.selectedCards.includes(cardID)) {
+        // If already selected, remove from selectedCards
+        this.selectedCards = this.selectedCards.filter(id => id !== cardID);
+        this.playerPassCards = this.playerPassCards.filter(id => id !== cardID);
+      } else if (this.selectedCards.length < 3) {
+        this.selectedCards.push(cardID);
+        this.playerPassCards.push(cardID);
+      }
+
+      // Trigger passing logic if 3 cards are selected
+      if (this.selectedCards.length === 3) {
+        const [card1, card2, card3] = this.selectedCards;
+        this.publishPassCards(card1, card2, card3);
+
+        delete this.playerCards[card1];
+        delete this.playerCards[card2];
+        delete this.playerCards[card3]; 
+
+        this.selectedCards = [];
+        this.playerPassCards = [];
       }
     },
-    getHand(playerID) {
-      this.currentPlayerID = playerID
+    publishPassCards(card1, card2, card3) {
+      this.stompClient.publish({
+        destination: "/app/passCards",
+        body: JSON.stringify({'playerID': this.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card1, card2, card3])})
+      });
+      this.playerPassCards = []; 
+    },
+    publishGetHand() {
       this.stompClient.publish({
         destination: "/app/getHand",
-        body: JSON.stringify({'content': this.currentPlayerID})
+        body: JSON.stringify({'playerID': this.playerID, 'roomID': this.gameID})
       })
     },
     playTurn(card) {
-      if (this.connected) {
-        // Sending a player's action through the WebSocket
-        this.stompClient.publish({
-          destination: "/app/playTurn",
-          body: JSON.stringify({'playerID': this.currentPlayerID, 'cardID': card})
-        });
-      } else {
-        console.log("WebSocket is not connected, attempting to connect..."); // NEW
-        this.connectWebSocket(); // NEW: Attempt to connect // NEW
-        // Wait until connected before retrying playTurn
-        this.$watch('connected', (newVal) => { // NEW
-          if (newVal) { // NEW
-            this.playTurn(card); // NEW
-          } // NEW
-        }); // NEW
-      }
+      this.stompClient.publish({
+        destination: "/app/playTurn",
+        body: JSON.stringify({'playerID': this.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card])})
+      });
     },
-    handleGameUpdate(message) {
-      // You can add more logic here to handle different types of game updates
-      this.gameMessages.push(message);
-    }
   }
 };
 </script>
@@ -221,6 +250,13 @@ export default {
 
 .startHeartsContent {
   margin-bottom: 50em;
+}
+
+.selected-card {
+  border: 2px solid gold; /* Highlight with a gold border */
+  border-radius: 5px;     /* Optional: Rounded corners */
+  transform: scale(1.1);  /* Slightly enlarge the image */
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.8); /* Add a glow effect */
 }
 
 .gameArea {

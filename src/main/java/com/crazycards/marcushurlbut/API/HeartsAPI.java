@@ -24,28 +24,23 @@ public class HeartsAPI {
     public ResponseEntity<Map<String, Object>> start(@RequestParam("playerID") int playerID) {
         Map<String, Object> result = new HashMap<>();
 
-        Hearts.initialize();
-        Hearts.deck.shuffleDeck();
-        Hearts.deck.dealDeck(Hearts.players);
+        // Hearts.initialize();
+        // Hearts.deck.shuffleDeck();
+        // Hearts.deck.dealDeck(Hearts.players);
 
-        HashMap<Integer, Card> hand_by_id = Hearts.players[playerID].getHand();
-        List<Map.Entry<Integer, Card>> sortedCards = new ArrayList<>(hand_by_id.entrySet());
-        sortedCards.sort(Map.Entry.comparingByKey());
+        // HashMap<Integer, Card> hand_by_id = Hearts.players[playerID].getHand();
+        // List<Map.Entry<Integer, Card>> sortedCards = new ArrayList<>(hand_by_id.entrySet());
+        // sortedCards.sort(Map.Entry.comparingByKey());
 
-        Map<Integer, Card> cardMap = new HashMap<>();
-        for (Map.Entry<Integer, Card> entry : sortedCards) {
-            Card card = entry.getValue();
-            int id = Hearts.players[playerID].getCardID(card);
-            cardMap.put(id, card);
-        }
+        // Map<Integer, Card> cardMap = new HashMap<>();
+        // for (Map.Entry<Integer, Card> entry : sortedCards) {
+        //     Card card = entry.getValue();
+        //     int id = Hearts.players[playerID].getCardID(card);
+        //     cardMap.put(id, card);
+        // }
 
-        result.put("cards", cardMap);
-        System.out.println("[API CALL] cards: " + result);
+        // result.put("cards", cardMap);
+        // System.out.println("[API CALL] cards: " + result);
         return ResponseEntity.ok(result);
     }
-
-    // public ResponseEntity<Map<String, Object>> playCard(@RequestParam("playerID") int playerID, @RequestParam("cardID") String cardID)  {
-        
-    //     return ResponseEntity.ok(Object());
-    // }
 }

@@ -6,10 +6,12 @@
       <nav class="dashboard-items">
         <ul>
           <li>
-            <button @click="callApi">View Profile</button>
+            <router-link to="/joinHearts">
+              <button>Join Hearts</button>
+            </router-link>
           </li>
           <li>
-            <router-link to="/hearts">
+            <router-link to="/heartsLobby">
               <button @click="callApi">Start Hearts</button>
             </router-link>
           </li>
