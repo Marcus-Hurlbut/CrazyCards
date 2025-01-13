@@ -52,7 +52,7 @@
             <img 
               :src="require(`@/assets/card-images/PNG-cards/${card.imgPath}`)" 
               :alt="'Card ' + (index + 1)"
-              @click="passPhase ? toggleCardSelection(card.id) : playTurn(card.id)"
+              @click="passPhase ? toggleCardSelection(card.id) : publishPlayTurn(card.id)"
               :class="{'selected-card': this.selectedCards.includes(card.id)}"
             />
           </div>
@@ -90,10 +90,8 @@ export default {
       playerPassCards: [],
       selectedCards: [],
       stompClient: null,
-      connected: false,
-      gameMessages: [],
-      connecting: false,
-      passPhase: true
+      passPhase: true,
+      cardInPlay: null
     };
   },
   mounted() {
@@ -106,7 +104,7 @@ export default {
     this.subscribePlayTurn();
     this.subscribeGetHand();
     this.subscribePassCards();
-    this.subscribeNotifyPassingPhaseOver()
+    this.subscribeNotifyPassingPhase()
 
     this.publishGetHand();
   },
@@ -155,15 +153,16 @@ export default {
     },
     subscribePlayTurn() {
       this.stompClient.subscribe('/topic/playTurn', message => {
-        console.log('Message received: ', message);
+        let validTurn = JSON.parse(message.body);
+        console.log('Card Played is valid: ', validTurn);
         this.gameMessages.push(message.body);
       });
     },
-    subscribeNotifyPassingPhaseOver() {
-      this.stompClient.subscribe(`/topic/notifyPassingPhaseOver/${this.gameID.toString()}`, message => {
-        let success = JSON.parse(message.body);
-        console.log('Notified of passing phase ended: ', success);
-        this.passPhase = false;
+    subscribeNotifyPassingPhase() {
+      this.stompClient.subscribe(`/topic/notifyPassingPhase/${this.gameID.toString()}`, message => {
+        let inPassPhase = JSON.parse(message.body);
+        console.log('Notified of passing phase - In pass phase: ', inPassPhase);
+        this.passPhase = Boolean(inPassPhase);
       });
     },
     subscribeNotifyPassCardsReceived() {
@@ -220,7 +219,8 @@ export default {
         body: JSON.stringify({'playerID': this.playerID, 'roomID': this.gameID})
       })
     },
-    playTurn(card) {
+    publishPlayTurn(card) {
+      this.cardInPlay = card
       this.stompClient.publish({
         destination: "/app/playTurn",
         body: JSON.stringify({'playerID': this.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card])})
