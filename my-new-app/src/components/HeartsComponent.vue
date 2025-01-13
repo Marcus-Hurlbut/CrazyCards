@@ -6,14 +6,20 @@
 
     <div v-if="gameStarted" class="gameArea">
 
-      <div v-if="passPhase" class="passingPhasePrompt">
-        <h3>Passing Phase</h3>
+      <div v-if="passPhase && !playerPassedCards" class="passingPhasePrompt">
+        <h3>Passing Phase!</h3>
         <p>Select 3 Cards to Pass</p>
+      </div>
+
+      <div v-if="playersTurn" class="yourTurnPrompt">
+        <h3>Your Turn!</h3>
+        <p>Select a card from the first suite played if you have one</p>
+        <p>Otherwise play any card as a wildcard</p>
       </div>
 
       <!-- Player 2 (top) -->
       <div class="player player-top">
-        <h3>Player 2</h3>
+        <h3>{{ otherPlayerNames[0] }}</h3>
         <div class="card face-down">
           <img src="./card-images/PNG-cards/back_dark.png" alt="back_dark" />
         </div>
@@ -21,7 +27,7 @@
 
       <!-- Player 3 (right) -->
       <div class="player player-right">
-        <h3>Player 3</h3>
+        <h3>{{ otherPlayerNames[1] }}</h3>
         <div class="card face-down">
           <img src="./card-images/PNG-cards/back_dark.png" alt="back_dark" />
         </div>
@@ -29,7 +35,7 @@
 
       <!-- Player 4 (left) -->
       <div class="player player-left">
-        <h3>Player 4</h3>
+        <h3>{{ otherPlayerNames[2] }}</h3>
         <div class="card face-down">
           <img src="./card-images/PNG-cards/back_dark.png" alt="back_dark" />
         </div>
@@ -54,8 +60,15 @@
         <h3>Card Pile</h3>
         <div class="card face-down">
           <img src="./card-images/PNG-cards/back_light.png" alt="back_dark" />
+          <div v-for="(card, index) in voidCardsInPlay" :key="index" class="card stacked-void-cards" :style="getCardPosition(index)">
+            <img 
+              :src="require(`@/assets/card-images/PNG-cards/${card.imgPath}`)" 
+              :alt="'Card ' + (index + 1)"
+            />
+          </div>
         </div>
       </div>
+
     </div>
   </div>
 </template>
@@ -79,28 +92,48 @@ export default {
       gameStarted: false,
       playerCards: {},
       playerPassCards: [],
-      selectedCards: [],
+      selectedCards: [],  // Cards highlighted for passing
       stompClient: null,
       passPhase: true,
-      cardIDInPlay: null
+      playerPassedCards: false,
+      cardIDInPlay: null, // Tracks card ID player attempts to put in play
+      otherPlayerNames: null,
+
+      numOfSubscribtionNotifyVoidCards: 0,  // Used for sorting void cards in play
+      voidCardsInPlay: {},  // Cards in middle that are in play
+      playersTurn: false  // Toggles when player is in turn
     };
   },
   mounted() {
     this.stompClient = this.$store.getters.stompClient;
     this.gameID = this.$store.getters.gameID;
     this.playerID = this.$store.getters.playerID;
+    this.otherPlayerNames = this.$store.getters.otherPlayers;
     this.gameStarted = true;
     this.passPhase = true
+    this.playerPassedCards = false
 
     this.subscribePlayTurn();
     this.subscribeGetHand();
     this.subscribePassCards();
     this.subscribeNotifyPassingPhase()
+    this.subscribeNotifyVoidCards()
+    this.subscribeNotifyPlayersTurn()
+    this.subscribeNotifyEndOfTrick()
+
     this.publishGetHand();
   },
   methods: {
     ...mapActions(['storeGameID']),
 
+    getCardPosition(index) {
+      const offset = 10; // Adjust this to control the distance between stacked cards
+      const xOffset = index * offset; // Spread cards horizontally based on their index
+      const yOffset = index * offset; // Add slight vertical offset for each card
+      return {
+        transform: `translate(${xOffset}px, ${yOffset}px)`
+      };
+    },
     subscribeGetHand() {
       let subscription = '/topic/getHand/' + this.playerID.toString();
       this.stompClient.subscribe(subscription, message => {
@@ -141,15 +174,51 @@ export default {
         }
       });
     },
+    subscribeNotifyPlayersTurn() {
+      let subscription = '/topic/notifyPlayersTurn/' + this.gameID.toString() + '/' + this.playerID.toString();
+      this.stompClient.subscribe(subscription, message => {
+        let isPlayersTurn = JSON.parse(message.body);
+        console.log("isPlayersTurn: ", isPlayersTurn);
+        // if (isPlayersTurn === true) {
+        this.playersTurn = true;
+        // }
+      });
+    },
     subscribePlayTurn() {
-      this.stompClient.subscribe('/topic/playTurn', message => {
+      let subscription = '/topic/playTurn/' + this.playerID.toString();
+      this.stompClient.subscribe(subscription, message => {
         let validTurn = JSON.parse(message.body);
-        console.log('Card Played is valid: ', validTurn);
+        console.log('Card placed was valid: ', validTurn);
 
         if (validTurn === true) {
           delete this.playerCards[this.cardIDInPlay];
           this.cardIDInPlay = null;
+          this.playersTurn = false;
         }
+      });
+    },
+    subscribeNotifyVoidCards() {
+      let subscription = '/topic/notifyVoidCards/' + this.gameID.toString();
+      this.stompClient.subscribe(subscription, message => {
+        let voidCards = JSON.parse(message.body);
+        console.log("Void cards in play updated: ", voidCards);
+
+        for (const [id, card] of Object.entries(voidCards)) {
+          // Check if the card with this id already exists
+          if (!Object.prototype.hasOwnProperty.call(this.voidCardsInPlay, id)) {
+            console.log(`Assigning imgPath for card ID ${id}:`, card.imgPath);
+            this.voidCardsInPlay[id] = {
+              id: id,         
+              suit: card.suit,
+              value: card.value,
+              imgPath: card.imgPath,
+              order: this.numOfSubscribtionNotifyVoidCards
+            };
+          }
+        }
+        this.voidCardsInPlay = Object.values(this.voidCardsInPlay)
+          .sort((a, b) => a.order - b.order);
+        this.numOfSubscribtionNotifyVoidCards += 1;
       });
     },
     subscribeNotifyPassingPhase() {
@@ -158,6 +227,7 @@ export default {
         let inPassPhase = JSON.parse(message.body);
         console.log('Notified of passing phase - In pass phase: ', inPassPhase);
         this.passPhase = Boolean(inPassPhase);
+        this.playerPassedCards = false;
       });
     },
     subscribeNotifyPassCardsReceived() {
@@ -178,18 +248,12 @@ export default {
         }
       });
     },
-    subscribeNotifyPlayerInitiative() {
-      let subscription = 'topic/notifyPlayerInitiative/' + this.gameID.toString();
-      this.stompClient.subscribe(subscription, message => {
-        let playerContent = JSON.parse(message.body);
-        console.log(`[topic/notifyPlayerInitiative/${this.playerID.toString()}] - message received: `, playerContent);
-      })
-    },
     subscribeNotifyEndOfTrick() {
-      let subscription = 'topic/notifyEndOfTrick/' + this.gameID.toString();
+      let subscription = '/topic/notifyEndOfTrick/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
         let isEndOfTrick = JSON.parse(message.body);
         console.log(`[topic/notifyEndOfTrick/${this.playerID.toString()}] - message received: `, isEndOfTrick);
+        this.voidCardsInPlay = {}
       })
     },
     toggleCardSelection(cardID) {
@@ -221,6 +285,7 @@ export default {
         body: JSON.stringify({'playerID': this.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card1, card2, card3])})
       });
       this.playerPassCards = []; 
+      this.playerPassedCards = true;
     },
     publishGetHand() {
       this.stompClient.publish({
@@ -318,6 +383,13 @@ export default {
   color: black;
   font-size: 20px;
   font-weight: bold;
+}
+
+.card.stacked-void-cards {
+  position: absolute;
+  top: 0; /* Default position at the top of the parent */
+  left: 0; /* Default position at the left of the parent */
+  transition: transform 0.3s ease-in-out;
 }
 
 .player-right {
@@ -419,6 +491,27 @@ button {
 
 button:hover {
   background-color: #ff80ab; /* Button hover effect */
+}
+
+.yourTurnPrompt {
+  position: absolute;
+  bottom: 20%;
+  background: linear-gradient(to bottom right, red, purple);
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  width: 80%;
+  max-width: 500px;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.yourTurnPrompt h3 {
+  margin: 0;
 }
 
 .passingPhasePrompt {

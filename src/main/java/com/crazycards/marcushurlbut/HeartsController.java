@@ -92,6 +92,8 @@ public class HeartsController {
         UUID gameID = UUID.fromString(message.getRoomID());
         String strCardIDs = message.getCardIDs();
 
+        // Format from JSON to to Int
+        // TODO: Cleanup/simplify handling
         ObjectMapper objectMapper = new ObjectMapper();
         List<String> cardsList = objectMapper.readValue(strCardIDs, List.class);
         List<Integer> cardIDs = cardsList.stream().map(Integer::parseInt).collect(Collectors.toList());
@@ -100,11 +102,23 @@ public class HeartsController {
         System.out.println("[/topic/playTurn] - playerID: " + message.getPlayerID() + " CardID: " + cardID);
         
         Hearts hearts = GameManager.retreiveGame(gameID);
+        int playerIDindex = hearts.playerIDtoInt.get(playerID);
+        Card cardToBePlayed = hearts.players[playerIDindex].hand.get(cardID);
+
         Boolean validTurn = hearts.playTurn(playerID, cardID);
         GameManager.updateGame(gameID, hearts);
 
         String destination = "/topic/playTurn/" + playerID.toString();
         messagingTemplate.convertAndSend(destination, toJSON(validTurn));
+
+        if (validTurn) {
+            notifyVoidCards(gameID, cardToBePlayed);
+            notifyPlayersTurn(gameID, hearts.players[hearts.playerInTurn].ID);
+        }
+
+        if (hearts.endOfTrick) {
+            notifyEndOfTrick(gameID);
+        }
 
         if (hearts.passingPhaseComplete == false) {
             notifyPassingPhase(gameID, true);
@@ -158,12 +172,12 @@ public class HeartsController {
             HashMap<Integer, Card> playerPassedCards = hearts.players[playerIDIndex].passedCards;
             String json = toJSON(playerPassedCards);
 
-            System.out.println("Sending player's received passed cards: " + json);
+            System.out.println("Sending player's received passed cards for playerID: " + playerID.toString());
             messagingTemplate.convertAndSend(destination, json);
         }
         // send false to notify them to listen on the notifyPassCardsReceived event
         else {
-            System.out.println("Still waiting to receive passed cards");
+            System.out.println("Returning False for " + playerID.toString() + " - must receive cards on notifyPassCardsReceived event");
             messagingTemplate.convertAndSend(destination, toJSON(false));
         }
 
@@ -176,10 +190,47 @@ public class HeartsController {
         }
 
         if (passingPhaseOver) {
+            System.out.println("\nPassing phase has ended.\n");
             hearts = GameManager.retreiveGame(gameID);
             hearts.onEndOfPassingPhase();
             GameManager.updateGame(gameID, hearts);
             notifyPassingPhase(gameID, false);
+            notifyPlayersTurn(gameID, hearts.players[hearts.playerInTurn].ID);
+        }
+    }
+
+    public void notifyPlayersTurn(UUID gameID, UUID playerID) {
+        try {
+            String destination = "/topic/notifyPlayersTurn/" + gameID.toString() + "/" + playerID.toString();
+            System.out.println("\nNotifying playerID " + playerID + " it's their turn\n - destination: "  + destination);
+            messagingTemplate.convertAndSend(destination, toJSON(true));
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void notifyVoidCards(UUID gameID,  Card voidCard) {
+        try {
+            System.out.println("Void Card for notifying: " + voidCard);
+            HashMap<Integer, Card> idToCard = new HashMap<Integer, Card>();
+            String destination = "/topic/notifyVoidCards/" + gameID.toString();
+
+            int cardID = voidCard.getCardID(voidCard);
+            idToCard.put(cardID, voidCard);
+
+            messagingTemplate.convertAndSend(destination, toJSON(idToCard));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void notifyEndOfTrick(UUID gameID) {
+        try {
+            System.out.println("Notifying end of trick to players");
+            String destination = "/topic/notifyEndOfTrick/" + gameID.toString();
+            messagingTemplate.convertAndSend(destination, toJSON(true));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -194,6 +245,7 @@ public class HeartsController {
 
     public void notifyPassCardsReceived(UUID playerID, HashMap<Integer, Card> passedCards) {
         try {
+            System.out.println("Notifying Player " + playerID + " of received passed cards in callback");
             String destination = "/topic/notifyPassCardsReceived/" + playerID.toString();
             String json = toJSON(passedCards);
             messagingTemplate.convertAndSend(destination, json);

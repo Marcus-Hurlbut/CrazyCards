@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,22 +24,19 @@ public class Hearts {
     public HashMap<UUID, Integer> playerIDtoInt = new HashMap<UUID, Integer>();
 
     public UUID gameID;
-    boolean active = false;
 
     public int playerInTurn = -1;
     public PassingPhase roundPassingType;
-    public boolean passingPhaseComplete = false;
 
     int cardsPlayedThisTrick = 0;
     public Card startingTrickCard  = new Card(Suit.CLUB, Name.TWO, 2, "2_of_clubs.png");
     public List<Card> voidCardPile = new ArrayList<Card>(4);
-    public boolean newRound = false;
-    public boolean newTrick = false;
 
-    static int PLAYER_1 = 0;
-    static int PLAYER_2 = 1;
-    static int PLAYER_3 = 2;
-    static int PLAYER_4 = 3;
+    boolean active = false;
+    public boolean passingPhaseComplete = false;
+    public boolean endOfRound = false;
+    public boolean endOfTrick = false;
+    boolean gameEnded = false;
 
     Hearts() {}
     Hearts(UUID gameID) {
@@ -47,20 +45,29 @@ public class Hearts {
 
     public void initializePlayers(List<Player> playerList) {
         for (int i = 0; i < 4; i++) {
-            players[i] = playerList.get(i);  // Initialize player with a name
+            players[i] = playerList.get(i);
             playerIDtoInt.put(playerList.get(i).ID, i);
+
+            voidCardPile.add(null);
         }
     }
 
     public void start() {
         deck.shuffleDeck();
         deck.dealDeck(players);
-        setPassingPhase(roundNumber);
+        setPassingPhase();
     }
 
     public void onEndOfPassingPhase() {
         passingPhaseComplete = true;
-        setPlayerInitiative(true);
+        setFirstPlayerInitiative();
+
+        for (Player player : players) {
+            player.passedCards.forEach((id, card) -> {
+                player.hand.put(id, card);
+            });
+            player.passedCards.clear();
+        }        
     }
 
     public int getPlayerInitiative() {
@@ -71,24 +78,25 @@ public class Hearts {
         return -1;
     }
 
-    public void setPlayerInitiative(boolean isNewRound) {
-        int intPlayerID = 0;
-
-        if (isNewRound) {
-            for (Player player : players) {
-                if (player.hand.containsKey(CardID.CLUB_TWO.ordinal())) {
-                    playerInTurn = intPlayerID;
-                    break;
-                }
-                intPlayerID++;
+    public void setFirstPlayerInitiative() {
+        for (int intPlayerID = 0; intPlayerID < players.length; intPlayerID++) {
+            if (players[intPlayerID].hand.containsKey(CardID.CLUB_TWO.getOrdinal())
+                || players[intPlayerID].passedCards.containsKey(CardID.CLUB_TWO.getOrdinal())
+            ) {
+                playerInTurn = intPlayerID;
+                break;
             }
         }
+
+        System.out.println("Setting first player initiative to: " + playerInTurn);
     }
 
-    public void setPassingPhase(int roundNumber) {
+    public void setPassingPhase() {
         PassingPhase[] phases = {PassingPhase.LEFT, PassingPhase.RIGHT, PassingPhase.ACROSS, PassingPhase.KEEP};
         roundPassingType = phases[roundNumber % 4];
         System.out.println("Setting passing type to: " + roundPassingType);
+
+        roundNumber += 1;
     }
 
     public boolean isEndOfTrick() {
@@ -116,11 +124,25 @@ public class Hearts {
         if (isSuitValid(card.suit) || isPlayerVoidSuit(playerID)) {
             return true;
         }
+        System.out.println("Unable to validate card as same suit or as a wildcard play - suit needed: " + startingTrickCard.suit);
+        System.out.println("Players hand in question" + players[playerID].getHand().entrySet() + "\n\n");
+
+        HashMap<Integer, Card> hand = players[playerID].getHand(); // Getting the hand of the player
+        for (Map.Entry<Integer, Card> entry : hand.entrySet()) { // Iterating over each entry in the map
+            Card c = entry.getValue(); // Get the Card object from the entry
+            Suit suit = c.suit; // Get the suit of the card
+            int value = c.value; // Get the value of the card
+            
+            // Print out the Card ID, Suit, and Value
+            System.out.println("Card ID: " + entry.getKey() + " | Suit: " + suit + " | Value: " + value);
+        }
         return false;
     }
 
     public void addCardToVoidPile(int intPlayerID, Card card) {
         voidCardPile.set(intPlayerID, card);
+        int cardID = getCardID(card);
+        players[intPlayerID].hand.remove(cardID);
         cardsPlayedThisTrick++;
     }
 
@@ -177,16 +199,21 @@ public class Hearts {
     }
 
     public int calculateTrickWinner() {
-        int highestValue = Integer.MIN_VALUE;
+        int maxValue = Integer.MIN_VALUE;
+        int intPlayerID = -1;
+
         for (int i = 0; i < voidCardPile.size(); i++) {
             Card cardPlayed = voidCardPile.get(i);
             int cardValue = cardPlayed.name.ordinal();
 
-            if (cardValue > highestValue && cardPlayed.suit == startingTrickCard.suit) {
-                highestValue = i;
+            System.out.println("Player " + i + ": cardPlayed value: " + cardPlayed.value + ", name: " + cardPlayed.name + ", ordinal: " + cardValue);
+
+            if (cardValue > maxValue && cardPlayed.suit == startingTrickCard.suit) {
+                maxValue = cardValue;
+                intPlayerID = i;
             }
         }
-        return highestValue;
+        return intPlayerID;
     }
 
     public boolean isEndOfRound() {
@@ -268,17 +295,18 @@ public class Hearts {
             return false;
         }
         // First turn of new Round
-        if (newRound && playerIDindex == playerInTurn) {
-            newRound = false;
+        if (endOfRound && playerIDindex == playerInTurn) {
+            endOfRound = false;
             startingTrickCard = card;
         }
         // First turn of new trick
-        else if(newTrick && playerIDindex == playerInTurn) {
-            newTrick = false;
+        else if(endOfTrick && playerIDindex == playerInTurn) {
+            endOfTrick = false;
             startingTrickCard = card;
         }
 
-        if (playerIDindex == playerInTurn && validateCardToPlay(playerIDindex, card)) {
+        // Validate card against game logic then allow turn
+        if (validateCardToPlay(playerIDindex, card)) {
             // Add Card to play pile
             addCardToVoidPile(playerIDindex, card);
 
@@ -286,19 +314,31 @@ public class Hearts {
                 playerInTurn = calculateTrickWinner();
                 addTrickToWinner(players[playerInTurn].ID, voidCardPile);
                 voidCardPile = new ArrayList<Card>();
+                for (int i = 0; i < 4; i++) {
+                    voidCardPile.add(null);
+                }
+
                 cardsPlayedThisTrick = 0;
+                endOfTrick = true;
             }
 
             // End of round requires a re-shuffle & new pass phase
             if (isEndOfRound()) {
-                newRound = true;
+                endOfRound = true;
                 calculateScore();
-                setPlayerInitiative(true);
+                setPassingPhase();
                 passingPhaseComplete = false;
             }
 
+            // TODO: figure out what I want to do when game ends aside from announcing winner
             if (isGameOver()) {
+                gameEnded = true;
                 System.out.print("Game ended!");
+            }
+
+            // Trick still in play, play in order around the table
+            if (!endOfTrick && !endOfRound) {
+                playerInTurn = (playerInTurn + 1) % 4;
             }
             return true;
         }

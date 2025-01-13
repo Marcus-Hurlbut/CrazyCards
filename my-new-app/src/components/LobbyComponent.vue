@@ -71,10 +71,11 @@ export default {
         let player = JSON.parse(body);
 
         if (player.username != this.displayName && !this.otherPlayerNames.includes(player.username)) {
-          this.otherPlayerNames.push(player.username)
+          // this.otherPlayerNames.push(player.username)
+          this.storeOtherPlayer(player.username)
         }
+        this.otherPlayerNames = this.$store.getters.otherPlayers;
         console.log('Another Player Joined Lobby: ' + player.username)
-        console.log('Other player list updated: ' + this.otherPlayerNames)
       })
     },
     subscribeNewLobby() {
