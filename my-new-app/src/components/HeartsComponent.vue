@@ -1,23 +1,14 @@
 <template>
   <div class="startHearts">
-    <h1>{{ playerID }}</h1>
-    
-    <!-- This part is shown before the game starts -->
-    <!-- <div v-if="!gameStarted" class="startHeartsContent">
-      <h3>Welcome to Hearts</h3>
-      <p>
-        Press start to begin<br>
-      </p>
-      <button @click="start">Start</button>
-    </div> -->
+    <div class ="playerIDDisplay">
+      <p>{{ playerID }}</p>
+    </div>
 
-    <!-- This part is shown after the user clicks Start -->
     <div v-if="gameStarted" class="gameArea">
-      <div v-if="passPhase" class="passingPhaseTitle">
+
+      <div v-if="passPhase" class="passingPhasePrompt">
         <h3>Passing Phase</h3>
-        <p>
-          Select 3 Cards to Pass
-        </p>
+        <p>Select 3 Cards to Pass</p>
       </div>
 
       <!-- Player 2 (top) -->
@@ -46,7 +37,7 @@
 
       <!-- Your Cards (bottom center) -->
       <div class="player player-center">
-        <h3>Your Cards</h3>
+        <!-- <h3>Your Cards</h3> -->
         <div class="your-cards">
           <div v-for="(card, index) in playerCards" :key="index" class="card">
             <img 
@@ -60,7 +51,7 @@
       </div>
 
       <div class="void-cards">
-        <h3>Cards in play</h3>
+        <h3>Card Pile</h3>
         <div class="card face-down">
           <img src="./card-images/PNG-cards/back_light.png" alt="back_dark" />
         </div>
@@ -91,7 +82,7 @@ export default {
       selectedCards: [],
       stompClient: null,
       passPhase: true,
-      cardInPlay: null
+      cardIDInPlay: null
     };
   },
   mounted() {
@@ -105,7 +96,6 @@ export default {
     this.subscribeGetHand();
     this.subscribePassCards();
     this.subscribeNotifyPassingPhase()
-
     this.publishGetHand();
   },
   methods: {
@@ -155,24 +145,29 @@ export default {
       this.stompClient.subscribe('/topic/playTurn', message => {
         let validTurn = JSON.parse(message.body);
         console.log('Card Played is valid: ', validTurn);
-        this.gameMessages.push(message.body);
+
+        if (validTurn === true) {
+          delete this.playerCards[this.cardIDInPlay];
+          this.cardIDInPlay = null;
+        }
       });
     },
     subscribeNotifyPassingPhase() {
-      this.stompClient.subscribe(`/topic/notifyPassingPhase/${this.gameID.toString()}`, message => {
+      let subscription = '/topic/notifyPassingPhase/' + this.gameID.toString();
+      this.stompClient.subscribe(subscription, message => {
         let inPassPhase = JSON.parse(message.body);
         console.log('Notified of passing phase - In pass phase: ', inPassPhase);
         this.passPhase = Boolean(inPassPhase);
       });
     },
     subscribeNotifyPassCardsReceived() {
-      this.stompClient.subscribe(`topic/notifyPassCardsReceived/${this.playerID.toString()}`, message => {
-        let body = JSON.parse(message.body);
-        let hand = JSON.parse(body.content);
-        console.log(`[topic/notifyPassCardsReceived/${this.playerID}]: `, hand);
-        this.playerCards = {}
+      let subscription = '/topic/notifyPassCardsReceived/' + this.playerID.toString();
+      this.stompClient.subscribe(subscription, message => {
+        let passedCards = JSON.parse(message.body);
+ 
+        console.log(`[topic/notifyPassCardsReceived/${this.playerID.toString()}]: `, passedCards);
 
-        for (const [id, card] of Object.entries(hand)) {
+        for (const [id, card] of Object.entries(passedCards)) {
           console.log(`Assigning imgPath for card ID ${id}:`, card.imgPath);
           this.playerCards[id] = {
             id: id,         
@@ -182,6 +177,20 @@ export default {
           };
         }
       });
+    },
+    subscribeNotifyPlayerInitiative() {
+      let subscription = 'topic/notifyPlayerInitiative/' + this.gameID.toString();
+      this.stompClient.subscribe(subscription, message => {
+        let playerContent = JSON.parse(message.body);
+        console.log(`[topic/notifyPlayerInitiative/${this.playerID.toString()}] - message received: `, playerContent);
+      })
+    },
+    subscribeNotifyEndOfTrick() {
+      let subscription = 'topic/notifyEndOfTrick/' + this.gameID.toString();
+      this.stompClient.subscribe(subscription, message => {
+        let isEndOfTrick = JSON.parse(message.body);
+        console.log(`[topic/notifyEndOfTrick/${this.playerID.toString()}] - message received: `, isEndOfTrick);
+      })
     },
     toggleCardSelection(cardID) {
       if (this.selectedCards.includes(cardID)) {
@@ -220,7 +229,7 @@ export default {
       })
     },
     publishPlayTurn(card) {
-      this.cardInPlay = card
+      this.cardIDInPlay = card
       this.stompClient.publish({
         destination: "/app/playTurn",
         body: JSON.stringify({'playerID': this.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card])})
@@ -233,7 +242,7 @@ export default {
 <style scoped>
 .startHearts {
   background: linear-gradient(to bottom right, #a2c2e3, #76b0e8);  /* Gradient background */
-  background-image: url(./poker-table-green-fabric.jpg);
+  background-image: url(./squares-background.jpg);
   background-size: cover; /* Makes the image cover the entire area */
   background-repeat: no-repeat;
   height: 100vh; /* Full viewport height */
@@ -246,7 +255,6 @@ export default {
   justify-content: center; /* Vertically center content */
   align-items: center; /* Horizontally center content */
 }
-
 
 .startHeartsContent {
   margin-bottom: 50em;
@@ -261,8 +269,8 @@ export default {
 
 .gameArea {
   position: relative;
-  width: 80%;
-  height: 80%;
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -275,28 +283,77 @@ export default {
   position: absolute;
 }
 
+.playerIDDisplay {
+  position: absolute;
+  top: 18%;
+  left: 1%;
+  color: wheat;
+  background-color: black;
+}
+
 .player-top {
-  top: 0px;
-  transform: translateX(-50%);
-  transform: translateY(-100%);
+  /* position: absolute; */
+  top: 0%;
+  /* left: 45%; */
+}
+
+.player-top h3 {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.void-cards {
+  position: absolute;
+  top: 25%;
+}
+
+.void-cards h3 {
+  position: absolute;
+  top: 0%;
+  left: 50%;
+  color: black;
+  font-size: 20px;
+  font-weight: bold;
 }
 
 .player-right {
-  right: 10%;
-  bottom: 50%;
-  transform: translateY(-50%);
+  right: 30%;
+  bottom: 70%;
+}
+
+.player-right h3 {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
 }
 
 .player-left {
-  left: 10%;
-  bottom: 50%;
-  transform: translateY(-50%);
+  left: 30%;
+  bottom: 70%;
+}
+
+.player-left h3 {
+  position: absolute; /* Position it relative to its parent (the .player-left div) */
+  top: 30%; /* Adjust the distance from the top */
+  left: 50%;
+  color: white;
+  font-size: 20px; 
+  font-weight: bold; /* Make it bold for better visibility */
 }
 
 .player-center {
+  position: absolute;
   bottom: 0px;
-  left: 35%;
-  transform: translateX(-50%);
+  /* left: 35%; */
+  /* transform: translateX(-50%); */
+  align-content: center;
   text-align: center;
   z-index: 10; /* Ensure your cards are on top */
 }
@@ -312,10 +369,6 @@ export default {
   max-width: 100px;
 }
 
-.void-cards {
-  transform: translateY(-20%);
-}
-
 .card {
   width: 50px;
   height: 70px;
@@ -325,9 +378,11 @@ export default {
   display: inline-block;
 }
 
+/* Other Players top card display & Void Card top card */
 .face-down img {
-  width: 160px; /* Adjust the card image size */
-  height: 190px;
+  width: 120px;
+  height: 142px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .your-cards .card {
@@ -339,12 +394,12 @@ export default {
 }
 
 .your-cards .card img {
-  width: 160px; /* Adjust the card image size */
-  height: 190px; /* Adjust the card image size */
+  width: 120px; /* Your Card width */
+  height: 142px;  /* Your Card height */
   border-radius: 5px; /* Optional: to make the card corners rounded */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Optional: add a slight shadow to make cards stand out */
   transition: transform 0.2s ease; /* Optional: add a hover effect */
-  cursor: pointer; /* NEW: Change cursor to pointer to indicate clickability */
+  cursor: pointer;
 }
 
 .your-cards .card:hover img {
@@ -366,7 +421,24 @@ button:hover {
   background-color: #ff80ab; /* Button hover effect */
 }
 
-a {
-  color: #42b983;
+.passingPhasePrompt {
+  position: absolute;
+  bottom: 20%;
+  background: linear-gradient(to bottom right, red, purple);
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  width: 80%;
+  max-width: 500px;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.passingPhasePrompt h3 {
+  margin: 0;
 }
 </style>
