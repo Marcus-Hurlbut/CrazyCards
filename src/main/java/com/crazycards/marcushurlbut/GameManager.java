@@ -46,7 +46,7 @@ public class GameManager {
 
         Hearts hearts = new Hearts(gameID);
         hearts.initializePlayers(players);
-        hearts.start();
+        hearts.shuffleAndDeal();
         hearts.active = true;
         sessions.put(gameID, hearts);
 

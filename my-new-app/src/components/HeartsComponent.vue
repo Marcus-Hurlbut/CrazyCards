@@ -3,8 +3,16 @@
     <div class ="playerIDDisplay">
       <p>{{ playerID }}</p>
     </div>
-
     <div v-if="gameStarted" class="gameArea">
+      <div v-if="passPhase && !playerPassedCards" class="scoreboard">
+        <h3>Scoreboard</h3>
+        <ul>
+          <li>{{ this.$store.getters.username }} : {{ getUsernameScore(this.$store.getters.username) }}</li>
+          <li>{{ otherPlayerNames[0] }} : {{ getUsernameScore(otherPlayerNames[0]) }}</li>
+          <li>{{ otherPlayerNames[1] }} : {{ getUsernameScore(otherPlayerNames[1]) }}</li>
+          <li>{{ otherPlayerNames[2] }} : {{ getUsernameScore(otherPlayerNames[2]) }}</li>
+        </ul>
+      </div>
 
       <div v-if="passPhase && !playerPassedCards" class="passingPhasePrompt">
         <h3>Passing Phase!</h3>
@@ -98,10 +106,10 @@ export default {
       playerPassedCards: false,
       cardIDInPlay: null, // Tracks card ID player attempts to put in play
       otherPlayerNames: null,
-
       numOfSubscribtionNotifyVoidCards: 0,  // Used for sorting void cards in play
       voidCardsInPlay: {},  // Cards in middle that are in play
-      playersTurn: false  // Toggles when player is in turn
+      playersTurn: false,  // Toggles when player is in turn
+      usernameToScore: {},
     };
   },
   mounted() {
@@ -109,6 +117,7 @@ export default {
     this.gameID = this.$store.getters.gameID;
     this.playerID = this.$store.getters.playerID;
     this.otherPlayerNames = this.$store.getters.otherPlayers;
+    this.displayName - this.$store.getters.username;
     this.gameStarted = true;
     this.passPhase = true
     this.playerPassedCards = false
@@ -120,11 +129,17 @@ export default {
     this.subscribeNotifyVoidCards()
     this.subscribeNotifyPlayersTurn()
     this.subscribeNotifyEndOfTrick()
+    this.subscribeNotifyEndOfRound()
+    this.subscribeUpdateScoreboard()
 
     this.publishGetHand();
   },
   methods: {
     ...mapActions(['storeGameID']),
+
+    getUsernameScore(username) {
+      return this.usernameToScore[username] || 0;
+    },
 
     getCardPosition(index) {
       const offset = 10; // Adjust this to control the distance between stacked cards
@@ -252,8 +267,25 @@ export default {
       let subscription = '/topic/notifyEndOfTrick/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
         let isEndOfTrick = JSON.parse(message.body);
-        console.log(`[topic/notifyEndOfTrick/${this.playerID.toString()}] - message received: `, isEndOfTrick);
+        console.log(`[topic/notifyEndOfTrick/${this.gameID.toString()}] - message received: `, isEndOfTrick);
         this.voidCardsInPlay = {}
+      })
+    },
+    subscribeNotifyEndOfRound() {
+      let subscription = '/topic/notifyEndOfRound/' + this.gameID.toString();
+      this.stompClient.subscribe(subscription, message => {
+        let isEndOfRound = JSON.parse(message.body);
+        console.log(`[topic/notifyEndOfRound/${this.gameID.toString()}] - message received: `, isEndOfRound)
+        
+        this.publishGetHand();
+      })
+    },
+    subscribeUpdateScoreboard() {
+      let subscribtion = '/topic/updateScoreboard/' + this.gameID.toString();
+      this.stompClient.subscribe(subscribtion, message => {
+        let scoreboardMap = JSON.parse(message.body);
+        console.log(`[topic/updateScoreboard/${this.gameID.toString()}] - message received: `, scoreboardMap)
+        this.usernameToScore = scoreboardMap;
       })
     },
     toggleCardSelection(cardID) {
@@ -532,6 +564,34 @@ button:hover {
 }
 
 .passingPhasePrompt h3 {
+  margin: 0;
+}
+
+.scoreboard {
+  position: absolute;
+  top: 10%;
+  left: 0%;
+  background: linear-gradient(to bottom right, red, purple);
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  width: 15%;
+  max-width: 400px;
+  min-width: 200px;
+  box-sizing: border-box;
+  margin: 0;
+}
+.scoreboard li {
+  list-style-type: none;
+  padding-left: 0;
+  text-align: left;
+}
+
+.scoreboard h3 {
   margin: 0;
 }
 </style>

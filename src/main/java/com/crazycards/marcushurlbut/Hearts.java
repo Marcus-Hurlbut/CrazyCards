@@ -52,7 +52,7 @@ public class Hearts {
         }
     }
 
-    public void start() {
+    public void shuffleAndDeal() {
         deck.shuffleDeck();
         deck.dealDeck(players);
         setPassingPhase();
@@ -176,7 +176,7 @@ public class Hearts {
     }
 
     public void calculateScore() {
-        int playerID = 0;
+        int intPlayerID = 0;
 
         for (Player player : players) {
             int points = 0;
@@ -187,10 +187,10 @@ public class Hearts {
                 points = deducePoints(player);
             }
 
-            int currentScore = players[playerID].getScore();
-            players[playerID].setScore(currentScore + points);
+            int currentScore = players[intPlayerID].getScore();
+            players[intPlayerID].setScore(currentScore + points);
 
-            playerID++;
+            intPlayerID++;
         }
     }
 
@@ -286,6 +286,15 @@ public class Hearts {
         });
     }
 
+    public void resetRoundFields() {
+        endOfRound = true;
+        passingPhaseComplete = false;
+        for (Player player : players) {
+            player.didPassCards = true;
+            player.didReceiveCards = true;
+        }
+    }
+
     public Boolean playTurn(UUID playerID, int cardID) {
         int playerIDindex = playerIDtoInt.get(playerID);
         Card card = players[playerIDindex].hand.get(cardID);
@@ -324,10 +333,9 @@ public class Hearts {
 
             // End of round requires a re-shuffle & new pass phase
             if (isEndOfRound()) {
-                endOfRound = true;
-                calculateScore();
-                setPassingPhase();
-                passingPhaseComplete = false;
+                resetRoundFields();
+                calculateScore(); 
+                shuffleAndDeal(); 
             }
 
             // TODO: figure out what I want to do when game ends aside from announcing winner

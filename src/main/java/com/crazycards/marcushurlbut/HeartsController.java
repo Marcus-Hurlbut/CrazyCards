@@ -85,6 +85,16 @@ public class HeartsController {
         }
     }
 
+    @MessageMapping("/updateScoreboard")
+    public void updateScoreboard(UUID gameID, Player[] players) throws Exception {
+        HashMap<String, String> userScores = new HashMap<String, String>();
+        for (Player player: players) {
+            userScores.put(player.username, String.valueOf(player.getScore()));
+        }
+        String destination = "/topic/updateScoreboard/" + gameID.toString();
+        messagingTemplate.convertAndSend(destination, toJSON(userScores));
+    }
+
     @SuppressWarnings("unchecked")
     @MessageMapping("/playTurn")
     public void playTurn(Message message) throws Exception {
@@ -113,14 +123,20 @@ public class HeartsController {
 
         if (validTurn) {
             notifyVoidCards(gameID, cardToBePlayed);
-            notifyPlayersTurn(gameID, hearts.players[hearts.playerInTurn].ID);
+
+            // Need to re-shuffle first & pass
+            if (!hearts.endOfRound) {
+                notifyPlayersTurn(gameID, hearts.players[hearts.playerInTurn].ID);
+            }
         }
 
         if (hearts.endOfTrick) {
             notifyEndOfTrick(gameID);
         }
 
-        if (hearts.passingPhaseComplete == false) {
+        if (hearts.endOfRound && !hearts.passingPhaseComplete) {
+            notifyEndOfRound(gameID);
+            updateScoreboard(gameID, hearts.players);
             notifyPassingPhase(gameID, true);
         }
     }
@@ -224,6 +240,16 @@ public class HeartsController {
         }
     }
 
+    public void notifyEndOfRound(UUID gameID) {
+        try {
+            System.out.println("Notifying end of round to players");
+            String destination = "/topic/notifyEndOfRound/" + gameID.toString();
+            messagingTemplate.convertAndSend(destination, toJSON(true));
+        } catch (Exception e) {
+
+        }
+    }
+   
     public void notifyEndOfTrick(UUID gameID) {
         try {
             System.out.println("Notifying end of trick to players");
