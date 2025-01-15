@@ -2,6 +2,7 @@ package com.crazycards.marcushurlbut.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import com.crazycards.marcushurlbut.Card;
@@ -11,15 +12,15 @@ import com.crazycards.marcushurlbut.Suit;
 import com.crazycards.marcushurlbut.utils.CardID;
 
 public class TestUtils {
-    public static UUID player_1_id = UUID.randomUUID();
-    public static UUID player_2_id = UUID.randomUUID();
-    public static UUID player_3_id = UUID.randomUUID();
-    public static UUID player_4_id = UUID.randomUUID();
+    public UUID player_1_id = UUID.randomUUID();
+    public UUID player_2_id = UUID.randomUUID();
+    public UUID player_3_id = UUID.randomUUID();
+    public UUID player_4_id = UUID.randomUUID();
 
-    public static Player player_1 = new Player(player_1_id, "Professor X");
-    public static Player player_2 = new Player(player_2_id, "Cyclops");
-    public static Player player_3 = new Player(player_3_id, "Mystique");
-    public static Player player_4 = new Player(player_4_id, "Magneto");
+    public Player player_1 = new Player(player_1_id, "Professor X");
+    public Player player_2 = new Player(player_2_id, "Cyclops");
+    public Player player_3 = new Player(player_3_id, "Mystique");
+    public Player player_4 = new Player(player_4_id, "Magneto");
 
     public ArrayList<Player> getPlayerList() {
         ArrayList<Player> players = new ArrayList<Player>();
@@ -93,6 +94,43 @@ public class TestUtils {
         players[3].addCardToHand(new Card(Suit.CLUB, Name.EIGHT, 8, "8_of_clubs.png"));
         players[3].addCardToHand(new Card(Suit.CLUB, Name.KING, 10, "king_of_clubs.png"));
         players[3].addCardToHand(new Card(Suit.CLUB, Name.ACE, 1, "ace_of_clubs.png"));
-
     }
+
+    public List<Integer> getFirstSimulatedTrickCardIDs() {
+        List<Integer> cardIDList = new ArrayList<Integer>();
+        cardIDList.add(CardID.CLUB_TWO.getOrdinal());
+        cardIDList.add(CardID.CLUB_THREE.getOrdinal());
+        cardIDList.add(CardID.CLUB_QUEEN.getOrdinal());
+        cardIDList.add(CardID.CLUB_ACE.getOrdinal());
+
+        return cardIDList;
+    }
+
+    public void populateSimulatedShootingTheMoonHand(Player player) {
+        player.tricks.put(CardID.HEART_SEVEN.getOrdinal(), new Card(Suit.HEART, Name.SEVEN, 7, "7_of_hearts.png"));
+        player.tricks.put(CardID.HEART_KING.getOrdinal(), new Card(Suit.HEART, Name.KING, 10, "king_of_hearts.png"));
+        player.tricks.put(CardID.HEART_ACE.getOrdinal(), new Card(Suit.HEART, Name.ACE, 1, "ace_of_hearts.png"));
+        player.tricks.put(CardID.HEART_TWO.getOrdinal(), new Card(Suit.HEART, Name.TWO, 2, "2_of_hearts.png"));
+        player.tricks.put(CardID.HEART_EIGHT.getOrdinal(), new Card(Suit.HEART, Name.EIGHT, 8, "8_of_hearts.png"));
+        player.tricks.put(CardID.HEART_NINE.getOrdinal(), new Card(Suit.HEART, Name.NINE, 9, "9_of_hearts.png"));
+        player.tricks.put(CardID.HEART_TEN.getOrdinal(), new Card(Suit.HEART, Name.TEN, 10, "10_of_hearts.png"));
+        player.tricks.put(CardID.HEART_FIVE.getOrdinal(), new Card(Suit.HEART, Name.FIVE, 5, "5_of_hearts.png"));
+        player.tricks.put(CardID.HEART_SIX.getOrdinal(), new Card(Suit.HEART, Name.SIX, 6, "6_of_hearts.png"));
+        player.tricks.put(CardID.HEART_QUEEN.getOrdinal(), new Card(Suit.HEART, Name.QUEEN, 10, "queen_of_hearts.png"));
+        player.tricks.put(CardID.HEART_THREE.getOrdinal(), new Card(Suit.HEART, Name.THREE, 3, "3_of_hearts.png"));
+        player.tricks.put(CardID.HEART_FOUR.getOrdinal(), new Card(Suit.HEART, Name.FOUR, 4, "4_of_hearts.png"));
+        player.tricks.put(CardID.HEART_JACK.getOrdinal(), new Card(Suit.HEART, Name.JACK, 10, "jack_of_hearts.png"));
+        player.tricks.put(CardID.SPADE_QUEEN.getOrdinal(), new Card(Suit.SPADE, Name.QUEEN, 10, "queen_of_spades.png"));
+        player.tricks.put(CardID.DIAMOND_EIGHT.getOrdinal(), new Card(Suit.DIAMOND, Name.EIGHT, 8, "8_of_diamonds.png"));
+        player.tricks.put(CardID.DIAMOND_NINE.getOrdinal(), new Card(Suit.DIAMOND, Name.NINE, 9, "9_of_diamonds.png"));
+        player.tricks.put(CardID.SPADE_THREE.getOrdinal(), new Card(Suit.SPADE, Name.THREE, 3, "3_of_spades.png"));
+        player.tricks.put(CardID.SPADE_FIVE.getOrdinal(), new Card(Suit.SPADE, Name.FIVE, 5, "5_of_spades.png"));
+        player.tricks.put(CardID.SPADE_SIX.getOrdinal(), new Card(Suit.SPADE, Name.SIX, 6, "6_of_spades.png"));
+        player.tricks.put(CardID.SPADE_TEN.getOrdinal(), new Card(Suit.SPADE, Name.TEN, 10, "10_of_spades.png"));
+        player.tricks.put(CardID.CLUB_NINE.getOrdinal(), new Card(Suit.CLUB, Name.NINE, 9, "9_of_clubs.png"));
+        player.tricks.put(CardID.CLUB_TEN.getOrdinal(), new Card(Suit.CLUB, Name.TEN, 10, "10_of_clubs.png"));
+        player.tricks.put(CardID.CLUB_JACK.getOrdinal(), new Card(Suit.CLUB, Name.JACK, 10, "jack_of_clubs.png"));
+        player.tricks.put(CardID.CLUB_TWO.getOrdinal(), new Card(Suit.CLUB, Name.TWO, 2, "2_of_clubs.png"));
+    }
+    
 }

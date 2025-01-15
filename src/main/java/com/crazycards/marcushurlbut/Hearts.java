@@ -29,6 +29,7 @@ public class Hearts {
     public boolean passingPhaseComplete = false;
     public boolean endOfRound = false;
     public boolean endOfTrick = false;
+    public boolean firstTrick = true;
     boolean gameEnded = false;
 
     Hearts() {}
@@ -119,22 +120,15 @@ public class Hearts {
     }
 
     public boolean validateCardToPlay(int playerID, Card card) {
-        // If card is not in same suit, check player hand to ensure
-        // they're void in that suit
         if (isSuitValid(card.suit) || isPlayerVoidSuit(playerID)) {
             return true;
         }
-        System.out.println("Unable to validate card as same suit or as a wildcard play - suit needed: " + startingTrickCard.suit);
-        System.out.println("Players hand in question" + players[playerID].getHand().entrySet() + "\n\n");
 
-        HashMap<Integer, Card> hand = players[playerID].getHand(); // Getting the hand of the player
-        for (Map.Entry<Integer, Card> entry : hand.entrySet()) { // Iterating over each entry in the map
-            Card c = entry.getValue(); // Get the Card object from the entry
-            Suit suit = c.suit; // Get the suit of the card
-            int value = c.value; // Get the value of the card
-            
-            // Print out the Card ID, Suit, and Value
-            System.out.println("Card ID: " + entry.getKey() + " | Suit: " + suit + " | Value: " + value);
+        HashMap<Integer, Card> hand = players[playerID].getHand();
+        for (Map.Entry<Integer, Card> entry : hand.entrySet()) {
+            Card c = entry.getValue();
+            Suit suit = c.suit;
+            int value = c.value;
         }
         return false;
     }
@@ -204,13 +198,14 @@ public class Hearts {
 
         for (int i = 0; i < voidCardPile.size(); i++) {
             Card cardPlayed = voidCardPile.get(i);
-            int cardValue = cardPlayed.name.ordinal();
 
-            System.out.println("Player " + i + ": cardPlayed value: " + cardPlayed.value + ", name: " + cardPlayed.name + ", ordinal: " + cardValue);
+            if (cardPlayed != null) {
+                int cardValue = cardPlayed.name.ordinal();
 
-            if (cardValue > maxValue && cardPlayed.suit == startingTrickCard.suit) {
-                maxValue = cardValue;
-                intPlayerID = i;
+                if (cardValue > maxValue && cardPlayed.suit == startingTrickCard.suit) {
+                    maxValue = cardValue;
+                    intPlayerID = i;
+                }
             }
         }
         return intPlayerID;
@@ -229,7 +224,6 @@ public class Hearts {
     public void transferCards(int sourceID, int targetID, List<Integer> cardIDs) {
         HashMap<Integer, Card> passedCards = new HashMap<Integer, Card>();
         for (Integer cardID : cardIDs) {
-            System.out.println("transfering card id: " + cardID);
             Card card = players[sourceID].hand.remove(cardID);
             passedCards.put(cardID, card);
         }
@@ -238,8 +232,8 @@ public class Hearts {
         players[targetID].didReceiveCards = true;
         players[targetID].passedCards = passedCards;
 
-        UUID targetUUID = players[targetID].ID;
-        System.out.println("Player with ID: " + targetUUID + " received Cards passed from other player");
+        // UUID targetUUID = players[targetID].ID;
+        // System.out.println("Player with ID: " + targetUUID + " received Cards passed from other player");
     }
 
     public UUID passCards(UUID playerID, List<Integer> cardIDs) {
@@ -274,7 +268,6 @@ public class Hearts {
             return playerID;
         }
         
-        System.out.println("Transferring cards from player id: " + intPlayerID + " to " + intTargetID);
         transferCards(intPlayerID, intTargetID, cardIDs);
         
         UUID targetID = players[intTargetID].ID;
@@ -290,6 +283,7 @@ public class Hearts {
 
     public void resetRoundFields() {
         endOfRound = true;
+        firstTrick = true;
         passingPhaseComplete = false;
         for (Player player : players) {
             player.didPassCards = true;
@@ -307,12 +301,23 @@ public class Hearts {
         return false;
     }
 
+    public boolean queenOfSpadesFirstRoundValidation(int cardID) {
+        return (firstTrick && cardID == CardID.SPADE_QUEEN.getOrdinal());
+    }
+
     public Boolean playTurn(UUID playerID, int cardID) {
         int playerIDindex = playerIDtoInt.get(playerID);
         Card card = players[playerIDindex].hand.get(cardID);
 
+        if (queenOfSpadesFirstRoundValidation(cardID)) {
+            return false;
+        }
+
         // Validate player's turn
-        if (!passingPhaseComplete || playerIDindex != playerInTurn || (card.suit == Suit.HEART && !isHeartsBroken())) {
+        if (!passingPhaseComplete || playerIDindex != playerInTurn 
+        || (card.suit == Suit.HEART && !isHeartsBroken())
+        ) 
+        {
             return false;
         }
 
@@ -342,6 +347,7 @@ public class Hearts {
 
                 cardsPlayedThisTrick = 0;
                 endOfTrick = true;
+                firstTrick = false;
             }
 
             // End of round requires a re-shuffle & new pass phase

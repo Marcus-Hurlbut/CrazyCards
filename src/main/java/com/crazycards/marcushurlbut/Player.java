@@ -4,12 +4,12 @@ import java.util.*;
 public class Player {
     UUID ID;
     String username;
-    HashMap<Integer, Card> hand = new HashMap<Integer, Card>();
-    HashMap<Integer, Card> tricks = new HashMap<Integer, Card>();
+    public HashMap<Integer, Card> hand = new HashMap<Integer, Card>();
+    public HashMap<Integer, Card> tricks = new HashMap<Integer, Card>();
     public HashMap<Integer, Card> passedCards = new HashMap<Integer, Card>();
     boolean didPassCards = false;
     boolean didReceiveCards = false;
-    private int score;
+    private int score = 0;
 
     public Player(UUID ID) {
         this.ID = ID;
@@ -70,6 +70,20 @@ public class Player {
         }
 
         return cardMap;
+    }
+
+    public HashMap<Integer, Card> getTricks() {
+        List<Map.Entry<Integer, Card>> sortedTricks = new ArrayList<>(tricks.entrySet());
+        sortedTricks.sort(Map.Entry.comparingByKey());
+
+        HashMap<Integer, Card> trickMap = new HashMap<>();
+        for (Map.Entry<Integer, Card> entry : sortedTricks) {
+            Card card = entry.getValue();
+            int id = getCardID(card);
+            trickMap.put(id, card);
+        }
+
+        return trickMap;
     }
 
     public int getScore() {

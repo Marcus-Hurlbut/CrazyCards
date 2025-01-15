@@ -4,27 +4,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-// import org.springframework.boot.test.web.client.TestRestTemplate;
-// import org.springframework.util.Assert;
-import org.springframework.core.annotation.Order;
 
 import com.crazycards.marcushurlbut.Card;
 import com.crazycards.marcushurlbut.Hearts;
 import com.crazycards.marcushurlbut.PassingPhase;
 import com.crazycards.marcushurlbut.Player;
-import com.crazycards.marcushurlbut.Suit;
 import com.crazycards.marcushurlbut.util.TestUtils;
 import com.crazycards.marcushurlbut.utils.CardID;
 
-// @SpringBootTest
 public class HeartsTest {
     private static UUID gameID;
     private static Hearts hearts;
@@ -35,6 +27,11 @@ public class HeartsTest {
         gameID = UUID.randomUUID();
         hearts = new Hearts(gameID);
         testUtils = new TestUtils();
+    }
+
+    @AfterAll
+    private static void deinit() {
+        hearts = null;
     }
 
     private void startGame(Hearts heart, boolean skipPassingPhase, boolean useFakeDeck) {
@@ -52,6 +49,27 @@ public class HeartsTest {
         }
     }
 
+    private void simulatePassPhase(Player[] players,  List<Integer> player_1_passCards,  List<Integer> player_2_passCards,  List<Integer> player_3_passCards,  List<Integer> player_4_passCards) {
+        hearts.passCards(players[0].getPlayerID(), player_1_passCards);
+        hearts.passCards(players[1].getPlayerID(), player_2_passCards);
+        hearts.passCards(players[2].getPlayerID(), player_3_passCards);
+        hearts.passCards(players[3].getPlayerID(), player_4_passCards);
+    }
+
+    private void simulateTrick(Hearts hearts, List<Integer> cardIDList) {
+        Player player1 = hearts.players[hearts.playerInTurn];
+        hearts.playTurn(player1.getPlayerID(), cardIDList.get(0));
+
+        Player player2 = hearts.players[hearts.playerInTurn];
+        hearts.playTurn(player2.getPlayerID(), cardIDList.get(1));
+
+        Player player3 = hearts.players[hearts.playerInTurn];
+        hearts.playTurn(player3.getPlayerID(), cardIDList.get(2));
+
+        Player player4 = hearts.players[hearts.playerInTurn];
+        hearts.playTurn(player4.getPlayerID(), cardIDList.get(3));
+    }
+
     @Test
     public void initializePlayersTest() {
         setup();
@@ -59,10 +77,10 @@ public class HeartsTest {
         ArrayList<Player> players = testUtils.getPlayerList();
         hearts.initializePlayers(players);
         
-        assertEquals(hearts.players[0].getPlayerID(), TestUtils.player_1_id);
-        assertEquals(hearts.players[1].getPlayerID(), TestUtils.player_2_id);
-        assertEquals(hearts.players[2].getPlayerID(), TestUtils.player_3_id);
-        assertEquals(hearts.players[3].getPlayerID(), TestUtils.player_4_id);
+        assertEquals(hearts.players[0].getPlayerID(), testUtils.player_1_id);
+        assertEquals(hearts.players[1].getPlayerID(), testUtils.player_2_id);
+        assertEquals(hearts.players[2].getPlayerID(), testUtils.player_3_id);
+        assertEquals(hearts.players[3].getPlayerID(), testUtils.player_4_id);
 	}
 
     @Test
@@ -103,7 +121,7 @@ public class HeartsTest {
         startGame(hearts, true, true);
         boolean validTurn;
 
-        simulateFirstTrick(hearts); // Last player wins simulated trick
+        simulateTrick(hearts, testUtils.getFirstSimulatedTrickCardIDs()); // Last player wins simulated trick
         validTurn = hearts.playTurn(hearts.players[3].getPlayerID(), CardID.HEART_THREE.getOrdinal());
 
         assertFalse(validTurn);
@@ -116,10 +134,10 @@ public class HeartsTest {
         Player[] players = hearts.players;
     
         // Create mutable lists for pass cards
-        List<Integer> player_1_passCards = new ArrayList<>(players[0].getHand().keySet()).subList(0, 3);  // Get 3 cards
-        List<Integer> player_2_passCards = new ArrayList<>(players[1].getHand().keySet()).subList(0, 3);  // Get 3 cards
-        List<Integer> player_3_passCards = new ArrayList<>(players[2].getHand().keySet()).subList(0, 3);  // Get 3 cards
-        List<Integer> player_4_passCards = new ArrayList<>(players[3].getHand().keySet()).subList(0, 3);  // Get 3 cards
+        List<Integer> player_1_passCards = new ArrayList<>(players[0].getHand().keySet()).subList(0, 3);
+        List<Integer> player_2_passCards = new ArrayList<>(players[1].getHand().keySet()).subList(0, 3);
+        List<Integer> player_3_passCards = new ArrayList<>(players[2].getHand().keySet()).subList(0, 3);
+        List<Integer> player_4_passCards = new ArrayList<>(players[3].getHand().keySet()).subList(0, 3);
 
         Collections.sort(player_1_passCards);
         Collections.sort(player_2_passCards);
@@ -252,40 +270,89 @@ public class HeartsTest {
         assertTrue(player_4_passCards.equals(player_2_receivedCards));
     }
 
-    public void isEndOfTrickTest() {}
+    @Test
+    public void isEndOfTrickTest() {
+        setup();
+        startGame(hearts, true, true);
 
-    public void isEndOfRoundTest() {}
-
-    public void calculateTrickWinnerTest() {}
-
-    public void trickAddedToWinnerTest() {}
-
-    public void calculateScoreTest() {}
-
-    public void shootingTheMoonTest() {}
-    
-    public void queenOfSpadesPlayedFirstRoundTest() {}
-
-    public void simulatePassPhase(Player[] players,  List<Integer> player_1_passCards,  List<Integer> player_2_passCards,  List<Integer> player_3_passCards,  List<Integer> player_4_passCards) {
-        hearts.passCards(players[0].getPlayerID(), player_1_passCards);
-        hearts.passCards(players[1].getPlayerID(), player_2_passCards);
-        hearts.passCards(players[2].getPlayerID(), player_3_passCards);
-        hearts.passCards(players[3].getPlayerID(), player_4_passCards);
+        simulateTrick(hearts, testUtils.getFirstSimulatedTrickCardIDs());
+        assertTrue(hearts.endOfTrick);
     }
 
-    public void simulateFirstTrick(Hearts hearts) {
+    @Test
+    public void calculateTrickWinnerTest() {
+        setup();
+        startGame(hearts, true, true);
+        int player4 = 3;
 
-        Player player1 = hearts.players[hearts.playerInTurn];
-        hearts.playTurn(player1.getPlayerID(), CardID.CLUB_TWO.getOrdinal());
+        assertFalse(hearts.playerInTurn == player4);
+        simulateTrick(hearts, testUtils.getFirstSimulatedTrickCardIDs());
 
-        Player player2 = hearts.players[hearts.playerInTurn];
-        hearts.playTurn(player2.getPlayerID(), CardID.CLUB_THREE.getOrdinal());
+        assertTrue(hearts.playerInTurn == player4);
+    }
 
-        Player player3 = hearts.players[hearts.playerInTurn];
-        hearts.playTurn(player3.getPlayerID(), CardID.CLUB_QUEEN.getOrdinal());
+    @Test
+    public void trickAddedToWinnerTest() {     
+        setup();
+        startGame(hearts, true, true);
 
-        Player player4 = hearts.players[hearts.playerInTurn];
-        hearts.playTurn(player4.getPlayerID(), CardID.CLUB_ACE.getOrdinal());
+        assertTrue(hearts.players[3].getTricks().isEmpty());
+        simulateTrick(hearts, testUtils.getFirstSimulatedTrickCardIDs());
+
+        assertTrue(hearts.playerInTurn == 3);
+        assertFalse(hearts.players[hearts.playerInTurn].getTricks().isEmpty());
+    }
+
+    @Test
+    public void calculateScoreTest() {
+        setup();
+        startGame(hearts, true, true);
+
+        hearts.players[0].tricks = hearts.players[0].getHand();
+        hearts.players[1].tricks = hearts.players[1].getHand();
+        hearts.players[2].tricks = hearts.players[2].getHand();
+        hearts.players[3].tricks = hearts.players[3].getHand();
+
+        hearts.calculateScore();
+
+        assertTrue(hearts.players[0].getScore() == 3);
+        assertTrue(hearts.players[1].getScore() == 17);
+        assertTrue(hearts.players[2].getScore() == 3);
+        assertTrue(hearts.players[3].getScore() == 3);
+    }
+
+    @Test
+    public void shootingTheMoonTest() {
+        setup();
+        startGame(hearts, true, true);
+        
+        testUtils.populateSimulatedShootingTheMoonHand(hearts.players[2]);
+
+        hearts.calculateScore();
+        assertTrue(hearts.players[2].getScore() == -26);
+
+    }
+    
+    @Test
+    public void queenOfSpadesPlayedFirstTrickTest() {
+        setup();
+        startGame(hearts, true, true);
+        hearts.playTurn(hearts.players[0].getPlayerID(), CardID.CLUB_TWO.getOrdinal());
+        
+        hearts.players[1].hand.remove(CardID.CLUB_THREE.getOrdinal());
+
+        boolean validTurn = hearts.playTurn(hearts.players[1].getPlayerID(), CardID.SPADE_QUEEN.getOrdinal());
+        assertFalse(validTurn);
+    }
+
+    @Test
+    public void playingWildcardWhenNotVoidTest() {
+        setup();
+        startGame(hearts, true, true);
+        hearts.playTurn(hearts.players[0].getPlayerID(), CardID.CLUB_TWO.getOrdinal());
+
+        boolean validTurn = hearts.playTurn(hearts.players[1].getPlayerID(), CardID.DIAMOND_SIX.getOrdinal());
+        assertFalse(validTurn);
     }
 
     // TODO: convert this and other trick tests to integration tests using web sockets
