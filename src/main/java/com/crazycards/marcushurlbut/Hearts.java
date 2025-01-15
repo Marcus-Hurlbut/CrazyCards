@@ -10,13 +10,6 @@ import java.util.UUID;
 
 import com.crazycards.marcushurlbut.utils.CardID;
 
-enum PassingPhase {
-    LEFT,
-    RIGHT,
-    ACROSS,
-    KEEP
-}
-
 public class Hearts {
     public Deck deck = new Deck();
     int roundNumber = 0;
@@ -97,6 +90,13 @@ public class Hearts {
         System.out.println("Setting passing type to: " + roundPassingType);
 
         roundNumber += 1;
+
+        if (roundPassingType == PassingPhase.KEEP) {
+            for (Player player : players) {
+                player.didPassCards = true;
+                player.didReceiveCards = true;
+            }
+        }
     }
 
     public boolean isEndOfTrick() {
@@ -229,6 +229,7 @@ public class Hearts {
     public void transferCards(int sourceID, int targetID, List<Integer> cardIDs) {
         HashMap<Integer, Card> passedCards = new HashMap<Integer, Card>();
         for (Integer cardID : cardIDs) {
+            System.out.println("transfering card id: " + cardID);
             Card card = players[sourceID].hand.remove(cardID);
             passedCards.put(cardID, card);
         }
@@ -249,14 +250,14 @@ public class Hearts {
         if (roundPassingType == PassingPhase.LEFT) {
             if (intPlayerID < 3) {
                 intTargetID = intPlayerID + 1;
-            } else { intTargetID = 0;}
+            } else { intTargetID = 0; }
 
         }
         // [0 -> 3, 3 -> 2, 2 -> 1, 1 -> 0]
         else if (roundPassingType == PassingPhase.RIGHT) {
             if (intPlayerID > 0) {
-                intTargetID -= 1;
-            } else { intTargetID =3;}
+                intTargetID = intPlayerID - 1;
+            } else { intTargetID = 3; }
         }
         // [0 -> 2, 2 -> 0, 1 -> 3, 3 -> 1]
         else if (roundPassingType == PassingPhase.ACROSS) {
@@ -273,6 +274,7 @@ public class Hearts {
             return playerID;
         }
         
+        System.out.println("Transferring cards from player id: " + intPlayerID + " to " + intTargetID);
         transferCards(intPlayerID, intTargetID, cardIDs);
         
         UUID targetID = players[intTargetID].ID;
