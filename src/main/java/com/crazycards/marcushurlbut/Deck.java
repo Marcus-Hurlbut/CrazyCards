@@ -11,10 +11,10 @@ public class Deck {
     }
 
     public void shuffleDeck() {
-        initializeSuit(Suit.HEART);
-        initializeSuit(Suit.DIAMOND);
-        initializeSuit(Suit.SPADE);
-        initializeSuit(Suit.CLUB);
+        initializeSuit(com.crazycards.marcushurlbut.Suit.HEART);
+        initializeSuit(com.crazycards.marcushurlbut.Suit.DIAMOND);
+        initializeSuit(com.crazycards.marcushurlbut.Suit.SPADE);
+        initializeSuit(com.crazycards.marcushurlbut.Suit.CLUB);
         Collections.shuffle(deck);
     }
 

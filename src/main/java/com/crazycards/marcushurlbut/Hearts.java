@@ -32,14 +32,14 @@ public class Hearts {
     public Card startingTrickCard  = new Card(Suit.CLUB, Name.TWO, 2, "2_of_clubs.png");
     public List<Card> voidCardPile = new ArrayList<Card>(4);
 
-    boolean active = false;
+    public boolean active = false;
     public boolean passingPhaseComplete = false;
     public boolean endOfRound = false;
     public boolean endOfTrick = false;
     boolean gameEnded = false;
 
     Hearts() {}
-    Hearts(UUID gameID) {
+    public Hearts(UUID gameID) {
         this.gameID = gameID;
     }
 
@@ -295,14 +295,25 @@ public class Hearts {
         }
     }
 
+    public boolean isHeartsBroken() {
+        for (Player player : players) {
+            boolean heartsPlayed = player.tricks.values().stream().anyMatch(card -> card.suit == Suit.HEART);
+            if (heartsPlayed) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Boolean playTurn(UUID playerID, int cardID) {
         int playerIDindex = playerIDtoInt.get(playerID);
         Card card = players[playerIDindex].hand.get(cardID);
 
         // Validate player's turn
-        if (!passingPhaseComplete || playerIDindex != playerInTurn) {
+        if (!passingPhaseComplete || playerIDindex != playerInTurn || (card.suit == Suit.HEART && !isHeartsBroken())) {
             return false;
         }
+
         // First turn of new Round
         if (endOfRound && playerIDindex == playerInTurn) {
             endOfRound = false;

@@ -6,7 +6,7 @@ public class Player {
     String username;
     HashMap<Integer, Card> hand = new HashMap<Integer, Card>();
     HashMap<Integer, Card> tricks = new HashMap<Integer, Card>();
-    HashMap<Integer, Card> passedCards = new HashMap<Integer, Card>();
+    public HashMap<Integer, Card> passedCards = new HashMap<Integer, Card>();
     boolean didPassCards = false;
     boolean didReceiveCards = false;
     private int score;
