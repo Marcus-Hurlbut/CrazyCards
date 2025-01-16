@@ -375,15 +375,21 @@ export default {
       })
     },
     subscribeUpdateScoreboard() {
-      let subscribtion = '/topic/updateScoreboard/' + this.gameID.toString();
-      this.stompClient.subscribe(subscribtion, message => {
+      let subscription = '/topic/updateScoreboard/' + this.gameID.toString();
+      this.stompClient.subscribe(subscription, message => {
         let scoreboardMap = JSON.parse(message.body);
         console.log(`[topic/updateScoreboard/${this.gameID.toString()}] - message received: `, scoreboardMap)
         this.usernameToScore = scoreboardMap;
       })
     },
     subscribeNotifyEndOfGame() {
-      let subscription = '/topic/updateScoreboard/' + this.gameID.toString();
+      let subscription = '/topic/subscribeNotifyEndOfGame/' + this.gameID.toString();
+      this.stompClient.subscribe(subscription, message => {
+        let scoreboardMap = JSON.parse(message.body);
+        console.log(`[topic/updateScoreboard/${this.gameID.toString()}] - message received: `, scoreboardMap)
+        this.usernameToScore = scoreboardMap;
+      })
+
     },
     toggleCardSelection(cardID) {
       if (this.selectedCards.includes(cardID)) {
