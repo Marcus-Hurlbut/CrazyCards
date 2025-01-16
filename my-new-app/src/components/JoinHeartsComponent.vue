@@ -1,16 +1,15 @@
 
 <template>
-      <div class="joinGame">
-      <form class="joinGameForm" @submit.prevent="start(lobbyID, displayName)">
-        <label for="lobbyID">Game Code</label><br>
-        <input type="text" id="lobbyID" v-model="lobbyID" name="lobbyID"><br>
-        <label for="displayName">Display Name:</label><br>
-        <input type="text" id="displayName" v-model="displayName" name="displayName"><br><br>
-        <button type="submit">Join Lobby</button>
-      </form> 
-    </div>
-  </template>
-  
+  <div class="joinGame">
+    <form class="joinGameForm" @submit.prevent="start(lobbyID, displayName)">
+      <label for="lobbyID">Enter the Game Code</label><br>
+      <input type="text" id="lobbyID" v-model="lobbyID" name="lobbyID"><br>
+      <label for="displayName">Enter your Display Name</label><br>
+      <input type="text" id="displayName" v-model="displayName" name="displayName"><br><br>
+      <button type="submit">Join Lobby</button>
+    </form> 
+  </div>
+</template>
   
 <script>
   import { Stomp } from '@stomp/stompjs';
@@ -92,21 +91,74 @@
 </script>
   
 <style scoped>
-  .joinGame {
-    display: flex;
-    justify-content: center; /* Centers horizontally */
-    align-items: center;     /* Centers vertically */
-    height: 100vh;           /* Full viewport height */
-    margin: 0;               /* Removes default body margin */
-  }
-  .joinGameForm {
+.joinGameForm {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); 
     display: inline-block;
-    padding: 20px 80px;
+    padding: 30px 50px;
+    background: linear-gradient(135deg, #6a1b9a, #ff1744);
+    border-radius: 15px;
+    border: 3px solid #ffffff;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
     text-align: center;
-    transform: translateY(-100%);
-    background: linear-gradient(to bottom right, red, purple);
-    border: 5px solid;
-    border-color: black;
+    color: #fff;
+    width: 300px;
+    transition: all 0.3s ease-in-out;
+    z-index: 100;
   }
+  
+  .joinGameForm label {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    display: block;
+    font-weight: bold;
+    color: #ffffff;
+  }
+  
+  .joinGameForm input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 2px solid #fff;
+    font-size: 1em;
+    background: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    text-align: center;
+    transition: background 0.3s ease;
+  }
+  
+  .joinGameForm input::placeholder {
+    color: #ccc;
+  }
+  
+  .joinGameForm input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.5);
+  }
+  
+  .joinGameForm button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    background-color: rgba(120, 101, 233, 0.507);
+    color: #fff;
+    border: none;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+  
+  .joinGameForm button:hover {
+    background-color: rgba(107, 82, 250, 0.507);;
+    transform: scale(1.05);
+  }
+  
+  .joinGameForm button:active {
+    background-color: rgba(120, 101, 233, 0.507);
+  }
+
 </style>
   

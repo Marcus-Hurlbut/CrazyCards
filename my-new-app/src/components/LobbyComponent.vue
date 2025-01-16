@@ -1,13 +1,7 @@
 
 <template>
   <div class="heartsLobby">
-    <form v-if="!isLobbyCreated" class="joinGameForm" @submit.prevent="start(displayName)">
-      <label for="displayName">Enter Your Display Name:</label><br>
-      <input type="text" id="displayName" v-model="displayName" name="displayName"><br><br>
-      <button type="submit">Create Lobby</button>
-    </form>
-
-    <div v-if="isLobbyCreated" class="playerList">
+    <div v-if="isLobbyCreated" class="playerList" >
       <h1>Waiting for other players...</h1>
       <h2>Game Code: {{ lobbyID }}</h2>
       <ul>
@@ -43,6 +37,13 @@ export default {
     if (this.isLobbyCreated == true) {
       this.onJoinedLobby()
     }
+    else {
+      this.displayName = this.$store.getters.username;
+      this.start(this.displayName)
+    }
+  },
+  props: {
+
   },
   methods: {
     ...mapActions(['storeIsLobbyCreated', 'storeStompClient' , 'storePlayerID', 'storeUsername', 'storeOtherPlayer', 'storeGameID', 'storeLobbyID']),
@@ -135,32 +136,70 @@ export default {
 <style scoped>
 .heartsLobby {
   display: flex;
-  justify-content: center; /* Centers horizontally */
-  align-items: center;     /* Centers vertically */
-  height: 100vh;           /* Full viewport height */
-  margin: 0;               /* Removes default body margin */
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  /* background: linear-gradient(to bottom right, #D50032, #9C1B80); */
 }
+
 .playerList {
   display: inline-block;
-  padding: 20px 80px;
+  padding: 30px 40px;
   text-align: center;
-  transform: translateY(-100%);
-  background: linear-gradient(to bottom right, red, purple);
-  border: 5px solid;
-  border-color: black;
+  background: linear-gradient(to bottom right, #C2185B, #9C27B0);
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  max-width: 450px;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease;
 }
-.joinGameForm {
-    display: inline-block;
-    padding: 20px 80px;
-    text-align: center;
-    transform: translateY(-100%);
-    background: linear-gradient(to bottom right, red, purple);
-    border: 5px solid;
-    border-color: black;
+
+.playerList:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
 }
+
+h1, h2 {
+  color: white;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+h1 {
+  font-size: 2.5em;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
 ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
+
+ul li {
+  font-size: 1.2em;
+  color: white;
+  padding: 10px;
+  margin: 8px 0;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+ul li:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(5px);
+}
+
+ul li:first-child {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 </style>
