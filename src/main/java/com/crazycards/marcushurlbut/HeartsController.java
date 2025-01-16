@@ -126,10 +126,22 @@ public class HeartsController {
                 notifyEndOfTrick(gameID, hearts.players[hearts.playerInTurn].getUsername());
             }
     
-            if (hearts.endOfRound && !hearts.passingPhaseComplete) {
+            if (hearts.endOfRound && (!hearts.passingPhaseComplete || hearts.roundPassingType == PassingPhase.KEEP)) {
                 notifyEndOfRound(gameID);
                 updateScoreboard(gameID, hearts.players);
-                notifyPassingPhase(gameID, true);
+                if (hearts.roundPassingType != PassingPhase.KEEP) {
+                    notifyPassingPhase(gameID, true);
+                } else {
+                    hearts = GameManager.retreiveGame(gameID);
+                    hearts.onEndOfPassingPhase();
+                    GameManager.updateGame(gameID, hearts);
+                    notifyPassingPhase(gameID, false);
+                    notifyPlayersTurn(gameID, hearts.players[hearts.playerInTurn].ID);
+                }
+            }
+
+            if (hearts.isGameEnded()) {
+                notifyGameEnded(gameID, hearts.getGameWinner().username);
             }
         }
 
@@ -172,7 +184,10 @@ public class HeartsController {
         // Notify other player of passed cards
         int sentToIDIndex = hearts.playerIDtoInt.get(sentToID);
         HashMap<Integer, Card> sentToPassedCards = hearts.players[sentToIDIndex].passedCards;
-        notifyPassCardsReceived(sentToID, sentToPassedCards);
+
+        if (hearts.players[sentToIDIndex].didPassCards) {
+            notifyPassCardsReceived(sentToID, sentToPassedCards);
+        }
 
         int playerIDIndex = hearts.playerIDtoInt.get(playerID);
         String destination = "/topic/passCards/" + playerID.toString();
@@ -237,13 +252,22 @@ public class HeartsController {
         }
     }
 
+    public void notifyGameEnded(UUID gameID, String winnerName) {
+        try {
+            String destination = "/topic/notifyGameEnded/" + gameID.toString();
+            messagingTemplate.convertAndSend(destination, toJSON(winnerName));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void notifyEndOfRound(UUID gameID) {
         try {
             System.out.println("Notifying end of round to players");
             String destination = "/topic/notifyEndOfRound/" + gameID.toString();
             messagingTemplate.convertAndSend(destination, toJSON(true));
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
    

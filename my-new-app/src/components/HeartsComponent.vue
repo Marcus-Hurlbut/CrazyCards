@@ -30,8 +30,13 @@
         <p>Otherwise play any card as a wildcard</p>
       </div>
 
-      <div v-if="trickWinnerName != null" class="trickWinnerPrompt">
+      <div v-if="trickWinnerName != null" class="winnerPrompt">
         <h3> {{ trickWinnerName }} won that hand!</h3>
+      </div>
+
+      <div v-if="winnerName != null" class="winnerPrompt">
+        <h3>Game Over</h3>
+        <p>{{ winnerName }} won the game!</p>
       </div>
 
       <!-- Player 2 (left) -->
@@ -94,7 +99,7 @@
       </div>
 
       <div class="void-cards">
-        <h3>Card Pile</h3>
+        <h3> {{ this.$store.getters.username  }} </h3>
         <div class="card face-down">
           <img src="./card-images/PNG-cards/back_light.png" alt="back_dark" />
 
@@ -148,7 +153,9 @@ export default {
       usernameToScore: {},
       validTurn: true,
       invalidTurn: false,
-      trickWinnerName: null
+      
+      trickWinnerName: null,
+      winnerName: null,
     };
   },
   mounted() {
@@ -160,8 +167,8 @@ export default {
 
     this.displayName - this.$store.getters.username;
     this.gameStarted = true;
-    this.passPhase = true
-    this.playerPassedCards = false
+    this.passPhase = true;
+    this.playerPassedCards = false;
 
     this.subscribePlayTurn();
     this.subscribeGetHand();
@@ -334,7 +341,10 @@ export default {
         let inPassPhase = JSON.parse(message.body);
         console.log('Notified of passing phase - In pass phase: ', inPassPhase);
         this.passPhase = Boolean(inPassPhase);
-        this.playerPassedCards = false;
+
+        if (this.passPhase === true) {
+          this.playerPassedCards = false;
+        }
       });
     },
     subscribeNotifyPassCardsReceived() {
@@ -385,9 +395,8 @@ export default {
     subscribeNotifyEndOfGame() {
       let subscription = '/topic/subscribeNotifyEndOfGame/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
-        let scoreboardMap = JSON.parse(message.body);
-        console.log(`[topic/updateScoreboard/${this.gameID.toString()}] - message received: `, scoreboardMap)
-        this.usernameToScore = scoreboardMap;
+        this.winnerName = JSON.parse(message.body);
+        console.log(`[topic/subscribeNotifyEndOfGame/${this.gameID.toString()}] - winner name: `, this.winnerName)
       })
 
     },
@@ -670,9 +679,9 @@ button:hover {
   margin: 0;
 }
 
-.trickWinnerPrompt {
+.winnerPrompt {
   position: absolute;
-  bottom: 35%;
+  bottom: 50%;
   background: linear-gradient(to bottom right, red, purple);
   color: white;
   font-size: 24px;
@@ -682,12 +691,12 @@ button:hover {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   text-align: center;
   width: 80%;
-  max-width: 300px;
+  max-width: 250px;
   box-sizing: border-box;
   margin: 0;
 }
 
-.trickWinnerPrompt h3 {
+.winnerPrompt h3 {
   margin: 0;
 }
 

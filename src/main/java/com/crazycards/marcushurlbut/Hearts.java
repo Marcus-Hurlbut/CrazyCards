@@ -30,7 +30,9 @@ public class Hearts {
     public boolean endOfRound = true;
     public boolean endOfTrick = false;
     public boolean firstTrick = true;
-    boolean gameEnded = false;
+
+    private boolean gameEnded = false;
+    public Player gameWinner = null;
 
     Hearts() {}
     public Hearts(UUID gameID) {
@@ -93,6 +95,7 @@ public class Hearts {
         roundNumber += 1;
 
         if (roundPassingType == PassingPhase.KEEP) {
+            passingPhaseComplete = true;
             for (Player player : players) {
                 player.didPassCards = true;
                 player.didReceiveCards = true;
@@ -307,16 +310,37 @@ public class Hearts {
         return (firstTrick && cardID == CardID.SPADE_QUEEN.getOrdinal());
     }
 
+    public boolean isGameEnded() {
+        return gameEnded;
+    }
+
+    public void setGameWinner() {
+        if (gameEnded) {
+            int playerWithLowestScore = 0;
+            for (Player player : players) {
+                int playerScore = player.getScore();
+                playerWithLowestScore = Math.min(playerWithLowestScore, playerScore);
+            }
+
+            gameWinner = players[playerWithLowestScore];
+        }
+    }
+
+    public Player getGameWinner() {
+        return gameWinner;
+    }
+
     public Boolean playTurn(UUID playerID, int cardID) {
         int playerIDindex = playerIDtoInt.get(playerID);
         Card card = players[playerIDindex].hand.get(cardID);
 
         if (!passingPhaseComplete || playerIDindex != playerInTurn) {
+            System.err.println("Error: Player not in turn");
             return false;
         }
 
-        // Queen of spades cannot be played first round
         if (queenOfSpadesFirstRoundValidation(cardID)) {
+            System.err.println("Error: Queen of spades cannot be played first round");
             return false;
         }
 
@@ -366,10 +390,11 @@ public class Hearts {
                 shuffleAndDeal(); 
             }
 
-            // TODO: figure out what I want to do when game ends aside from announcing winner
             if (isGameOver()) {
                 gameEnded = true;
-                System.out.print("Game ended!");
+                System.out.print("\nGame ended!\n");
+                setGameWinner();
+                active = false;
             }
 
             // Trick still in play, play in order around the table
