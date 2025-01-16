@@ -27,7 +27,7 @@ public class Hearts {
 
     public boolean active = false;
     public boolean passingPhaseComplete = false;
-    public boolean endOfRound = false;
+    public boolean endOfRound = true;
     public boolean endOfTrick = false;
     public boolean firstTrick = true;
     boolean gameEnded = false;
@@ -286,14 +286,16 @@ public class Hearts {
         firstTrick = true;
         passingPhaseComplete = false;
         for (Player player : players) {
-            player.didPassCards = true;
-            player.didReceiveCards = true;
+            player.didPassCards = false;
+            player.didReceiveCards = false;
         }
     }
 
     public boolean isHeartsBroken() {
         for (Player player : players) {
-            boolean heartsPlayed = player.tricks.values().stream().anyMatch(card -> card.suit == Suit.HEART);
+            boolean heartsPlayed = player.tricks.values().stream().anyMatch(card -> 
+                (card.suit == Suit.HEART || (card.suit == Suit.SPADE && card.name == Name.QUEEN))
+            );
             if (heartsPlayed) {
                 return true;
             }
@@ -309,23 +311,30 @@ public class Hearts {
         int playerIDindex = playerIDtoInt.get(playerID);
         Card card = players[playerIDindex].hand.get(cardID);
 
+        if (!passingPhaseComplete || playerIDindex != playerInTurn) {
+            return false;
+        }
+
+        // Queen of spades cannot be played first round
         if (queenOfSpadesFirstRoundValidation(cardID)) {
             return false;
         }
 
-        // Validate player's turn
-        if (!passingPhaseComplete || playerIDindex != playerInTurn 
-        || (card.suit == Suit.HEART && !isHeartsBroken())
-        ) 
-        {
+        // Hearts cannot be broken until played mid-trick as wildcard
+        if (endOfTrick && card.suit == Suit.HEART && !isHeartsBroken()) {
             return false;
         }
 
-        // First turn of new Round
+        // First turn of new Round - Must be 2 of clubs
         if (endOfRound && playerIDindex == playerInTurn) {
+            if (cardID != CardID.CLUB_TWO.getOrdinal()) {
+                return false;
+            }
             endOfRound = false;
+            endOfTrick = false;
             startingTrickCard = card;
         }
+
         // First turn of new trick
         else if(endOfTrick && playerIDindex == playerInTurn) {
             endOfTrick = false;
@@ -334,8 +343,8 @@ public class Hearts {
 
         // Validate card against game logic then allow turn
         if (validateCardToPlay(playerIDindex, card)) {
-            // Add Card to play pile
-            addCardToVoidPile(playerIDindex, card);
+            
+            addCardToVoidPile(playerIDindex, card); // Add card to void pile after all validation checks
 
             if (isEndOfTrick()) {
                 playerInTurn = calculateTrickWinner();

@@ -4,7 +4,7 @@
       <p>{{ playerID }}</p>
     </div>
     <div v-if="gameStarted" class="gameArea">
-      <div v-if="passPhase && !playerPassedCards" class="scoreboard">
+      <div class="scoreboard">
         <h3>Scoreboard</h3>
         <ul>
           <li>{{ this.$store.getters.username }} : {{ getUsernameScore(this.$store.getters.username) }}</li>
@@ -14,44 +14,73 @@
         </ul>
       </div>
 
+      <div v-if="invalidTurn && playersTurn && !passPhase" class="invalidTurnPrompt">
+        <h3>Invalid Card</h3>
+        <p>You must play a card with the same suite of the starting card if present</p>
+      </div>
+
       <div v-if="passPhase && !playerPassedCards" class="passingPhasePrompt">
         <h3>Passing Phase!</h3>
         <p>Select 3 Cards to Pass</p>
       </div>
 
-      <div v-if="playersTurn" class="yourTurnPrompt">
+      <div v-if="playersTurn && !invalidTurn" class="yourTurnPrompt">
         <h3>Your Turn!</h3>
         <p>Select a card from the first suite played if you have one</p>
         <p>Otherwise play any card as a wildcard</p>
       </div>
 
-      <!-- Player 2 (top) -->
-      <div class="player player-top">
+      <div v-if="trickWinnerName != null" class="trickWinnerPrompt">
+        <h3> {{ trickWinnerName }} won that hand!</h3>
+      </div>
+
+      <!-- Player 2 (left) -->
+      <div class="player player-left">
         <h3>{{ otherPlayerNames[0] }}</h3>
         <div class="card face-down">
-          <img src="./card-images/PNG-cards/back_dark.png" alt="back_dark" />
+          <img src="./card-images/PNG-cards/back_dark.png" alt="back_dark"/>
+
+          <div v-if="this.voidCardsInPlay[otherPlayerNames[0]] != null" class="card stacked-void-cards" :style="getCardPosition(1, this.voidCardsInPlay[otherPlayerNames[0]])">
+            <img
+              :src="require(`./card-images/PNG-cards/${voidCardsInPlay[otherPlayerNames[0]].imgPath}`)" 
+              :alt="'Card 4'"
+              />
+          </div>
         </div>
       </div>
 
-      <!-- Player 3 (right) -->
-      <div class="player player-right">
+      <!-- Player 3 (top) -->
+      <div class="player player-top">
         <h3>{{ otherPlayerNames[1] }}</h3>
         <div class="card face-down">
           <img src="./card-images/PNG-cards/back_dark.png" alt="back_dark" />
+
+          <div v-if="this.voidCardsInPlay[otherPlayerNames[1]] != null" class="card stacked-void-cards" :style="getCardPosition(1, this.voidCardsInPlay[otherPlayerNames[1]])">
+            <img
+              :src="require(`./card-images/PNG-cards/${voidCardsInPlay[otherPlayerNames[1]].imgPath}`)" 
+              :alt="'Card 2'"
+              />
+          </div>
         </div>
       </div>
 
-      <!-- Player 4 (left) -->
-      <div class="player player-left">
+      <!-- Player 4 (right) -->
+      <div class="player player-right">
         <h3>{{ otherPlayerNames[2] }}</h3>
         <div class="card face-down">
-          <img src="./card-images/PNG-cards/back_dark.png" alt="back_dark" />
+          <img src="./card-images/PNG-cards/back_dark.png" alt="back_dark"/>
+
+          <div v-if="this.voidCardsInPlay[this.otherPlayerNames[2]] != null" class="card stacked-void-cards" :style="getCardPosition(1, this.voidCardsInPlay[otherPlayerNames[2]])">
+            <img
+              :src="require(`./card-images/PNG-cards/${voidCardsInPlay[otherPlayerNames[2]].imgPath}`)" 
+              :alt="'Card 3'"
+              />
+          </div>
         </div>
       </div>
 
-      <!-- Your Cards (bottom center) -->
+      <!-- Your Cards (bottom) -->
       <div class="player player-center">
-        <!-- <h3>Your Cards</h3> -->
         <div class="your-cards">
           <div v-for="(card, index) in playerCards" :key="index" class="card">
             <img 
@@ -68,12 +97,19 @@
         <h3>Card Pile</h3>
         <div class="card face-down">
           <img src="./card-images/PNG-cards/back_light.png" alt="back_dark" />
-          <div v-for="(card, index) in voidCardsInPlay" :key="index" class="card stacked-void-cards" :style="getCardPosition(index)">
+
+          <div v-if="this.voidCardsInPlay[this.$store.getters.username] != null" class="card stacked-void-cards" :style="getCardPosition(1, this.voidCardsInPlay[otherPlayerNames[2]])">
+            <img
+              :src="require(`./card-images/PNG-cards/${voidCardsInPlay[this.$store.getters.username].imgPath}`)" 
+              :alt="'Card 4'"
+              />
+          </div>
+          <!-- <div v-for="(card, index) in voidCardsInPlay" :key="index" class="card stacked-void-cards" :style="getCardPosition(index, card)">
             <img 
               :src="require(`@/assets/card-images/PNG-cards/${card.imgPath}`)" 
               :alt="'Card ' + (index + 1)"
             />
-          </div>
+          </div> -->
         </div>
       </div>
 
@@ -89,7 +125,7 @@ import { mapState } from 'vuex';
 export default {
   name: 'HeartsComponent',
   computed: {
-    ...mapState(['isLobbyCreated', 'otherPlayers', 'username', 'stompClient', 'gameID', 'playerID']),
+    ...mapState(['isLobbyCreated', 'otherPlayers', 'username', 'stompClient', 'gameID', 'playerID', 'playerIndex']),
   },
   props: {
     msg: String
@@ -110,6 +146,9 @@ export default {
       voidCardsInPlay: {},  // Cards in middle that are in play
       playersTurn: false,  // Toggles when player is in turn
       usernameToScore: {},
+      validTurn: true,
+      invalidTurn: false,
+      trickWinnerName: null
     };
   },
   mounted() {
@@ -117,6 +156,8 @@ export default {
     this.gameID = this.$store.getters.gameID;
     this.playerID = this.$store.getters.playerID;
     this.otherPlayerNames = this.$store.getters.otherPlayers;
+    this.setPlayerOrientationRing();
+
     this.displayName - this.$store.getters.username;
     this.gameStarted = true;
     this.passPhase = true
@@ -125,26 +166,73 @@ export default {
     this.subscribePlayTurn();
     this.subscribeGetHand();
     this.subscribePassCards();
-    this.subscribeNotifyPassingPhase()
-    this.subscribeNotifyVoidCards()
-    this.subscribeNotifyPlayersTurn()
-    this.subscribeNotifyEndOfTrick()
-    this.subscribeNotifyEndOfRound()
+    this.subscribeNotifyPassingPhase();
+    this.subscribeNotifyVoidCards();
+    this.subscribeNotifyPlayersTurn();
+    this.subscribeNotifyEndOfTrick();
+    this.subscribeNotifyEndOfRound();
+    this.subscribeNotifyEndOfGame();
+
     this.subscribeUpdateScoreboard()
 
     this.publishGetHand();
   },
   methods: {
-    ...mapActions(['storeGameID']),
+    ...mapActions(['storeGameID', 'storeOtherPlayers']),
+
+    setPlayerOrientationRing() {
+      let otherPlayer_1 = this.otherPlayerNames[0]
+      let otherPlayer_2 = this.otherPlayerNames[1]
+      let otherPlayer_3 = this.otherPlayerNames[2]
+
+      switch (this.$store.getters.playerIndex) {
+        case 1:
+          this.otherPlayerNames[0] = otherPlayer_2;
+          this.otherPlayerNames[1] = otherPlayer_3;
+          this.otherPlayerNames[2] = otherPlayer_1;
+          break;
+        case 2:
+          this.otherPlayerNames[0] = otherPlayer_3;
+          this.otherPlayerNames[1] = otherPlayer_1;
+          this.otherPlayerNames[2] = otherPlayer_2;
+          break;
+        default:
+          break;
+      }
+
+      this.storeOtherPlayers(this.otherPlayerNames);
+    },
+
+    getUsernameCardPlayed(username) {
+      return this.voidCardsInPlay[username].imgPath;
+    },
 
     getUsernameScore(username) {
       return this.usernameToScore[username] || 0;
     },
 
-    getCardPosition(index) {
+    announceTrickWinner(winnerName) {
+      this.trickWinnerName = winnerName;
+      setTimeout(() => {
+        this.trickWinnerName = null;
+      }, 3000);
+    },
+
+    getCardPosition(index, card) {
       const offset = 10; // Adjust this to control the distance between stacked cards
       const xOffset = index * offset; // Spread cards horizontally based on their index
       const yOffset = index * offset; // Add slight vertical offset for each card
+      console.log('get card position for', card);
+
+      // let username = card.playedByUsername;
+      // let userIndex = 0;
+
+      // for (let i = 0; i < this.otherPlayerNames.length; i++) {
+      //   if (this.otherPlayerNames[i] == username) {
+      //     userIndex = i;
+      //   }
+      // }
+
       return {
         transform: `translate(${xOffset}px, ${yOffset}px)`
       };
@@ -194,45 +282,49 @@ export default {
       this.stompClient.subscribe(subscription, message => {
         let isPlayersTurn = JSON.parse(message.body);
         console.log("isPlayersTurn: ", isPlayersTurn);
-        // if (isPlayersTurn === true) {
         this.playersTurn = true;
-        // }
       });
     },
     subscribePlayTurn() {
       let subscription = '/topic/playTurn/' + this.playerID.toString();
       this.stompClient.subscribe(subscription, message => {
-        let validTurn = JSON.parse(message.body);
-        console.log('Card placed was valid: ', validTurn);
+        this.validTurn = JSON.parse(message.body);
+        console.log('Card placed was valid: ', this.validTurn);
 
-        if (validTurn === true) {
+        if (this.validTurn === true) {
           delete this.playerCards[this.cardIDInPlay];
           this.cardIDInPlay = null;
           this.playersTurn = false;
+          this.invalidTurn = false;
+        } else {
+          console.log("Setting invalid turn to true - playerPassedCards: ", this.playerPassedCards);
+          this.invalidTurn = true;
         }
       });
     },
     subscribeNotifyVoidCards() {
       let subscription = '/topic/notifyVoidCards/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
-        let voidCards = JSON.parse(message.body);
-        console.log("Void cards in play updated: ", voidCards);
+        let usernameToVoidCards = JSON.parse(message.body);
+        console.log("Void cards in play updated: ", usernameToVoidCards);
 
-        for (const [id, card] of Object.entries(voidCards)) {
-          // Check if the card with this id already exists
-          if (!Object.prototype.hasOwnProperty.call(this.voidCardsInPlay, id)) {
-            console.log(`Assigning imgPath for card ID ${id}:`, card.imgPath);
-            this.voidCardsInPlay[id] = {
-              id: id,         
-              suit: card.suit,
-              value: card.value,
-              imgPath: card.imgPath,
-              order: this.numOfSubscribtionNotifyVoidCards
-            };
-          }
+        let playedByUsername = Object.keys(usernameToVoidCards)[0];
+        let cardIDtoVoidCard = usernameToVoidCards[playedByUsername];
+
+        for (const [id, voidCard] of Object.entries(cardIDtoVoidCard)) {
+          this.voidCardsInPlay[playedByUsername] = {
+            id: id,  
+            suit: voidCard.suit,
+            value: voidCard.value,
+            imgPath: voidCard.imgPath,
+            order: this.numOfSubscribtionNotifyVoidCards,
+            playedBy: playedByUsername
+          };
         }
-        this.voidCardsInPlay = Object.values(this.voidCardsInPlay)
-          .sort((a, b) => a.order - b.order);
+        
+        console.log(`UPDATED VOID CARDS IN PLAY - this.voidCardsInPlay:`, this.voidCardsInPlay);
+        // this.voidCardsInPlay = Object.values(this.voidCardsInPlay)
+        //   .sort((a, b) => a.order - b.order);
         this.numOfSubscribtionNotifyVoidCards += 1;
       });
     },
@@ -266,9 +358,11 @@ export default {
     subscribeNotifyEndOfTrick() {
       let subscription = '/topic/notifyEndOfTrick/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
-        let isEndOfTrick = JSON.parse(message.body);
-        console.log(`[topic/notifyEndOfTrick/${this.gameID.toString()}] - message received: `, isEndOfTrick);
+        let name = JSON.parse(message.body);
+        console.log(`[topic/notifyEndOfTrick/${this.gameID.toString()}] - trick winner name received: `, name);
+        
         this.voidCardsInPlay = {}
+        this.announceTrickWinner(name)
       })
     },
     subscribeNotifyEndOfRound() {
@@ -287,6 +381,9 @@ export default {
         console.log(`[topic/updateScoreboard/${this.gameID.toString()}] - message received: `, scoreboardMap)
         this.usernameToScore = scoreboardMap;
       })
+    },
+    subscribeNotifyEndOfGame() {
+      let subscription = '/topic/updateScoreboard/' + this.gameID.toString();
     },
     toggleCardSelection(cardID) {
       if (this.selectedCards.includes(cardID)) {
@@ -545,6 +642,49 @@ button:hover {
 .yourTurnPrompt h3 {
   margin: 0;
 }
+
+.invalidTurnPrompt {
+  position: absolute;
+  bottom: 20%;
+  background: linear-gradient(to bottom right, red, purple);
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  width: 80%;
+  max-width: 500px;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.invalidTurnPrompt h3 {
+  margin: 0;
+}
+
+.trickWinnerPrompt {
+  position: absolute;
+  bottom: 35%;
+  background: linear-gradient(to bottom right, red, purple);
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  width: 80%;
+  max-width: 300px;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.trickWinnerPrompt h3 {
+  margin: 0;
+}
+
 
 .passingPhasePrompt {
   position: absolute;

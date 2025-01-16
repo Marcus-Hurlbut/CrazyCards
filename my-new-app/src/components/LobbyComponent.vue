@@ -11,10 +11,10 @@
       <h1>Waiting for other players...</h1>
       <h2>Game Code: {{ lobbyID }}</h2>
       <ul>
-        <li>Player 1: {{ displayName || 'Waiting..'}}</li>
-        <li>Player 2: {{ otherPlayerNames[0] || 'Waiting..'}}</li>
-        <li>Player 3: {{ otherPlayerNames[1] || 'Waiting..'}}</li>
-        <li>Player 4: {{ otherPlayerNames[2] || 'Waiting..'}}</li>
+        <li> {{ displayName || 'Waiting..'}}</li>
+        <li> {{ otherPlayerNames[0] || 'Waiting..'}}</li>
+        <li> {{ otherPlayerNames[1] || 'Waiting..'}}</li>
+        <li> {{ otherPlayerNames[2] || 'Waiting..'}}</li>
       </ul>  
     </div>
   </div>
@@ -28,7 +28,7 @@ import { mapActions } from 'vuex';
 export default {
   name: 'LobbyComponent',
   computed: {
-    ...mapState(['isLobbyCreated', 'otherPlayers', 'username', 'stompClient', 'lobbyID', 'playerID']),
+    ...mapState(['isLobbyCreated', 'otherPlayers', 'username', 'stompClient', 'lobbyID', 'playerID', 'playerIndex']),
   },
   data() {
     return {

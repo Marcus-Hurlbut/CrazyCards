@@ -31,7 +31,7 @@
       }
     },
     methods: {
-      ...mapActions(['storeIsLobbyCreated', 'storeStompClient', 'storePlayerID', 'storeUsername', 'storeOtherPlayer', 'storeLobbyID']),
+      ...mapActions(['storeIsLobbyCreated', 'storeStompClient', 'storePlayerID', 'storeUsername', 'storeOtherPlayer', 'storeLobbyID', 'storePlayerIndex']),
 
       start(lobbyID, displayName) {
         if (this.connected || this.connecting) return; 
@@ -66,12 +66,15 @@
         this.stompClient.subscribe(subscription, message => {
           let otherNames = JSON.parse(message.body);
           console.log('Joined lobby successfully - Other player names: ', otherNames)
+          let index = 0;
 
           otherNames.forEach(playerName => {
             console.log("storing username: ", playerName)
             this.storeOtherPlayer(playerName)
+            index += 1;
           });
 
+          this.storePlayerIndex(index);
           this.storeIsLobbyCreated(true);
           this.$router.push('/heartsLobby');
         });

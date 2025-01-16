@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 import com.crazycards.marcushurlbut.Card;
@@ -27,11 +26,6 @@ public class HeartsTest {
         gameID = UUID.randomUUID();
         hearts = new Hearts(gameID);
         testUtils = new TestUtils();
-    }
-
-    @AfterAll
-    private static void deinit() {
-        hearts = null;
     }
 
     private void startGame(Hearts heart, boolean skipPassingPhase, boolean useFakeDeck) {
@@ -101,6 +95,19 @@ public class HeartsTest {
 
         Card twoOfClubs = testUtils.getCardFromPlayerHand(hearts.players[hearts.playerInTurn], CardID.CLUB_TWO);
         assertTrue(twoOfClubs != null);
+    }
+
+    @Test void playerDoesNotPlayTwoOfClubsTest() {
+        setup();
+        startGame(hearts, true, true);
+
+        Player startingPlayer = hearts.players[hearts.playerInTurn];
+        
+        Card jackOfClubs = testUtils.getCardFromPlayerHand(startingPlayer, CardID.CLUB_JACK);
+        assertTrue(jackOfClubs != null);
+
+        boolean validTurn = hearts.playTurn(startingPlayer.getPlayerID(), CardID.CLUB_JACK.getOrdinal());
+        assertFalse(validTurn);
     }
 
     @Test

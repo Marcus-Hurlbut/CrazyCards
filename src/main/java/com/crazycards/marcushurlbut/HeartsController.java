@@ -115,23 +115,24 @@ public class HeartsController {
         messagingTemplate.convertAndSend(destination, toJSON(validTurn));
 
         if (validTurn) {
-            notifyVoidCards(gameID, cardToBePlayed);
+            notifyVoidCards(gameID, cardToBePlayed, hearts.players[playerIDindex].getUsername());
 
             // Need to re-shuffle first & pass
             if (!hearts.endOfRound) {
                 notifyPlayersTurn(gameID, hearts.players[hearts.playerInTurn].ID);
             }
+
+            if (hearts.endOfTrick) {
+                notifyEndOfTrick(gameID, hearts.players[hearts.playerInTurn].getUsername());
+            }
+    
+            if (hearts.endOfRound && !hearts.passingPhaseComplete) {
+                notifyEndOfRound(gameID);
+                updateScoreboard(gameID, hearts.players);
+                notifyPassingPhase(gameID, true);
+            }
         }
 
-        if (hearts.endOfTrick) {
-            notifyEndOfTrick(gameID);
-        }
-
-        if (hearts.endOfRound && !hearts.passingPhaseComplete) {
-            notifyEndOfRound(gameID);
-            updateScoreboard(gameID, hearts.players);
-            notifyPassingPhase(gameID, true);
-        }
     }
 
     @MessageMapping("/getHand")
@@ -218,16 +219,19 @@ public class HeartsController {
         }
     }
 
-    public void notifyVoidCards(UUID gameID,  Card voidCard) {
+    public void notifyVoidCards(UUID gameID,  Card voidCard, String playedByName) {
         try {
             System.out.println("Void Card for notifying: " + voidCard);
             HashMap<Integer, Card> idToCard = new HashMap<Integer, Card>();
+            HashMap<String, Object> nameToContent = new HashMap<String, Object>();
+
             String destination = "/topic/notifyVoidCards/" + gameID.toString();
 
             int cardID = voidCard.getCardID(voidCard);
             idToCard.put(cardID, voidCard);
+            nameToContent.put(playedByName, idToCard);
 
-            messagingTemplate.convertAndSend(destination, toJSON(idToCard));
+            messagingTemplate.convertAndSend(destination, toJSON(nameToContent));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -243,11 +247,11 @@ public class HeartsController {
         }
     }
    
-    public void notifyEndOfTrick(UUID gameID) {
+    public void notifyEndOfTrick(UUID gameID, String trickWinnerUsername) {
         try {
             System.out.println("Notifying end of trick to players");
             String destination = "/topic/notifyEndOfTrick/" + gameID.toString();
-            messagingTemplate.convertAndSend(destination, toJSON(true));
+            messagingTemplate.convertAndSend(destination, toJSON(trickWinnerUsername));
         } catch (Exception e) {
             e.printStackTrace();
         }

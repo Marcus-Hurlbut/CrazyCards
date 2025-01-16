@@ -7,6 +7,7 @@ const store = createStore({
     otherPlayers: [],
     stompClient: null,
     playerID: "",
+    playerIndex: "",
     username: "",
     gameID: ""
   },
@@ -15,16 +16,19 @@ const store = createStore({
       state.isLobbyCreated = status;
     },
     storePlayerID(state, id) {
-      state.playerID = id
+      state.playerID = id;
     },
     storeUsername(state, name) {
-      state.username = name
+      state.username = name;
+    },
+    storePlayerIndex(state, index) {
+      state.playerIndex = index
     },
     storeGameID(state, id) {
-      state.gameID = id
+      state.gameID = id;
     },
     storeLobbyID(state, id) {
-      state.lobbyID = id
+      state.lobbyID = id;
     },
     storeStompClient(state, stompClient) {
       state.stompClient = stompClient;
@@ -33,6 +37,10 @@ const store = createStore({
       if (!state.otherPlayers.includes(playerName)) {
         state.otherPlayers.push(playerName);
       }
+    },
+    storeOtherPlayers(state, otherPlayers) {
+      state.otherPlayers = null;
+      state.otherPlayers = otherPlayers;
     },
   },
   actions: {
@@ -44,6 +52,9 @@ const store = createStore({
     },
     storeUsername({ commit }, name) {
       commit('storeUsername', name);
+    },
+    storePlayerIndex({ commit }, index) {
+      commit('storePlayerIndex', index);
     },
     storeGameID({ commit }, id) {
       commit('storeGameID', id);
@@ -57,11 +68,15 @@ const store = createStore({
     storeOtherPlayer({ commit }, playerName) {
       commit('storeOtherPlayer', playerName);
     },
+    storeOtherPlayers({ commit }, otherPlayers) {
+      commit('storeOtherPlayers', otherPlayers);
+    },
   },
   getters: {
     stompClient: (state) => state.stompClient,
     username: (state) => state.username,
     playerID: (state) => state.playerID,
+    playerIndex: (state) => state.playerIndex,
     gameID: (state) => state.gameID,
     lobbyID: (state) => state.lobbyID,
     otherPlayers: (state) => state.otherPlayers
