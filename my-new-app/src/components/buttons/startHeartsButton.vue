@@ -9,7 +9,7 @@
     name: 'StartHeartsButton',
     methods: {
       handleClick() {
-        this.$emit('start-hearts');  // Emit a custom event when the button is clicked
+        this.$emit('start-hearts');
       }
     }
   }
@@ -31,16 +31,16 @@
   
   .start-hearts-button:hover {
     background: linear-gradient(to top right, #7f56d9, #8e24aa);
-    transform: translateY(-3px); /* Hover lift */
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
   }
   
   .start-hearts-button:active {
-    transform: translateY(2px); /* Button press effect */
+    transform: translateY(2px); 
   }
   
   .start-hearts-button:focus {
-    outline: none; /* Remove outline on focus */
+    outline: none;
   }
   </style>
   
