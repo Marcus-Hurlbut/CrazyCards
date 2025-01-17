@@ -197,6 +197,7 @@ export default {
       }
 
       this.storeOtherPlayers(this.otherPlayerNames);
+      console.log("!!!!",this.otherPlayerNames );
     },
 
     getUsernameCardPlayed(username) {
@@ -210,8 +211,9 @@ export default {
     announceTrickWinner(winnerName) {
       this.trickWinnerName = winnerName;
       setTimeout(() => {
+        this.voidCardsInPlay = {}
         this.trickWinnerName = null;
-      }, 3000);
+      }, 4000);
     },
 
     getCardPosition(index, card) {
@@ -347,7 +349,7 @@ export default {
         let name = JSON.parse(message.body);
         console.log(`[topic/notifyEndOfTrick/${this.gameID.toString()}] - trick winner name received: `, name);
         
-        this.voidCardsInPlay = {}
+        // this.voidCardsInPlay = {}
         this.announceTrickWinner(name)
       })
     },
@@ -415,10 +417,13 @@ export default {
     },
     publishPlayTurn(card) {
       this.cardIDInPlay = card
-      this.stompClient.publish({
-        destination: "/app/playTurn",
-        body: JSON.stringify({'playerID': this.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card])})
-      });
+
+      if (this.trickWinnerName == null) {
+        this.stompClient.publish({
+          destination: "/app/playTurn",
+          body: JSON.stringify({'playerID': this.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card])})
+        });
+      }
     },
   }
 };
@@ -508,6 +513,7 @@ export default {
   top: 0; /* Default position at the top of the parent */
   left: 0; /* Default position at the left of the parent */
   transition: transform 0.3s ease-in-out;
+  /* z-index: 0; */
 }
 
 .player-right {
@@ -530,22 +536,25 @@ export default {
 }
 
 .player-left h3 {
-  position: absolute; /* Position it relative to its parent (the .player-left div) */
-  top: 30%; /* Adjust the distance from the top */
+  position: absolute;
+  top: 30%;
   left: 50%;
   color: white;
   font-size: 20px; 
-  font-weight: bold; /* Make it bold for better visibility */
+  font-weight: bold; 
 }
+
+.player-left h3, .player-right h3, .player-top h3 {
+  color: white;
+  z-index: 10;
+}
+
 
 .player-center {
   position: absolute;
   bottom: 0px;
-  /* left: 35%; */
-  /* transform: translateX(-50%); */
   align-content: center;
   text-align: center;
-  z-index: 10; /* Ensure your cards are on top */
 }
 
 .small-button {
@@ -566,6 +575,7 @@ export default {
   border-radius: 5px;
   margin: 5px;
   display: inline-block;
+  z-index: 0;
 }
 
 /* Other Players top card display & Void Card top card */

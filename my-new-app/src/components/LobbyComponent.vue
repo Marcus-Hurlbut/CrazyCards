@@ -67,7 +67,8 @@ export default {
       })
     },
     subscribeNotifyPlayerJoined() {
-      this.stompClient.subscribe('/topic/notifyPlayerJoined', message => {
+      // this.stompClient.subscribe('/topic/notifyPlayerJoined/' + this.lobbyID.toString() , message => {
+        this.stompClient.subscribe('/topic/notifyPlayerJoined', message => {
         let body = message.body
         let player = JSON.parse(body);
 
@@ -138,9 +139,8 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 60vh;
   margin: 0;
-  /* background: linear-gradient(to bottom right, #D50032, #9C1B80); */
 }
 
 .playerList {

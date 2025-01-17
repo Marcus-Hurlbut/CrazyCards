@@ -148,7 +148,6 @@ public class HeartsController {
     }
 
     @MessageMapping("/getHand")
-    // @SendTo("/topic/getHand")
     public void getHand(Message message) throws Exception {
         UUID playerID = UUID.fromString(message.getPlayerID());
         UUID gameID = UUID.fromString(message.getRoomID());
@@ -159,14 +158,12 @@ public class HeartsController {
         HashMap<Integer, Card> playerHand = hearts.players[index].getHand();
         String json = toJSON(playerHand);
 
-        // System.out.println("[/topic/getHand] cards: " + json);
         String destination = "/topic/getHand/" + playerID.toString(); 
         messagingTemplate.convertAndSend(destination, json);
     }
 
     @SuppressWarnings("unchecked")
     @MessageMapping("/passCards")
-    // @SendTo("/topic/passCards")
     public void passCards(Message message) throws Exception {
         UUID playerID = UUID.fromString(message.getPlayerID());
         UUID gameID = UUID.fromString(message.getRoomID());
@@ -303,6 +300,8 @@ public class HeartsController {
 
     public void notifyPlayerJoined(Player joinedPlayer, Integer roomID) {
         try {
+            // TODO: Convert to only send to specific lobby
+            // String destination = "/topic/notifyPlayerJoined/" + Integer.toString(roomID);
             String destination = "/topic/notifyPlayerJoined";
             String json = toJSON(joinedPlayer);
     

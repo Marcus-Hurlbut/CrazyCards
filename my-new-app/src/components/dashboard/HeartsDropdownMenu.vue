@@ -14,16 +14,15 @@
         </li>
       </ul>
     </li>
-  </template>
+</template>
   
-  <script>
+<script>
   export default {
     name: "HeartsDropdownMenu"
   };
-  </script>
+</script>
   
-  <style scoped>
-    /* Sci-Fi / Fantasy background */
+<style scoped>
     .submenu-dropdown {
       display: none;
       background: linear-gradient(45deg, #6600cc, #003366);
@@ -35,7 +34,7 @@
       box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
     }
   
-    /* Sci-Fi Fantasy Font */
+    /* Sci-Fi Font */
     .submenu-item {
       font-size: 1.4em;
       font-weight: 500;
@@ -54,7 +53,6 @@
       padding-bottom: 2em;
     }
   
-    /* Show submenu on hover */
     .submenu:hover .submenu-dropdown {
       display: block;
     }
@@ -75,11 +73,11 @@
       box-shadow: 0 0 10px rgba(0, 255, 255, 0.6), 0 0 20px rgba(0, 255, 255, 0.8);
     }
   
-    /* Button hover effects with glowing effect */
     .menu-button:hover {
       background-color: #001c33;
       transform: translateY(-3px); 
       box-shadow: 0 0 20px rgba(0, 255, 255, 1), 0 0 30px rgba(0, 255, 255, 0.9); /* Intense glowing */
     }
+
   </style>
   

@@ -1,5 +1,5 @@
 <template>
-    <span class="game-vault-button">Game Vault</span>
+    <button class="game-vault-btn">Game Vault</button>
 </template>
 
 <script>
@@ -9,45 +9,45 @@
 </script>
 
 <style scoped>
-  .game-vault-button {
-    font-size: 1.8em;
-    font-weight: bold;
-    cursor: pointer;
-    color: #fff;
-    padding: 15px 30px;
-    background: linear-gradient(45deg, #6a1b9a, #ff1744);
-    border-radius: 60px;
-    font-family: 'Cursive', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    box-shadow: 0 0 25px rgba(255, 20, 60, 0.7), 0 0 50px rgba(255, 20, 60, 0.7);
-    transition: all 0.3s ease-in-out, transform 0.2s ease-in-out;
-  }
+.game-vault-btn {
+  background: linear-gradient(to right, #9C27B0, #D50032);
+  color: white;
+  font-size: 1.5em;
+  font-weight: bold;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+  text-shadow: 0px 0px 10px #00ffff, 0px 0px 20px #00ffff;
+}
 
-  .game-vault-button:hover {
-    background: linear-gradient(45deg, #ff1744, #6a1b9a);
-    box-shadow: 0 0 30px rgba(255, 20, 60, 1), 0 0 60px rgba(255, 20, 60, 0.9);
-    transform: translateY(-4px);
-  }
+.game-vault-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  opacity: 0;
+}
 
-  .game-vault-button:active {
-    transform: translateY(0);
-    box-shadow: 0 0 20px rgba(255, 20, 60, 0.6), 0 0 40px rgba(255, 20, 60, 0.8);
-  }
+.game-vault-btn:hover {
+  background: linear-gradient(to right, #D50032, #9C27B0);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+  transform: translateY(-3px);
+}
 
-  @keyframes pulseGlow {
-    0% {
-      box-shadow: 0 0 25px rgba(255, 20, 60, 0.7), 0 0 50px rgba(255, 20, 60, 0.7);
-    }
-    50% {
-      box-shadow: 0 0 40px rgba(255, 20, 60, 1), 0 0 70px rgba(255, 20, 60, 1);
-    }
-    100% {
-      box-shadow: 0 0 25px rgba(255, 20, 60, 0.7), 0 0 50px rgba(255, 20, 60, 0.7);
-    }
-  }
+.game-vault-btn:focus {
+  outline: none;
+}
 
-  .game-vault-button:hover {
-    animation: pulseGlow 1.5s infinite;
-  }
+.game-vault-btn:hover::before {
+  opacity: 1;  /* Show overlay on hover */
+}
 </style>
