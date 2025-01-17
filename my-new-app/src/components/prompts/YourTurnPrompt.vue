@@ -1,0 +1,85 @@
+<template>
+  <div v-if="playersTurn && !invalidTurn" class="yourTurnPrompt">
+    <h3>Your Turn!</h3>
+    <div class="prompt-content">
+      <p>Select a card from the first suite played if you have one</p>
+      <p>Otherwise play any card as a wildcard</p>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "YourTurnPrompt",
+  props: {
+    playersTurn: Boolean,
+    invalidTurn: Boolean,
+  },
+};
+</script>
+
+<style scoped> 
+.yourTurnPrompt {
+  position: absolute;
+  bottom: 20%;
+  background: linear-gradient(to bottom right, red, purple);
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  width: 80%;
+  max-width: 500px;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.yourTurnPrompt h3 {
+  margin: 0;
+}
+
+.yourTurnPrompt {
+  position: fixed;
+  bottom: 20%;
+  background: linear-gradient(to bottom right, #6A4C9C, red);
+  color: white;
+  font-family: 'Roboto', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 80%;
+  max-width: 500px;
+  min-width: 280px;
+  box-sizing: border-box;
+  margin: 0;
+  z-index: 1000;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease;
+}
+
+.yourTurnPrompt .prompt-content {
+  animation: fadeInUp 0.5s ease-in-out;
+}
+
+.yourTurnPrompt h3 {
+  font-size: 26px;
+  margin-bottom: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.yourTurnPrompt p {
+  font-size: 18px;
+  margin-top: 8px;
+  opacity: 0.9;
+}
+
+.yourTurnPrompt:hover {
+  /* transform: translateY(-5px); */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+</style>

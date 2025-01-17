@@ -1,38 +1,16 @@
 <template>
   <div class="startHearts">
     <div class ="playerIDDisplay">
-      <p>{{ playerID }}</p>
+      <!-- Uncomment to show player's UUID -->
+      <!-- <p>{{ playerID }}</p>  -->
     </div>
     <div v-if="gameStarted" class="gameArea">
-      <div class="scoreboard">
-        <h3>Scoreboard</h3>
-        <ul>
-          <li>{{ this.$store.getters.username }} : {{ getUsernameScore(this.$store.getters.username) }}</li>
-          <li>{{ otherPlayerNames[0] }} : {{ getUsernameScore(otherPlayerNames[0]) }}</li>
-          <li>{{ otherPlayerNames[1] }} : {{ getUsernameScore(otherPlayerNames[1]) }}</li>
-          <li>{{ otherPlayerNames[2] }} : {{ getUsernameScore(otherPlayerNames[2]) }}</li>
-        </ul>
-      </div>
 
-      <div v-if="invalidTurn && playersTurn && !passPhase" class="invalidTurnPrompt">
-        <h3>Invalid Card</h3>
-        <p>You must play a card with the same suite of the starting card if present</p>
-      </div>
-
-      <div v-if="passPhase && !playerPassedCards" class="passingPhasePrompt">
-        <h3>Passing Phase!</h3>
-        <p>Select 3 Cards to Pass</p>
-      </div>
-
-      <div v-if="playersTurn && !invalidTurn" class="yourTurnPrompt">
-        <h3>Your Turn!</h3>
-        <p>Select a card from the first suite played if you have one</p>
-        <p>Otherwise play any card as a wildcard</p>
-      </div>
-
-      <div v-if="trickWinnerName != null" class="winnerPrompt">
-        <h3> {{ trickWinnerName }} won that hand!</h3>
-      </div>
+      <Scoreboard :username="this.$store.getters.username" :otherPlayerNames="otherPlayerNames" :usernameToScore="usernameToScore" />
+      <InvalidCardPrompt :invalidTurn="invalidTurn" :playersTurn="playersTurn" :passPhase="passPhase" />
+      <PassingPhasePrompt :passPhase="passPhase" :playerPassedCards="playerPassedCards" />
+      <YourTurnPrompt :playersTurn="playersTurn" :invalidTurn="invalidTurn" />
+      <WinnerPrompt :trickWinnerName="trickWinnerName" :winnerName="winnerName" />
 
       <div v-if="winnerName != null" class="winnerPrompt">
         <h3>Game Over</h3>
@@ -123,12 +101,23 @@
 </template>
   
 <script>
-// import { Stomp } from '@stomp/stompjs';
 import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
+import WinnerPrompt from './prompts/WinnerPrompt.vue';
+import PassingPhasePrompt from './prompts/PassingPhasePrompt.vue';
+import InvalidCardPrompt from './prompts/InvalidCardPrompt.vue';
+import Scoreboard from './hud/Scoreboard.vue';
+import YourTurnPrompt from './prompts/YourTurnPrompt.vue';
 
 export default {
   name: 'HeartsComponent',
+  components:  { 
+    WinnerPrompt,
+    PassingPhasePrompt,
+    InvalidCardPrompt,
+    Scoreboard,
+    YourTurnPrompt
+  },
   computed: {
     ...mapState(['isLobbyCreated', 'otherPlayers', 'username', 'stompClient', 'gameID', 'playerID', 'playerIndex']),
   },
@@ -208,6 +197,7 @@ export default {
       }
 
       this.storeOtherPlayers(this.otherPlayerNames);
+      console.log("!!!!",this.otherPlayerNames );
     },
 
     getUsernameCardPlayed(username) {
@@ -221,24 +211,16 @@ export default {
     announceTrickWinner(winnerName) {
       this.trickWinnerName = winnerName;
       setTimeout(() => {
+        this.voidCardsInPlay = {}
         this.trickWinnerName = null;
-      }, 3000);
+      }, 4000);
     },
 
     getCardPosition(index, card) {
-      const offset = 10; // Adjust this to control the distance between stacked cards
-      const xOffset = index * offset; // Spread cards horizontally based on their index
-      const yOffset = index * offset; // Add slight vertical offset for each card
+      const offset = 10;
+      const xOffset = index * offset;
+      const yOffset = index * offset;
       console.log('get card position for', card);
-
-      // let username = card.playedByUsername;
-      // let userIndex = 0;
-
-      // for (let i = 0; i < this.otherPlayerNames.length; i++) {
-      //   if (this.otherPlayerNames[i] == username) {
-      //     userIndex = i;
-      //   }
-      // }
 
       return {
         transform: `translate(${xOffset}px, ${yOffset}px)`
@@ -328,10 +310,6 @@ export default {
             playedBy: playedByUsername
           };
         }
-        
-        console.log(`UPDATED VOID CARDS IN PLAY - this.voidCardsInPlay:`, this.voidCardsInPlay);
-        // this.voidCardsInPlay = Object.values(this.voidCardsInPlay)
-        //   .sort((a, b) => a.order - b.order);
         this.numOfSubscribtionNotifyVoidCards += 1;
       });
     },
@@ -371,7 +349,7 @@ export default {
         let name = JSON.parse(message.body);
         console.log(`[topic/notifyEndOfTrick/${this.gameID.toString()}] - trick winner name received: `, name);
         
-        this.voidCardsInPlay = {}
+        // this.voidCardsInPlay = {}
         this.announceTrickWinner(name)
       })
     },
@@ -439,10 +417,13 @@ export default {
     },
     publishPlayTurn(card) {
       this.cardIDInPlay = card
-      this.stompClient.publish({
-        destination: "/app/playTurn",
-        body: JSON.stringify({'playerID': this.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card])})
-      });
+
+      if (this.trickWinnerName == null) {
+        this.stompClient.publish({
+          destination: "/app/playTurn",
+          body: JSON.stringify({'playerID': this.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card])})
+        });
+      }
     },
   }
 };
@@ -455,14 +436,14 @@ export default {
   background-size: cover; /* Makes the image cover the entire area */
   background-repeat: no-repeat;
   height: 100vh; /* Full viewport height */
-  color: white; /* Text color */
+  color: white;
   text-align: center;
   padding: 10px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Vertically center content */
-  align-items: center; /* Horizontally center content */
+  justify-content: center; 
+  align-items: center; 
 }
 
 .startHeartsContent {
@@ -470,10 +451,10 @@ export default {
 }
 
 .selected-card {
-  border: 2px solid gold; /* Highlight with a gold border */
-  border-radius: 5px;     /* Optional: Rounded corners */
-  transform: scale(1.1);  /* Slightly enlarge the image */
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.8); /* Add a glow effect */
+  border: 2px solid gold;
+  border-radius: 5px;
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.8); /* glow effect */
 }
 
 .gameArea {
@@ -501,9 +482,7 @@ export default {
 }
 
 .player-top {
-  /* position: absolute; */
   top: 0%;
-  /* left: 45%; */
 }
 
 .player-top h3 {
@@ -534,6 +513,7 @@ export default {
   top: 0; /* Default position at the top of the parent */
   left: 0; /* Default position at the left of the parent */
   transition: transform 0.3s ease-in-out;
+  /* z-index: 0; */
 }
 
 .player-right {
@@ -556,22 +536,25 @@ export default {
 }
 
 .player-left h3 {
-  position: absolute; /* Position it relative to its parent (the .player-left div) */
-  top: 30%; /* Adjust the distance from the top */
+  position: absolute;
+  top: 30%;
   left: 50%;
   color: white;
   font-size: 20px; 
-  font-weight: bold; /* Make it bold for better visibility */
+  font-weight: bold; 
 }
+
+.player-left h3, .player-right h3, .player-top h3 {
+  color: white;
+  z-index: 10;
+}
+
 
 .player-center {
   position: absolute;
   bottom: 0px;
-  /* left: 35%; */
-  /* transform: translateX(-50%); */
   align-content: center;
   text-align: center;
-  z-index: 10; /* Ensure your cards are on top */
 }
 
 .small-button {
@@ -592,6 +575,7 @@ export default {
   border-radius: 5px;
   margin: 5px;
   display: inline-block;
+  z-index: 0;
 }
 
 /* Other Players top card display & Void Card top card */
@@ -599,6 +583,7 @@ export default {
   width: 120px;
   height: 142px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
 }
 
 .your-cards .card {
@@ -637,116 +622,5 @@ button:hover {
   background-color: #ff80ab; /* Button hover effect */
 }
 
-.yourTurnPrompt {
-  position: absolute;
-  bottom: 20%;
-  background: linear-gradient(to bottom right, red, purple);
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  width: 80%;
-  max-width: 500px;
-  box-sizing: border-box;
-  margin: 0;
-}
 
-.yourTurnPrompt h3 {
-  margin: 0;
-}
-
-.invalidTurnPrompt {
-  position: absolute;
-  bottom: 20%;
-  background: linear-gradient(to bottom right, red, purple);
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  width: 80%;
-  max-width: 500px;
-  box-sizing: border-box;
-  margin: 0;
-}
-
-.invalidTurnPrompt h3 {
-  margin: 0;
-}
-
-.winnerPrompt {
-  position: absolute;
-  bottom: 50%;
-  background: linear-gradient(to bottom right, red, purple);
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  width: 80%;
-  max-width: 250px;
-  box-sizing: border-box;
-  margin: 0;
-}
-
-.winnerPrompt h3 {
-  margin: 0;
-}
-
-
-.passingPhasePrompt {
-  position: absolute;
-  bottom: 20%;
-  background: linear-gradient(to bottom right, red, purple);
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  width: 80%;
-  max-width: 500px;
-  box-sizing: border-box;
-  margin: 0;
-}
-
-.passingPhasePrompt h3 {
-  margin: 0;
-}
-
-.scoreboard {
-  position: absolute;
-  top: 10%;
-  left: 0%;
-  background: linear-gradient(to bottom right, red, purple);
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  width: 15%;
-  max-width: 400px;
-  min-width: 200px;
-  box-sizing: border-box;
-  margin: 0;
-}
-.scoreboard li {
-  list-style-type: none;
-  padding-left: 0;
-  text-align: left;
-}
-
-.scoreboard h3 {
-  margin: 0;
-}
 </style>

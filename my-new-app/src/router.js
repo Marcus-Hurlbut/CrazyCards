@@ -3,11 +3,13 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HeartsComponent from './components/HeartsComponent.vue';
 import JoinHeartsComponent from './components/JoinHeartsComponent.vue';
 import LobbyComponent from './components/LobbyComponent.vue';
+import CreateLobbyForm from './components/forms/CreateLobbyForm.vue';
 
 const routes = [
   // { path: '/', component: CrazyCards },
   { path: '/heartsGame', component: HeartsComponent },
   { path: '/joinHearts', component: JoinHeartsComponent },
+  { path: '/createHeartsLobby', component: CreateLobbyForm },
   { path: '/heartsLobby', component: LobbyComponent },
 ];
 
