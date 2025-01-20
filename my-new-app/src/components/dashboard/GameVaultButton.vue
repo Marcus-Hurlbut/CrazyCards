@@ -1,5 +1,5 @@
 <template>
-    <button class="game-vault-btn">Game Vault</button>
+  <button class="game-vault-btn">Game Vault</button>
 </template>
 
 <script>
@@ -10,44 +10,48 @@
 
 <style scoped>
 .game-vault-btn {
-  background: linear-gradient(to right, #9C27B0, #D50032);
+  background: linear-gradient(to right, #9C27B0, #D50032, #3D5AFE);
   color: white;
-  font-size: 1.5em;
-  font-weight: bold;
-  padding: 12px 30px;
+  font-size: 2em;
+  font-weight: 700;
+  padding: 25px 80px;
   border: none;
   border-radius: 50px;
   cursor: pointer;
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: all 0.4s ease;
   position: relative;
-  text-shadow: 0px 0px 10px #00ffff, 0px 0px 20px #00ffff;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0px 0px 15px #00ffff, 0px 0px 25px #00ffff, 0px 0px 30px #ff0080;
 }
 
 .game-vault-btn::before {
-  content: '';
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.2);
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
   border-radius: 50px;
-  transition: all 0.3s ease;
   opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
 }
 
 .game-vault-btn:hover {
-  background: linear-gradient(to right, #D50032, #9C27B0);
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
-  transform: translateY(-3px);
-}
-
-.game-vault-btn:focus {
-  outline: none;
+  background: linear-gradient(to left, #D50032, #9C27B0, #3D5AFE);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+  transform: translateY(-5px);
 }
 
 .game-vault-btn:hover::before {
-  opacity: 1;  /* Show overlay on hover */
+  opacity: 1;
 }
+
+.game-vault-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
 </style>

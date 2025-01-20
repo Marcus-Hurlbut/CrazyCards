@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router';
-// import CrazyCards from './components/CrazyCards.vue';
 import HeartsComponent from './components/HeartsComponent.vue';
 import JoinHeartsComponent from './components/JoinHeartsComponent.vue';
 import LobbyComponent from './components/LobbyComponent.vue';
 import CreateLobbyForm from './components/forms/CreateLobbyForm.vue';
+import MainMenu from './components/MainMenu.vue';
 
 const routes = [
-  // { path: '/', component: CrazyCards },
+  { path: '/', component: MainMenu },
   { path: '/heartsGame', component: HeartsComponent },
   { path: '/joinHearts', component: JoinHeartsComponent },
   { path: '/createHeartsLobby', component: CreateLobbyForm },

@@ -1,11 +1,7 @@
 <template>
-  <CrazyCards msg="Crazy Cards"/>
-    <div id="content">
-      <HeartsComponent msg="Hearts Game"/>
-    </div>
+  <CrazyCards/>
   <router-view />
 </template>
-
 
 <script>
 import CrazyCards from './components/CrazyCards.vue'
@@ -22,32 +18,31 @@ export default {
 #app {
   display: flex;
   flex-direction: column;
-  height: 100vh; /* Full viewport height */
+  height: 100vh;
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Prevent any scrolling */
+  overflow: hidden;
 }
 
 
 #content {
   display: flex;
-  overflow: hidden; /* Prevents scrolling */
+  overflow: hidden;
 }
 
 html, body {
-  height: 100%; /* Make sure the body takes up full height */
-  margin: 0; /* Remove default margin */
+  height: 100%;
+  margin: 0;
   padding: 0;
-  overflow: hidden; /* Disable scrolling */ 
+  overflow: hidden;
 }
-
 
 body {
   background-color: rgb(12, 11, 11);
-  background-size: cover; /* Cover the entire area */
-  background-position: center; /* Center the image */
-  background-repeat: no-repeat; /* Prevent repeating */
-  color: #fff; /* Default text color */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #fff;
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
   font-weight: bold;
