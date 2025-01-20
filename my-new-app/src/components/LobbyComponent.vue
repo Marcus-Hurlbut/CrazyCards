@@ -39,7 +39,7 @@ export default {
     }
     else {
       this.displayName = this.$store.getters.username;
-      this.start(this.displayName)
+      this.onNewLobby(this.displayName)
     }
   },
   props: {
@@ -56,54 +56,7 @@ export default {
       this.subscribeNotifyPlayerJoined();
       this.subscribeNotifyGameStart();
     },
-    subscribeNotifyGameStart() {
-      this.stompClient.subscribe('/topic/notifyGameStart/' + this.lobbyID.toString(), message => {
-        console.log('Game Started');
-        let body = message.body
-        let gameID = JSON.parse(body)
-
-        this.storeGameID(gameID)
-        this.$router.push('/heartsGame');
-      })
-    },
-    subscribeNotifyPlayerJoined() {
-      // this.stompClient.subscribe('/topic/notifyPlayerJoined/' + this.lobbyID.toString() , message => {
-        this.stompClient.subscribe('/topic/notifyPlayerJoined', message => {
-        let body = message.body
-        let player = JSON.parse(body);
-
-        if (player.username != this.displayName && !this.otherPlayerNames.includes(player.username)) {
-          // this.otherPlayerNames.push(player.username)
-          this.storeOtherPlayer(player.username)
-        }
-        this.otherPlayerNames = this.$store.getters.otherPlayers;
-        console.log('Another Player Joined Lobby: ' + player.username)
-      })
-    },
-    subscribeNewLobby() {
-      this.stompClient.subscribe('/topic/newLobby', message => {
-        let body = JSON.parse(message.body);
-        let lobbyID = JSON.parse(body.content);
-
-        console.log('Lobby started: ', lobbyID);
-
-        this.storeLobbyID(lobbyID);
-        this.subscribeNotifyGameStart();
-      });
-    },
-    publishNewLobby() {
-      if (this.connected) {
-        let playerID = crypto.randomUUID();
-        this.storePlayerID(playerID);
-        console.log('Creating Lobby with playerID: ', playerID);
-
-        this.stompClient.publish({
-          destination: "/app/newLobby",
-          body: JSON.stringify({'ID': this.$store.getters.playerID, 'username': this.displayName})
-        })
-      }
-    },
-    start(displayName) {
+    onNewLobby(displayName) {
       this.displayName = displayName
       this.storeUsername(displayName)
 
@@ -119,7 +72,6 @@ export default {
         this.connecting = false;
 
         this.subscribeNewLobby();
-        this.subscribeNotifyPlayerJoined();
         this.storeIsLobbyCreated(true);
         this.publishNewLobby();
       },
@@ -130,6 +82,52 @@ export default {
 
       this.storeStompClient(this.stompClient);
     },
+    subscribeNotifyGameStart() {
+      this.stompClient.subscribe('/topic/notifyGameStart/' + this.lobbyID.toString(), message => {
+        console.log('Game Started');
+        let body = message.body
+        let gameID = JSON.parse(body)
+
+        this.storeGameID(gameID)
+        this.$router.push('/heartsGame');
+      })
+    },
+    subscribeNotifyPlayerJoined() {
+      this.stompClient.subscribe('/topic/notifyPlayerJoined/' + this.lobbyID.toString() , message => {
+        let body = message.body
+        let player = JSON.parse(body);
+
+        if (player.username != this.displayName && !this.otherPlayerNames.includes(player.username)) {
+          this.storeOtherPlayer(player.username)
+        }
+        this.otherPlayerNames = this.$store.getters.otherPlayers;
+        console.log('Another Player Joined Lobby: ' + player.username)
+      })
+    },
+    subscribeNewLobby() {
+      this.stompClient.subscribe('/topic/newLobby', message => {
+        let body = JSON.parse(message.body);
+        let lobbyID = JSON.parse(body.content);
+
+        console.log('Lobby started: ', lobbyID);
+        this.storeLobbyID(lobbyID);
+
+        this.subscribeNotifyPlayerJoined();
+        this.subscribeNotifyGameStart();
+      });
+    },
+    publishNewLobby() {
+      if (this.connected) {
+        let playerID = crypto.randomUUID();
+        this.storePlayerID(playerID);
+        console.log('Creating Lobby with playerID: ', playerID);
+
+        this.stompClient.publish({
+          destination: "/app/newLobby",
+          body: JSON.stringify({'ID': this.$store.getters.playerID, 'username': this.displayName})
+        })
+      }
+    }
   }
 }
 </script>

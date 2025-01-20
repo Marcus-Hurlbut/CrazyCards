@@ -298,11 +298,9 @@ public class HeartsController {
         }
     }
 
-    public void notifyPlayerJoined(Player joinedPlayer, Integer roomID) {
+    public void notifyPlayerJoined(Player joinedPlayer, Integer lobbyID) {
         try {
-            // TODO: Convert to only send to specific lobby
-            // String destination = "/topic/notifyPlayerJoined/" + Integer.toString(roomID);
-            String destination = "/topic/notifyPlayerJoined";
+            String destination = "/topic/notifyPlayerJoined/" + lobbyID.toString();
             String json = toJSON(joinedPlayer);
     
             System.out.println("Player joined: " + json);
