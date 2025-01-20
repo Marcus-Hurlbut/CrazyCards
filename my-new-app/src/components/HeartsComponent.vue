@@ -12,87 +12,47 @@
       <YourTurnPrompt :playersTurn="playersTurn" :invalidTurn="invalidTurn" />
       <WinnerPrompt :trickWinnerName="trickWinnerName" :winnerName="winnerName" />
 
-      <div v-if="winnerName != null" class="winnerPrompt">
-        <h3>Game Over</h3>
-        <p>{{ winnerName }} won the game!</p>
-      </div>
-
-      <!-- Player 2 (left) -->
       <div class="player player-left">
         <h3>{{ otherPlayerNames[0] }}</h3>
-        <div class="card face-down">
-          <img src="./card-images/PNG-cards/back_dark.png" alt="back_dark"/>
-
-          <div v-if="this.voidCardsInPlay[otherPlayerNames[0]] != null" class="card stacked-void-cards" :style="getCardPosition(1, this.voidCardsInPlay[otherPlayerNames[0]])">
-            <img
-              :src="require(`./card-images/PNG-cards/${voidCardsInPlay[otherPlayerNames[0]].imgPath}`)" 
-              :alt="'Card 4'"
-              />
-          </div>
+          <Card :fileName="'back_dark.png'" />
+          <div v-if="this.voidCardsInPlay[otherPlayerNames[0]] != null" class="stacked-card" :style="getCardPosition(1)">
+            <Card :fileName="voidCardsInPlay[otherPlayerNames[0]].imgPath" />
         </div>
       </div>
 
-      <!-- Player 3 (top) -->
       <div class="player player-top">
         <h3>{{ otherPlayerNames[1] }}</h3>
-        <div class="card face-down">
-          <img src="./card-images/PNG-cards/back_dark.png" alt="back_dark" />
-
-          <div v-if="this.voidCardsInPlay[otherPlayerNames[1]] != null" class="card stacked-void-cards" :style="getCardPosition(1, this.voidCardsInPlay[otherPlayerNames[1]])">
-            <img
-              :src="require(`./card-images/PNG-cards/${voidCardsInPlay[otherPlayerNames[1]].imgPath}`)" 
-              :alt="'Card 2'"
-              />
-          </div>
+          <Card :fileName="'back_dark.png'" />
+          <div v-if="this.voidCardsInPlay[otherPlayerNames[1]] != null" class="stacked-card" :style="getCardPosition(1)">
+            <Card :fileName="voidCardsInPlay[otherPlayerNames[1]].imgPath" />
         </div>
       </div>
 
-      <!-- Player 4 (right) -->
       <div class="player player-right">
         <h3>{{ otherPlayerNames[2] }}</h3>
-        <div class="card face-down">
-          <img src="./card-images/PNG-cards/back_dark.png" alt="back_dark"/>
-
-          <div v-if="this.voidCardsInPlay[this.otherPlayerNames[2]] != null" class="card stacked-void-cards" :style="getCardPosition(1, this.voidCardsInPlay[otherPlayerNames[2]])">
-            <img
-              :src="require(`./card-images/PNG-cards/${voidCardsInPlay[otherPlayerNames[2]].imgPath}`)" 
-              :alt="'Card 3'"
-              />
+          <Card :fileName="'back_dark.png'" />
+          <div v-if="this.voidCardsInPlay[this.otherPlayerNames[2]] != null" class="stacked-card" :style="getCardPosition(1)">
+            <Card :fileName="voidCardsInPlay[otherPlayerNames[2]].imgPath" />
           </div>
-        </div>
       </div>
 
-      <!-- Your Cards (bottom) -->
-      <div class="player player-center">
-        <div class="your-cards">
-          <div v-for="(card, index) in playerCards" :key="index" class="card">
-            <img 
-              :src="require(`@/assets/card-images/PNG-cards/${card.imgPath}`)" 
-              :alt="'Card ' + (index + 1)"
+      <div class="player main-player">
+        <div class="main-player-hand">
+          <div v-for="(card, index) in playerCards" :key="index" class="hand">
+            <Card
+              :fileName="card.imgPath"
+              :isSelected="this.selectedCards.includes(card.id)"
               @click="passPhase ? toggleCardSelection(card.id) : publishPlayTurn(card.id)"
-              :class="{'selected-card': this.selectedCards.includes(card.id)}"
             />
           </div>
         </div>
       </div>
 
-      <div class="void-cards">
+      <div class="main-player-void-cards">
         <h3> {{ this.$store.getters.username  }} </h3>
-        <div class="card face-down">
-          <img src="./card-images/PNG-cards/back_light.png" alt="back_dark" />
-
-          <div v-if="this.voidCardsInPlay[this.$store.getters.username] != null" class="card stacked-void-cards" :style="getCardPosition(1, this.voidCardsInPlay[otherPlayerNames[2]])">
-            <img
-              :src="require(`./card-images/PNG-cards/${voidCardsInPlay[this.$store.getters.username].imgPath}`)" 
-              :alt="'Card 4'"
-              />
-          </div>
-          <!-- <div v-for="(card, index) in voidCardsInPlay" :key="index" class="card stacked-void-cards" :style="getCardPosition(index, card)">
-            <img 
-              :src="require(`@/assets/card-images/PNG-cards/${card.imgPath}`)" 
-              :alt="'Card ' + (index + 1)"
-            />
-          </div> -->
+          <Card :fileName="'back_light.png'" />
+          <div v-if="this.voidCardsInPlay[this.$store.getters.username] != null" class="stacked-card" :style="getCardPosition(1)">
+            <Card :fileName="voidCardsInPlay[this.$store.getters.username].imgPath"/>
         </div>
       </div>
 
@@ -108,6 +68,7 @@ import PassingPhasePrompt from './prompts/PassingPhasePrompt.vue';
 import InvalidCardPrompt from './prompts/InvalidCardPrompt.vue';
 import Scoreboard from './hud/Scoreboard.vue';
 import YourTurnPrompt from './prompts/YourTurnPrompt.vue';
+import Card from './objects/Card.vue'
 
 export default {
   name: 'HeartsComponent',
@@ -116,7 +77,8 @@ export default {
     PassingPhasePrompt,
     InvalidCardPrompt,
     Scoreboard,
-    YourTurnPrompt
+    YourTurnPrompt,
+    Card
   },
   computed: {
     ...mapState(['isLobbyCreated', 'otherPlayers', 'username', 'stompClient', 'gameID', 'playerID', 'playerIndex']),
@@ -216,11 +178,10 @@ export default {
       }, 4000);
     },
 
-    getCardPosition(index, card) {
+    getCardPosition(index) {
       const offset = 10;
       const xOffset = index * offset;
       const yOffset = index * offset;
-      console.log('get card position for', card);
 
       return {
         transform: `translate(${xOffset}px, ${yOffset}px)`
@@ -431,9 +392,9 @@ export default {
 
 <style scoped>
 .startHearts {
-  background: linear-gradient(to bottom right, #a2c2e3, #76b0e8);  /* Gradient background */
+  background: linear-gradient(to bottom right, #a2c2e3, #76b0e8);
   background-image: url(./squares-background.jpg);
-  background-size: cover; /* Makes the image cover the entire area */
+  background-size: cover;
   background-repeat: no-repeat;
   height: 100vh; /* Full viewport height */
   color: white;
@@ -446,15 +407,12 @@ export default {
   align-items: center; 
 }
 
-.startHeartsContent {
-  margin-bottom: 50em;
-}
-
-.selected-card {
-  border: 2px solid gold;
-  border-radius: 5px;
-  transform: scale(1.1);
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.8); /* glow effect */
+.playerIDDisplay {
+  position: absolute;
+  top: 18%;
+  left: 1%;
+  color: wheat;
+  background-color: black;
 }
 
 .gameArea {
@@ -473,47 +431,48 @@ export default {
   position: absolute;
 }
 
-.playerIDDisplay {
+.main-player {
   position: absolute;
-  top: 18%;
-  left: 1%;
-  color: wheat;
-  background-color: black;
+  bottom: 0px;
+  align-content: center;
+  text-align: center;
 }
 
-.player-top {
-  top: 0%;
+/* Players hand */
+.hand {
+  width: 50px;
+  height: 70px;
+  border-radius: 5px;
+  margin: 5px;
+  display: inline-block;
+  z-index: 0;
 }
 
-.player-top h3 {
-  position: absolute;
-  top: 30%;
-  left: 50%;
-  color: white;
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.void-cards {
+.main-player-void-cards {
   position: absolute;
   top: 25%;
 }
 
-.void-cards h3 {
+.main-player-void-cards h3 {
   position: absolute;
   top: 0%;
   left: 50%;
   color: black;
   font-size: 20px;
   font-weight: bold;
+  z-index: 10;
 }
 
-.card.stacked-void-cards {
+.stacked-card {
   position: absolute;
-  top: 0; /* Default position at the top of the parent */
-  left: 0; /* Default position at the left of the parent */
+  top: 0;
+  left: 0;
   transition: transform 0.3s ease-in-out;
-  /* z-index: 0; */
+}
+
+/* Other players cards position */
+.player-top {
+  top: 0%;
 }
 
 .player-right {
@@ -521,106 +480,20 @@ export default {
   bottom: 70%;
 }
 
-.player-right h3 {
-  position: absolute;
-  top: 30%;
-  left: 50%;
-  color: white;
-  font-size: 20px;
-  font-weight: bold;
-}
-
 .player-left {
   left: 30%;
   bottom: 70%;
 }
 
-.player-left h3 {
+/* Other players names */
+.player-left h3, .player-right h3, .player-top h3 {
   position: absolute;
   top: 30%;
   left: 50%;
-  color: white;
+  color: purple;
   font-size: 20px; 
   font-weight: bold; 
-}
-
-.player-left h3, .player-right h3, .player-top h3 {
-  color: white;
   z-index: 10;
 }
-
-
-.player-center {
-  position: absolute;
-  bottom: 0px;
-  align-content: center;
-  text-align: center;
-}
-
-.small-button {
-  padding: 5px 10px; /* Adjust the padding */
-  font-size: 12px; /* Reduce the font size */
-  border: 1px solid #ccc; /* Optional: adjust the border */
-  border-radius: 5px; /* Add rounded corners */
-  background-color: #f5f5f5; /* Light background color */
-  color: #333; /* Adjust text color */
-  cursor: pointer;
-  max-width: 100px;
-}
-
-.card {
-  width: 50px;
-  height: 70px;
-  background-color: #2c3e50; /* Card back color */
-  border-radius: 5px;
-  margin: 5px;
-  display: inline-block;
-  z-index: 0;
-}
-
-/* Other Players top card display & Void Card top card */
-.face-down img {
-  width: 120px;
-  height: 142px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-}
-
-.your-cards .card {
-  background-color: #2980b9; /* Example color for your cards */
-  color: white;
-  text-align: center;
-  font-size: 18px;
-  line-height: 70px;
-}
-
-.your-cards .card img {
-  width: 120px; /* Your Card width */
-  height: 142px;  /* Your Card height */
-  border-radius: 5px; /* Optional: to make the card corners rounded */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Optional: add a slight shadow to make cards stand out */
-  transition: transform 0.2s ease; /* Optional: add a hover effect */
-  cursor: pointer;
-}
-
-.your-cards .card:hover img {
-  transform: scale(1.1); /* Slightly enlarge the card on hover */
-}
-
-button {
-  padding: 10px 20px;
-  background-color: #ff4081; /* Button color */
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-}
-
-button:hover {
-  background-color: #ff80ab; /* Button hover effect */
-}
-
 
 </style>
