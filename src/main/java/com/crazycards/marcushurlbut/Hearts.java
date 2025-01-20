@@ -186,7 +186,7 @@ public class Hearts {
 
             int currentScore = players[intPlayerID].getScore();
             players[intPlayerID].setScore(currentScore + points);
-
+            player.tricks = new HashMap<Integer, Card>();
             intPlayerID++;
         }
     }
