@@ -39,6 +39,7 @@ export default {
 
 .card:hover {
   transform: scale(1.1);
+  z-index: 100;
 }
 
 .selected-card {

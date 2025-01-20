@@ -48,7 +48,7 @@
         </div>
       </div>
 
-      <div class="main-player-void-cards">
+      <div class="player main-player-void-cards">
         <h3> {{ this.$store.getters.username  }} </h3>
           <Card :fileName="'back_light.png'" />
           <div v-if="this.voidCardsInPlay[this.$store.getters.username] != null" class="stacked-card" :style="getCardPosition(1)">
@@ -430,12 +430,9 @@ export default {
   align-items: center;
   position: absolute;
 }
-
+/* Main player positioning */
 .main-player {
-  position: absolute;
-  bottom: 0px;
-  align-content: center;
-  text-align: center;
+  bottom: 0%;
 }
 
 /* Players hand */
@@ -451,16 +448,6 @@ export default {
 .main-player-void-cards {
   position: absolute;
   top: 25%;
-}
-
-.main-player-void-cards h3 {
-  position: absolute;
-  top: 0%;
-  left: 50%;
-  color: black;
-  font-size: 20px;
-  font-weight: bold;
-  z-index: 10;
 }
 
 .stacked-card {
@@ -485,15 +472,22 @@ export default {
   bottom: 70%;
 }
 
-/* Other players names */
-.player-left h3, .player-right h3, .player-top h3 {
+/* Players name tags */
+.player-left h3, .player-right h3, .player-top h3, .main-player-void-cards h3 {
   position: absolute;
-  top: 30%;
-  left: 50%;
-  color: purple;
-  font-size: 20px; 
-  font-weight: bold; 
+  color: #f9e3fc;
+  font-size: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   z-index: 10;
+  font-family: 'Lobster', sans-serif;
+  text-align: center;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: linear-gradient(45deg, #5d5bee, #fa00d0);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-shadow: 0px 0px 10px #00ffff, 0px 0px 20px #00b7ff;
 }
-
 </style>

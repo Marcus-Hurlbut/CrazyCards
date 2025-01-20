@@ -2,8 +2,7 @@
   <div v-if="playersTurn && !invalidTurn" class="yourTurnPrompt">
     <h3>Your Turn!</h3>
     <div class="prompt-content">
-      <p>Select a card from the first suite played if you have one</p>
-      <p>Otherwise play any card as a wildcard</p>
+      <p>Select a card from the first suite played if you have one, otherwise play any card as a wildcard</p>
     </div>
   </div>
 </template>
@@ -20,27 +19,6 @@ export default {
 
 <style scoped> 
 .yourTurnPrompt {
-  position: absolute;
-  bottom: 20%;
-  background: linear-gradient(to bottom right, red, purple);
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  width: 80%;
-  max-width: 500px;
-  box-sizing: border-box;
-  margin: 0;
-}
-
-.yourTurnPrompt h3 {
-  margin: 0;
-}
-
-.yourTurnPrompt {
   position: fixed;
   bottom: 20%;
   background: linear-gradient(to bottom right, #6A4C9C, red);
@@ -48,7 +26,7 @@ export default {
   font-family: 'Roboto', sans-serif;
   font-size: 20px;
   font-weight: 600;
-  padding: 20px;
+  padding: 5px;
   border-radius: 8px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   text-align: center;
@@ -79,7 +57,6 @@ export default {
 }
 
 .yourTurnPrompt:hover {
-  /* transform: translateY(-5px); */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 </style>

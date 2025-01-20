@@ -26,7 +26,7 @@ export default {
   font-family: 'Roboto', sans-serif;
   font-size: 20px;
   font-weight: 600;
-  padding: 20px;
+  padding: 5px;
   border-radius: 8px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   text-align: center;

@@ -15,33 +15,33 @@
     props: {
       invalidTurn: {
         type: Boolean,
-        default: null
+        default: false
       },
-      playerInTurn: {
+      playersTurn: {
         type: Boolean,
-        default: null
-      }
+        default: false
+      },
+      passPhase: Boolean
     }
   };
 </script>
 
 <style scoped>
-
 .invalidTurnPrompt {
-  position: fixed;
-  bottom: 20%;
+  position: relative;
+  transform: translateY(50%);
   background: linear-gradient(to bottom right, #6A4C9C, red);
   color: white;
   font-family: 'Roboto', sans-serif;
   font-size: 20px;
   font-weight: 600;
-  padding: 20px;
+  padding: 5px;
   border-radius: 8px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   text-align: center;
   width: 80%;
   max-width: 500px;
-  min-width: 280px;
+  min-width: 500px;
   box-sizing: border-box;
   margin: 0;
   z-index: 1000;
@@ -66,7 +66,6 @@
 }
 
 .invalidTurnPrompt:hover {
-  /* transform: translateY(-5px); */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 </style>
