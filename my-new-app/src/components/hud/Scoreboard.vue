@@ -55,7 +55,7 @@
     position: fixed;
     bottom: 20px;
     left: 20px;
-    background: linear-gradient(135deg, purple, #af002d, #1f4e79);
+    background: linear-gradient(135deg, purple, #be0130, #1d3dcc);
     color: white;
     font-family: 'Arial', sans-serif;
     font-size: 18px;
