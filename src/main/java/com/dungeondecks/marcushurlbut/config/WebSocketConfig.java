@@ -21,9 +21,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @SuppressWarnings("null")
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/gs-guide-websocket")
+        registry.addEndpoint("/dungeon-decks-websocket")
                 .setAllowedOriginPatterns("*");
 
-        registry.addEndpoint("/gs-guide-websocket").withSockJS();
+        registry.addEndpoint("/dungeon-decks-websocket").withSockJS();
     }
 }

@@ -43,7 +43,7 @@
         this.connecting = true;
         this.lobbyID = lobbyID
 
-        const socketUrl = 'ws://localhost:8080/gs-guide-websocket';
+        const socketUrl = 'ws://localhost:8080/dungeon-decks-websocket';
         this.stompClient = Stomp.over(() => new WebSocket(socketUrl));
         
         this.stompClient.connect({}, frame => {
