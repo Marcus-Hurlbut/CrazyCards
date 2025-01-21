@@ -1,4 +1,4 @@
-package com.crazycards.marcushurlbut.unit;
+package com.dungeondecks.marcushurlbut.unit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -10,12 +10,12 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import com.crazycards.marcushurlbut.Card;
-import com.crazycards.marcushurlbut.Hearts;
-import com.crazycards.marcushurlbut.PassingPhase;
-import com.crazycards.marcushurlbut.Player;
-import com.crazycards.marcushurlbut.util.TestUtils;
-import com.crazycards.marcushurlbut.utils.CardID;
+import com.dungeondecks.marcushurlbut.Card;
+import com.dungeondecks.marcushurlbut.Hearts;
+import com.dungeondecks.marcushurlbut.PassingPhase;
+import com.dungeondecks.marcushurlbut.Player;
+import com.dungeondecks.marcushurlbut.util.TestUtils;
+import com.dungeondecks.marcushurlbut.utils.CardID;
 
 public class HeartsTest {
     private static UUID gameID;

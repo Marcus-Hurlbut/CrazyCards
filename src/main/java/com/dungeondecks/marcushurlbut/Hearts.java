@@ -1,4 +1,4 @@
-package com.crazycards.marcushurlbut;
+package com.dungeondecks.marcushurlbut;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.crazycards.marcushurlbut.utils.CardID;
+import com.dungeondecks.marcushurlbut.utils.CardID;
 
 public class Hearts {
     public Deck deck = new Deck();

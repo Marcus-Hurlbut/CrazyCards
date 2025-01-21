@@ -1,4 +1,4 @@
-package com.crazycards.marcushurlbut.utils;
+package com.dungeondecks.marcushurlbut.utils;
 
 public enum CardID {
     // HEART cards

@@ -1,13 +1,13 @@
-package com.crazycards.marcushurlbut;
+package com.dungeondecks.marcushurlbut;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CrazyCardsApplication {
+public class DungeonDecksApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CrazyCardsApplication.class, args);
+		SpringApplication.run(DungeonDecksApplication.class, args);
 	}
 
 }

@@ -1,15 +1,15 @@
 <template>
-  <CrazyCards/>
+  <DungeonDecks/>
   <router-view />
 </template>
 
 <script>
-import CrazyCards from './components/CrazyCards.vue'
+import DungeonDecks from './components/DungeonDecks.vue'
 
 export default {
   name: 'App',
   components: {
-    CrazyCards
+    DungeonDecks
   }
 }
 </script>

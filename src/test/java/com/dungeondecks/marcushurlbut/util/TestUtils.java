@@ -1,15 +1,15 @@
-package com.crazycards.marcushurlbut.util;
+package com.dungeondecks.marcushurlbut.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import com.crazycards.marcushurlbut.Card;
-import com.crazycards.marcushurlbut.Name;
-import com.crazycards.marcushurlbut.Player;
-import com.crazycards.marcushurlbut.Suit;
-import com.crazycards.marcushurlbut.utils.CardID;
+import com.dungeondecks.marcushurlbut.Card;
+import com.dungeondecks.marcushurlbut.Name;
+import com.dungeondecks.marcushurlbut.Player;
+import com.dungeondecks.marcushurlbut.Suit;
+import com.dungeondecks.marcushurlbut.utils.CardID;
 
 public class TestUtils {
     public UUID player_1_id = UUID.randomUUID();

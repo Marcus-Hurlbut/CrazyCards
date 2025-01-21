@@ -1,5 +1,5 @@
 <template>
-    <div class="crazyCards">
+    <div class="dungeon-decks">
       <ul>
         <li class="game-vault-dropdown">
           <GameVaultButton />
@@ -38,7 +38,7 @@ export default {
     padding: 0;
   }
   
-  .crazyCards {
+  .dungeon-decks {
     background: linear-gradient(to bottom right, #b40e40, #9C27B0);
     animation: gradientAnimation 10s ease-in-out infinite;
     color: white;

@@ -1,4 +1,4 @@
-package com.crazycards.marcushurlbut;
+package com.dungeondecks.marcushurlbut;
 
 import java.util.*;
 
@@ -11,10 +11,10 @@ public class Deck {
     }
 
     public void shuffleDeck() {
-        initializeSuit(com.crazycards.marcushurlbut.Suit.HEART);
-        initializeSuit(com.crazycards.marcushurlbut.Suit.DIAMOND);
-        initializeSuit(com.crazycards.marcushurlbut.Suit.SPADE);
-        initializeSuit(com.crazycards.marcushurlbut.Suit.CLUB);
+        initializeSuit(Suit.HEART);
+        initializeSuit(Suit.DIAMOND);
+        initializeSuit(Suit.SPADE);
+        initializeSuit(Suit.CLUB);
         Collections.shuffle(deck);
     }
 

@@ -1,4 +1,4 @@
-package com.crazycards.marcushurlbut;
+package com.dungeondecks.marcushurlbut;
 
 public enum PassingPhase {
     LEFT,

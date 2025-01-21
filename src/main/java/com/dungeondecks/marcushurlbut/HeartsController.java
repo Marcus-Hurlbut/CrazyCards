@@ -1,4 +1,4 @@
-package com.crazycards.marcushurlbut;
+package com.dungeondecks.marcushurlbut;
 
 import java.util.ArrayList;
 import java.util.HashMap;

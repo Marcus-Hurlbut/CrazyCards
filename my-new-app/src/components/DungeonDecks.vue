@@ -1,8 +1,8 @@
 <template>
-  <div class="crazyCards">
+  <div class="dungeon-decks">
     <div class="dashboard">
       <h1 class="app-title">
-        Crazy Cards
+        Dungeon Decks
         <img alt="Crazy Cards logo" src="./card_icon.png" class="banner-logo" />
       </h1>
 
@@ -42,7 +42,7 @@ import { mapState } from 'vuex';
 import { mapActions } from 'vuex';
 
 export default {
-  name: 'CrazyCards',
+  name: 'DungeonDecks',
   computed: {
     ...mapState(['stompClient', 'isLobbyCreated'])
   },
@@ -75,7 +75,7 @@ html, body {
   padding: 0;
 }
 
-.crazyCards {
+.dungeon-decks {
   background: linear-gradient(to bottom right, #b40e40, #9C27B0);
   animation: gradientAnimation 10s ease-in-out infinite;
   color: white;

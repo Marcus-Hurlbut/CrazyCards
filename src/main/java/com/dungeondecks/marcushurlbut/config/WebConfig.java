@@ -1,4 +1,4 @@
-package com.crazycards.marcushurlbut.config;
+package com.dungeondecks.marcushurlbut.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
