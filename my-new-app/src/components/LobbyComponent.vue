@@ -1,7 +1,7 @@
 
 <template>
   <div class="heartsLobby">
-    <div v-if="isLobbyCreated" class="playerList" >
+    <div v-if="isLobbyCreated" class="lobbyPlayerList" >
       <h1>Waiting for other players...</h1>
       <h2>Game Code: {{ lobbyID }}</h2>
       <ul>
@@ -9,20 +9,25 @@
         <li> {{ otherPlayerNames[0] || 'Waiting..'}}</li>
         <li> {{ otherPlayerNames[1] || 'Waiting..'}}</li>
         <li> {{ otherPlayerNames[2] || 'Waiting..'}}</li>
-      </ul>  
+      </ul>
     </div>
   </div>
+  <BubbleBackground />
 </template>
 
 <script>
 import { Stomp } from '@stomp/stompjs';
 import { mapState } from 'vuex';
 import { mapActions } from 'vuex';
+import BubbleBackground from './animations/BubbleBackground.vue';
 
 export default {
   name: 'LobbyComponent',
   computed: {
     ...mapState(['isLobbyCreated', 'otherPlayers', 'username', 'stompClient', 'lobbyID', 'playerID', 'playerIndex']),
+  },
+  components: {
+    BubbleBackground,
   },
   data() {
     return {
@@ -60,7 +65,7 @@ export default {
       this.displayName = displayName
       this.storeUsername(displayName)
 
-      if (this.connected || this.connecting) return;
+      if (this.stompClient && this.stompClient.connected) return;
       this.connecting = true;
 
       const socketUrl = 'ws://localhost:8080/gs-guide-websocket';
@@ -133,15 +138,11 @@ export default {
 </script>
 
 <style scoped>
-.heartsLobby {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 60vh;
-  margin: 0;
-}
-
-.playerList {
+.lobbyPlayerList {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: inline-block;
   padding: 30px 40px;
   text-align: center;
@@ -151,11 +152,13 @@ export default {
   width: 100%;
   max-width: 450px;
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease;
+  z-index: 100;
 }
 
-.playerList:hover {
-  transform: translateY(-5px);
+.lobbyPlayerList:hover {
+  transform: translate(-50%, -51%);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+  background: linear-gradient(to bottom right, #C2185B, rgb(177, 52, 199));
 }
 
 h1, h2 {

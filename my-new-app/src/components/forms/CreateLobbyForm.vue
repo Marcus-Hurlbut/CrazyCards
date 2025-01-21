@@ -5,13 +5,18 @@
         <input type="text" id="displayName" v-model="displayName" name="displayName" placeholder="Your Display Name"><br><br>
         <button type="submit">Create Lobby</button>
       </form>
+      <BubbleBackground />
     </div>
   </template>
   
   <script>
     import { mapActions } from 'vuex';
+    import BubbleBackground from '../animations/BubbleBackground.vue';
     export default {
       name: "CreateLobbyForm",
+      components: {
+        BubbleBackground,
+      },
       data() {
         return {
           displayName: ''
@@ -37,7 +42,7 @@
     position: absolute;
     top: 50%;
     left: 50%; 
-    transform: translate(-50%, -50%); 
+    transform: translate(-50%, -50%);
     display: inline-block;
     padding: 30px 50px;
     background: linear-gradient(135deg, #6a1b9a, #ff1744);

@@ -12,7 +12,7 @@
         </button>
         <ul class="options-menu">
           <router-link to="/">
-            <li>Main Menu</li>
+            <li @click="disconnectSocket()">Main Menu</li>
           </router-link>
           <li class="has-sublist">Game Vault
             <ul class="sublist">
@@ -38,11 +38,32 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import { mapActions } from 'vuex';
+
 export default {
   name: 'CrazyCards',
+  computed: {
+    ...mapState(['stompClient', 'isLobbyCreated'])
+  },
   components: {},
   props: {
     msg: String
+  },
+  methods: {
+    ...mapActions(['storeStompClient', 'storeIsLobbyCreated']),
+
+    disconnectSocket() {
+      console.log('Disconnecting websocket: ', this.$store.getters.stompClient);
+      if (this.$store.getters.stompClient && this.$store.getters.stompClient.connected){
+        let socket = this.$store.getters.stompClient;
+        socket.disconnect(() => {
+          console.log('Websocket connection closed.');
+        });
+        this.storeStompClient(null);
+        this.storeIsLobbyCreated(false);
+      }
+    }
   }
 }
 </script>

@@ -10,3 +10,4 @@ with others through the use web sockets. This is still actively in development.
 
 ## Third Party Credits
 Louis Hoebregts - css background bubble animation
+Bjorn - css background cubes animation

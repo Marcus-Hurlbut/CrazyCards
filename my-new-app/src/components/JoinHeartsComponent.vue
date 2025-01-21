@@ -7,7 +7,8 @@
       <label for="displayName">Enter your Display Name</label><br>
       <input type="text" id="displayName" v-model="displayName" name="displayName"><br><br>
       <button type="submit">Join Lobby</button>
-    </form> 
+    </form>
+    <BubbleBackground />
   </div>
 </template>
   
@@ -15,8 +16,13 @@
   import { Stomp } from '@stomp/stompjs';
   import { mapActions } from 'vuex';
   import { mapState } from 'vuex';
+  import BubbleBackground from './animations/BubbleBackground.vue';
+
   export default {
     name: 'JoinHeartsComponent',
+    components: {
+      BubbleBackground,
+    },
     computed: {
       ...mapState(['playerID', 'username'])
     },
@@ -95,7 +101,7 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); 
+    transform: translate(-50%, -50%);
     display: inline-block;
     padding: 30px 50px;
     background: linear-gradient(135deg, #6a1b9a, #ff1744);

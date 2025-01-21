@@ -55,7 +55,7 @@
             <Card :fileName="voidCardsInPlay[this.$store.getters.username].imgPath"/>
         </div>
       </div>
-
+      <SquaresBackground />
     </div>
   </div>
 </template>
@@ -69,6 +69,7 @@ import InvalidCardPrompt from './prompts/InvalidCardPrompt.vue';
 import Scoreboard from './hud/Scoreboard.vue';
 import YourTurnPrompt from './prompts/YourTurnPrompt.vue';
 import Card from './objects/Card.vue'
+import SquaresBackground from './animations/SquaresBackground.vue';
 
 export default {
   name: 'HeartsComponent',
@@ -78,7 +79,8 @@ export default {
     InvalidCardPrompt,
     Scoreboard,
     YourTurnPrompt,
-    Card
+    Card,
+    SquaresBackground,
   },
   computed: {
     ...mapState(['isLobbyCreated', 'otherPlayers', 'username', 'stompClient', 'gameID', 'playerID', 'playerIndex']),
@@ -392,14 +394,12 @@ export default {
 
 <style scoped>
 .startHearts {
-  background: linear-gradient(to bottom right, #a2c2e3, #76b0e8);
-  background-image: url(./squares-background.jpg);
+  /* background-image: url(./squares-background.jpg);
   background-size: cover;
-  background-repeat: no-repeat;
-  height: 100vh; /* Full viewport height */
+  background-repeat: no-repeat; */
+  height: 100vh;
   color: white;
   text-align: center;
-  padding: 10px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -433,9 +433,16 @@ export default {
 /* Main player positioning */
 .main-player {
   bottom: 0%;
+  position: absolute;
 }
 
-/* Players hand */
+.main-player-hand {
+  position: relative;
+  bottom: 0%;
+  transform: translate(0%, -100%);
+}
+
+/* Players hand stacking formatting */
 .hand {
   width: 50px;
   height: 70px;
@@ -459,7 +466,7 @@ export default {
 
 /* Other players cards position */
 .player-top {
-  top: 0%;
+  top: 2%;
 }
 
 .player-right {
