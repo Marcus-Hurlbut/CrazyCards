@@ -17,6 +17,7 @@
   import { mapActions } from 'vuex';
   import { mapState } from 'vuex';
   import BubbleBackground from './animations/BubbleBackground.vue';
+  import { v4 as uuidv4 } from 'uuid';
 
   export default {
     name: 'JoinHeartsComponent',
@@ -43,7 +44,7 @@
         this.connecting = true;
         this.lobbyID = lobbyID
 
-        const socketUrl = 'ws://localhost:8080/dungeon-decks-websocket';
+        const socketUrl = 'ws://dungeondecks.net/dungeon-decks-websocket';
         this.stompClient = Stomp.over(() => new WebSocket(socketUrl));
         
         this.stompClient.connect({}, frame => {
@@ -52,7 +53,7 @@
           this.connecting = false;
 
           // Set store values
-          let playerID = crypto.randomUUID().toString();
+          let playerID =  uuidv4().toString();
           this.storePlayerID(playerID);
           this.storeStompClient(this.stompClient);
           this.storeUsername(displayName);

@@ -20,6 +20,7 @@ import { Stomp } from '@stomp/stompjs';
 import { mapState } from 'vuex';
 import { mapActions } from 'vuex';
 import BubbleBackground from './animations/BubbleBackground.vue';
+import { v4 as uuidv4 } from 'uuid';
 
 export default {
   name: 'LobbyComponent',
@@ -68,7 +69,7 @@ export default {
       if (this.stompClient && this.stompClient.connected) return;
       this.connecting = true;
 
-      const socketUrl = 'ws://localhost:8080/dungeon-decks-websocket';
+      const socketUrl = 'ws://dungeondecks.net/dungeon-decks-websocket';
       this.stompClient = Stomp.over(() => new WebSocket(socketUrl));
 
       this.stompClient.connect({}, frame => {
@@ -110,6 +111,7 @@ export default {
       })
     },
     subscribeNewLobby() {
+      // TODO: add lobbyID to subscription
       this.stompClient.subscribe('/topic/newLobby', message => {
         let body = JSON.parse(message.body);
         let lobbyID = JSON.parse(body.content);
@@ -123,7 +125,7 @@ export default {
     },
     publishNewLobby() {
       if (this.connected) {
-        let playerID = crypto.randomUUID();
+        let playerID = uuidv4().toString();
         this.storePlayerID(playerID);
         console.log('Creating Lobby with playerID: ', playerID);
 
