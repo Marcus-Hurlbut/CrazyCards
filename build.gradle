@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.dungeondecks.marcushurlbut'
-version = '0.0.1-SNAPSHOT'
+version = '0.1.0'
 
 java {
 	toolchain {
@@ -31,4 +31,13 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+task buildVue(type: Exec) {
+    workingDir = file("${projectDir}/my-new-app")
+    if (System.getProperty("os.name").toLowerCase().contains("win")) {
+        commandLine 'cmd', '/c', 'npm run build'
+    } else {
+        commandLine 'npm', 'run', 'build'
+    }
 }
