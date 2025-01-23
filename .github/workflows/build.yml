@@ -55,10 +55,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jar-artifact
-          path: ./build/libs
+          path: ./build/libs/dungeondecks-0.1.0.jar
 
       - name: Upload Vue assets artifact
         uses: actions/upload-artifact@v4
         with:
           name: assets-artifact
-          path: ./dungeon-decks-app/dist
+          path: ./dungeon-decks-app/dist/*
