@@ -24,13 +24,16 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Install npm
+        run: npm install
+
       - name: Setup Vue
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Install npm
-        run: npm install
+      - name: Install Vue CLI Service
+        run: npm install @vue/cli-service --save-dev
 
       - name: Set execute permissions for gradlew
         run: chmod +x ./gradlew  
