@@ -34,7 +34,7 @@ tasks.named('test') {
 }
 
 task buildVue(type: Exec) {
-    workingDir = file("${projectDir}/my-new-app")
+    workingDir = file("${projectDir}/dungeon-decks-app")
     if (System.getProperty("os.name").toLowerCase().contains("win")) {
         commandLine 'cmd', '/c', 'npm run build'
     } else {

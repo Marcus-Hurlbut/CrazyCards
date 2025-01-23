@@ -1,4 +1,4 @@
-# my-new-app
+# Dungeon Decks App
 
 ## Project setup
 ```

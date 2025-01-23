@@ -71,7 +71,7 @@ export default {
 
       const socketUrl = process.env.NODE_ENV === 'development'
           ? 'ws://localhost:8080/dungeon-decks-websocket'
-          : 'ws://dungeondecks.net/dungeon-decks-websocket'
+          : 'wss://dungeondecks.net/dungeon-decks-websocket'
 
       this.stompClient = Stomp.over(() => new WebSocket(socketUrl));
 
