@@ -33,9 +33,13 @@ jobs:
         run: |
             npm ci
             npm install
-            npm install @vue/cli-service --save-dev
-            npm install @vue/cli-plugin-babel --save-dev
-            npm install @vue/cli-plugin-eslint --save-dev
+            npm install @vue/cli-service
+            npm install @vue/cli-plugin-babel
+            npm install @vue/cli-plugin-eslint
+            npm install eslint
+            npm install eslint-plugin-vue
+            npm install @babel/core
+            npm install @babel/eslint-parser
 
       - name: Set execute permissions for gradlew
         run: chmod +x ./gradlew
