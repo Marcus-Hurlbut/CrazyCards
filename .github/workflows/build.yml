@@ -33,6 +33,7 @@ jobs:
         run: |
             npm ci
             npm install @vue/cli-service --save-dev
+            npm install @vue/cli-plugin-babel --save-dev
 
       - name: Set execute permissions for gradlew
         run: chmod +x ./gradlew
