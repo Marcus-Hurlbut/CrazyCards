@@ -32,8 +32,10 @@ jobs:
       - name: Install Vue dependencies
         run: |
             npm ci
+            npm install
             npm install @vue/cli-service --save-dev
             npm install @vue/cli-plugin-babel --save-dev
+            npm install @vue/cli-plugin-eslint --save-dev
 
       - name: Set execute permissions for gradlew
         run: chmod +x ./gradlew
