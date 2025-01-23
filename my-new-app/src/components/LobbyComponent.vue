@@ -69,7 +69,10 @@ export default {
       if (this.stompClient && this.stompClient.connected) return;
       this.connecting = true;
 
-      const socketUrl = 'ws://dungeondecks.net/dungeon-decks-websocket';
+      const socketUrl = process.env.NODE_ENV === 'development'
+          ? 'ws://localhost:8080/dungeon-decks-websocket'
+          : 'ws://dungeondecks.net/dungeon-decks-websocket'
+
       this.stompClient = Stomp.over(() => new WebSocket(socketUrl));
 
       this.stompClient.connect({}, frame => {
@@ -77,9 +80,12 @@ export default {
         this.connected = true;
         this.connecting = false;
 
-        this.subscribeNewLobby();
+        let playerID = uuidv4().toString();
+        this.storePlayerID(playerID);
+
+        this.subscribeNewLobby(playerID);
         this.storeIsLobbyCreated(true);
-        this.publishNewLobby();
+        this.publishNewLobby(playerID);
       },
       error => {
         console.error("WebSocket connection error:", error);
@@ -110,12 +116,10 @@ export default {
         console.log('Another Player Joined Lobby: ' + player.username)
       })
     },
-    subscribeNewLobby() {
-      // TODO: add lobbyID to subscription
-      this.stompClient.subscribe('/topic/newLobby', message => {
-        let body = JSON.parse(message.body);
-        let lobbyID = JSON.parse(body.content);
-
+    subscribeNewLobby(playerID) {
+      let subscription = '/topic/newLobby/' + playerID.toString();
+      this.stompClient.subscribe(subscription, message => {
+        let lobbyID = JSON.parse(message.body);
         console.log('Lobby started: ', lobbyID);
         this.storeLobbyID(lobbyID);
 
@@ -123,10 +127,8 @@ export default {
         this.subscribeNotifyGameStart();
       });
     },
-    publishNewLobby() {
+    publishNewLobby(playerID) {
       if (this.connected) {
-        let playerID = uuidv4().toString();
-        this.storePlayerID(playerID);
         console.log('Creating Lobby with playerID: ', playerID);
 
         this.stompClient.publish({

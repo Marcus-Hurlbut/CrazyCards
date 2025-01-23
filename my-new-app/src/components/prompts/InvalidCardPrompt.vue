@@ -1,8 +1,8 @@
 <template>
     <div>
       <div v-if="invalidTurn && playersTurn && !passPhase" class="invalidTurnPrompt">
-        <h3>Invalid Card</h3>
         <div class="prompt-content">
+        <h3>Invalid Card</h3>
           <p>You must play a card with the same suite of the starting card if present</p>
         </div>
       </div>
@@ -28,8 +28,8 @@
 
 <style scoped>
 .invalidTurnPrompt {
-  position: relative;
-  transform: translateY(50%);
+  position: fixed;
+  bottom: 20%;
   background: linear-gradient(to bottom right, #6A4C9C, red);
   color: white;
   font-family: 'Roboto', sans-serif;
@@ -46,6 +46,8 @@
   margin: 0;
   z-index: 1000;
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .invalidTurnPrompt .prompt-content {

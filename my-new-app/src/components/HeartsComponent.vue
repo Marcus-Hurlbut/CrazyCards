@@ -114,7 +114,6 @@ export default {
   mounted() {
     this.stompClient = this.$store.getters.stompClient;
     this.gameID = this.$store.getters.gameID;
-    this.playerID = this.$store.getters.playerID;
     this.otherPlayerNames = this.$store.getters.otherPlayers;
     this.setPlayerOrientationRing();
 
@@ -134,7 +133,6 @@ export default {
     this.subscribeNotifyEndOfGame();
 
     this.subscribeUpdateScoreboard()
-
     this.publishGetHand();
   },
   methods: {
@@ -190,10 +188,10 @@ export default {
       };
     },
     subscribeGetHand() {
-      let subscription = '/topic/getHand/' + this.playerID.toString();
+      let subscription = '/topic/getHand/' + this.$store.getters.playerID.toString();
       this.stompClient.subscribe(subscription, message => {
         let hand = JSON.parse(message.body);
-        console.log(`[topic/getHand/${this.playerID}]: `, hand);
+        console.log(`[topic/getHand/${this.$store.getters.playerID}]: `, hand);
         this.playerCards = {}
 
         for (const [id, card] of Object.entries(hand)) {
@@ -208,7 +206,7 @@ export default {
       });
     },
     subscribePassCards() {
-      let subscription = '/topic/passCards/' + this.playerID.toString();
+      let subscription = '/topic/passCards/' + this.$store.getters.playerID.toString();
       this.stompClient.subscribe(subscription, message => {
         let passedCards = JSON.parse(message.body);
 
@@ -230,7 +228,7 @@ export default {
       });
     },
     subscribeNotifyPlayersTurn() {
-      let subscription = '/topic/notifyPlayersTurn/' + this.gameID.toString() + '/' + this.playerID.toString();
+      let subscription = '/topic/notifyPlayersTurn/' + this.gameID.toString() + '/' + this.$store.getters.playerID.toString();
       this.stompClient.subscribe(subscription, message => {
         let isPlayersTurn = JSON.parse(message.body);
         console.log("isPlayersTurn: ", isPlayersTurn);
@@ -238,7 +236,7 @@ export default {
       });
     },
     subscribePlayTurn() {
-      let subscription = '/topic/playTurn/' + this.playerID.toString();
+      let subscription = '/topic/playTurn/' + this.$store.getters.playerID.toString();
       this.stompClient.subscribe(subscription, message => {
         this.validTurn = JSON.parse(message.body);
         console.log('Card placed was valid: ', this.validTurn);
@@ -289,11 +287,9 @@ export default {
       });
     },
     subscribeNotifyPassCardsReceived() {
-      let subscription = '/topic/notifyPassCardsReceived/' + this.playerID.toString();
+      let subscription = '/topic/notifyPassCardsReceived/' + this.$store.getters.playerID.toString();
       this.stompClient.subscribe(subscription, message => {
         let passedCards = JSON.parse(message.body);
- 
-        console.log(`[topic/notifyPassCardsReceived/${this.playerID.toString()}]: `, passedCards);
 
         for (const [id, card] of Object.entries(passedCards)) {
           console.log(`Assigning imgPath for card ID ${id}:`, card.imgPath);
@@ -367,7 +363,7 @@ export default {
     publishPassCards(card1, card2, card3) {
       this.stompClient.publish({
         destination: "/app/passCards",
-        body: JSON.stringify({'playerID': this.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card1, card2, card3])})
+        body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card1, card2, card3])})
       });
       this.playerPassCards = []; 
       this.playerPassedCards = true;
@@ -375,7 +371,7 @@ export default {
     publishGetHand() {
       this.stompClient.publish({
         destination: "/app/getHand",
-        body: JSON.stringify({'playerID': this.playerID, 'roomID': this.gameID})
+        body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID': this.gameID})
       })
     },
     publishPlayTurn(card) {
@@ -384,7 +380,7 @@ export default {
       if (this.trickWinnerName == null) {
         this.stompClient.publish({
           destination: "/app/playTurn",
-          body: JSON.stringify({'playerID': this.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card])})
+          body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card])})
         });
       }
     },
@@ -394,9 +390,6 @@ export default {
 
 <style scoped>
 .startHearts {
-  /* background-image: url(./squares-background.jpg);
-  background-size: cover;
-  background-repeat: no-repeat; */
   height: 100vh;
   color: white;
   text-align: center;

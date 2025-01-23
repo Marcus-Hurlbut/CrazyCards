@@ -27,15 +27,15 @@ public class HeartsController {
     }
 
     @MessageMapping("/newLobby")
-    @SendTo("/topic/newLobby")
-    public Message newLobby(Player player) throws Exception {
+    public void newLobby(Player player) throws Exception {
         System.out.println("newLobby called with params - playerID: " + player.getPlayerID() + " username: " + player.getUsername());
 
+        String playerID = player.getPlayerID().toString();
         Player newPlayer = new Player(player.getPlayerID(), player.getUsername());
         Integer roomID = GameManager.newLobby(newPlayer);
 
-        String json = toJSON(roomID);
-        return new Message(json);
+        String destination = "/topic/newLobby/" + playerID;
+        messagingTemplate.convertAndSend(destination, toJSON(roomID));
     }
 
     @MessageMapping("/joinLobby")
