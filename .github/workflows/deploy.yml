@@ -32,7 +32,7 @@ jobs:
 
       - name: Copy files to VPS
         run: |
-          scp assets-artifact ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/dungeondecks
-          scp -r ./jar-artifact/* ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/dungeondecks
+          scp -r ./assets-artifact/* ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/dungeondecks
+          scp jar-artifact ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/dungeondecks
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
