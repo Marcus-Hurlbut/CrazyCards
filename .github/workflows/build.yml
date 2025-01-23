@@ -51,4 +51,14 @@ jobs:
       - name: Build Assets
         run: ./gradlew buildVue
 
-    
+      - name: Upload Java build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jar-artifact
+          path: ./build/libs
+
+      - name: Upload Vue assets artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: assets-artifact
+          path: ./dungeon-decks-app/dist
