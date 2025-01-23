@@ -20,19 +20,41 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Download Java build artifact
-        uses: actions/download-artifact@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
         with:
-          name: jar-artifact
+          java-version: '17'
+          distribution: 'temurin'
   
-      - name: Download Vue build artifact
-        uses: actions/download-artifact@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          name: assets-artifact
-
+          node-version: '20'
+  
+      - name: Install Vue dependencies
+        run: |
+            cd dungeon-decks-app
+            npm ci
+            npm install
+            cd ../
+  
+      - name: Set execute permissions for gradlew
+        run: chmod +x ./gradlew
+  
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+  
+      - name: Install dependencies
+        run: ./gradlew dependencies
+  
+      - name: Build App
+        run: |
+            ./gradlew build
+            ./gradlew buildVue
+  
       - name: Copy files to VPS
         run: |
-          scp -r ./assets-artifact/* ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/dungeondecks
-          scp jar-artifact ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/dungeondecks
+          scp -r ./dungeon-decks-app/dist/* ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/dungeondecks/github
+          scp ./build/libs/dungeondecks-0.1.0.jar ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/dungeondecks/github
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
