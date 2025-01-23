@@ -31,15 +31,10 @@ jobs:
 
       - name: Install Vue dependencies
         run: |
+            cd dungeon-decks-app
             npm ci
             npm install
-            npm install @vue/cli-service
-            npm install @vue/cli-plugin-babel
-            npm install @vue/cli-plugin-eslint
-            npm install eslint
-            npm install eslint-plugin-vue
-            npm install @babel/core
-            npm install @babel/eslint-parser
+            cd ../
 
       - name: Set execute permissions for gradlew
         run: chmod +x ./gradlew
