@@ -51,10 +51,23 @@ jobs:
         run: |
             ./gradlew build
             ./gradlew buildVue
-  
-      - name: Copy files to VPS
-        run: |
-          scp -r ./dungeon-decks-app/dist/* ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/dungeondecks/github
-          scp ./build/libs/dungeondecks-0.1.0.jar ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/dungeondecks/github
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+            
+      - name: SCP Jar file
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT }}
+          source: "build/libs/dungeondecks-0.1.0.jar"
+          target: "dungeondecks/github"
+        
+      - name: SCP Assets
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT }}
+          source: dungeon-decks-app/dist/*
+          target: "dungeondecks/github"
