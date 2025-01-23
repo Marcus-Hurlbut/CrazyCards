@@ -20,6 +20,8 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
+          distribution: 'adoptopenjdk'
+          java-package: jdk
 
       - name: Install dependencies
         run: ./gradlew dependencies
