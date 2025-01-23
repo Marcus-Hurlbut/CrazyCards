@@ -1,8 +1,9 @@
-name: Deploy to Production
+name: Deploy
 
 on:
   workflow_run:
-    workflows: ["Build App"]
+    workflows: 
+      - "Build"
     types:
       - completed
 
