@@ -3,9 +3,8 @@
     <div class="dashboard">
       <h1 class="app-title">
         Dungeon Decks
-        <img alt="Crazy Cards logo" src="./card_icon.png" class="banner-logo" />
+        <img alt="Crazy Cards logo" src="@/assets/card_icon.png" class="banner-logo" />
       </h1>
-
       <div class="dropdown-container">
         <button class="dropdown-button">
           <img src="@/assets/burger-menu.png" alt="Menu" class="menu-icon" />
@@ -30,7 +29,9 @@
             </ul>
           </li>
           <li>About</li>
-          <li>Report a Bug</li>
+          <router-link to="/bugReport">
+            <li>Report a Bug</li>
+          </router-link>
         </ul>
       </div>
     </div>
@@ -96,7 +97,7 @@ html, body {
   padding: 5px 0;
   font-size: 3em;
   font-weight: bold;
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-family:'Courier New', Courier, monospace;
   text-align: center;
   display: flex;
   align-items: center;

@@ -20,7 +20,7 @@ export default {
 <style scoped> 
 .yourTurnPrompt {
   position: fixed;
-  bottom: 20%;
+  bottom: 25vh;
   background: linear-gradient(to bottom right, #6A4C9C, red);
   color: white;
   font-family: 'Roboto', sans-serif;
