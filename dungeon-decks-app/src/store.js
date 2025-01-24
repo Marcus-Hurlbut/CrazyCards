@@ -9,7 +9,8 @@ const store = createStore({
     playerID: "",
     playerIndex: "",
     username: "",
-    gameID: ""
+    gameID: "",
+    hand: {},
   },
   mutations: {
     storeIsLobbyCreated(state, status) {
@@ -42,6 +43,10 @@ const store = createStore({
       state.otherPlayers = null;
       state.otherPlayers = otherPlayers;
     },
+    storeHand(state, hand) {
+      state.hand = null;
+      state.hand = hand;
+    },
   },
   actions: {
     storeIsLobbyCreated({ commit }, status) {
@@ -71,6 +76,9 @@ const store = createStore({
     storeOtherPlayers({ commit }, otherPlayers) {
       commit('storeOtherPlayers', otherPlayers);
     },
+    storeHand({ commit }, hand) {
+      commit('storeHand', hand);
+    },
   },
   getters: {
     stompClient: (state) => state.stompClient,
@@ -79,7 +87,8 @@ const store = createStore({
     playerIndex: (state) => state.playerIndex,
     gameID: (state) => state.gameID,
     lobbyID: (state) => state.lobbyID,
-    otherPlayers: (state) => state.otherPlayers
+    otherPlayers: (state) => state.otherPlayers,
+    hand: (state) => state.hand
   },
 });
 

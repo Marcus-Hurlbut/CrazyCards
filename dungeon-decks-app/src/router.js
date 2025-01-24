@@ -4,6 +4,7 @@ import JoinHeartsComponent from './components/JoinHeartsComponent.vue';
 import LobbyComponent from './components/LobbyComponent.vue';
 import CreateLobbyForm from './components/forms/CreateLobbyForm.vue';
 import MainMenu from './components/MainMenu.vue';
+import BugReport from './components/index/BugReport.vue';
 
 const routes = [
   { path: '/', component: MainMenu },
@@ -11,6 +12,7 @@ const routes = [
   { path: '/joinHearts', component: JoinHeartsComponent },
   { path: '/createHeartsLobby', component: CreateLobbyForm },
   { path: '/heartsLobby', component: LobbyComponent },
+  { path: '/bugReport', component: BugReport}
 ];
 
 const router = createRouter({
