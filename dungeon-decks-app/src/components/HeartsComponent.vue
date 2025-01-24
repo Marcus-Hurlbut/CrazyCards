@@ -11,6 +11,16 @@
       <PassingPhasePrompt :passPhase="passPhase" :playerPassedCards="playerPassedCards" />
       <YourTurnPrompt :playersTurn="playersTurn" :invalidTurn="invalidTurn" />
       <WinnerPrompt :trickWinnerName="trickWinnerName" :winnerName="winnerName" />
+      <GameHUD
+        :username="this.$store.getters.username"
+        :score="usernameToScore[this.$store.getters.username]"
+        :passPhase="passPhase"
+        :handlePass="publishPassCards"
+        :handlePlay="publishPlayTurn"
+        :hand="this.$store.getters.hand"
+        :selected="selectedCards"
+      />
+
 
       <div class="player player-left">
         <h3>{{ otherPlayerNames[0] }}</h3>
@@ -31,18 +41,18 @@
       <div class="player player-right">
         <h3>{{ otherPlayerNames[2] }}</h3>
           <Card :fileName="'back_dark.png'" />
-          <div v-if="this.voidCardsInPlay[this.otherPlayerNames[2]] != null" class="stacked-card" :style="getCardPosition(1)">
+          <div v-if="this.voidCardsInPlay[otherPlayerNames[2]] != null" class="stacked-card" :style="getCardPosition(1)">
             <Card :fileName="voidCardsInPlay[otherPlayerNames[2]].imgPath" />
           </div>
       </div>
 
       <div class="player main-player">
         <div class="main-player-hand">
-          <div v-for="(card, index) in playerCards" :key="index" class="hand">
+          <div v-for="(card, index) in Object.values(this.$store.getters.hand).slice().sort((a, b) => a.order - b.order)" :key="index" class="hand">
             <Card
               :fileName="card.imgPath"
               :isSelected="this.selectedCards.includes(card.id)"
-              @click="passPhase ? toggleCardSelection(card.id) : publishPlayTurn(card.id)"
+              @click="toggleCardSelection(card.id, passPhase)"
             />
           </div>
         </div>
@@ -70,6 +80,7 @@ import Scoreboard from './hud/Scoreboard.vue';
 import YourTurnPrompt from './prompts/YourTurnPrompt.vue';
 import Card from './objects/Card.vue'
 import SquaresBackground from './animations/SquaresBackground.vue';
+import GameHUD from './hud/GameHUD.vue';
 
 export default {
   name: 'HeartsComponent',
@@ -81,9 +92,10 @@ export default {
     YourTurnPrompt,
     Card,
     SquaresBackground,
+    GameHUD
   },
   computed: {
-    ...mapState(['isLobbyCreated', 'otherPlayers', 'username', 'stompClient', 'gameID', 'playerID', 'playerIndex']),
+    ...mapState(['isLobbyCreated', 'otherPlayers', 'username', 'stompClient', 'gameID', 'playerID', 'playerIndex', 'hand']),
   },
   props: {
     msg: String
@@ -136,7 +148,7 @@ export default {
     this.publishGetHand();
   },
   methods: {
-    ...mapActions(['storeGameID', 'storeOtherPlayers']),
+    ...mapActions(['storeGameID', 'storeOtherPlayers', 'storeHand']),
 
     setPlayerOrientationRing() {
       let otherPlayer_1 = this.otherPlayerNames[0]
@@ -159,7 +171,6 @@ export default {
       }
 
       this.storeOtherPlayers(this.otherPlayerNames);
-      console.log("!!!!",this.otherPlayerNames );
     },
 
     getUsernameCardPlayed(username) {
@@ -177,7 +188,6 @@ export default {
         this.trickWinnerName = null;
       }, 4000);
     },
-
     getCardPosition(index) {
       const offset = 10;
       const xOffset = index * offset;
@@ -191,17 +201,22 @@ export default {
       let subscription = '/topic/getHand/' + this.$store.getters.playerID.toString();
       this.stompClient.subscribe(subscription, message => {
         let hand = JSON.parse(message.body);
-        console.log(`[topic/getHand/${this.$store.getters.playerID}]: `, hand);
         this.playerCards = {}
 
+        let index = 0;
         for (const [id, card] of Object.entries(hand)) {
           this.playerCards[id] = {
             id: id,
+            name: card.name,
             suit: card.suit,
             value: card.value,
             imgPath: card.imgPath,
+            order: index
           };
+          index += 1;
         }
+
+        this.storeHand(this.playerCards);
         console.log('Starting cards received: ', this.playerCards);
       });
     },
@@ -243,6 +258,8 @@ export default {
 
         if (this.validTurn === true) {
           delete this.playerCards[this.cardIDInPlay];
+          this.storeHand(this.playerCards);
+
           this.cardIDInPlay = null;
           this.playersTurn = false;
           this.invalidTurn = false;
@@ -291,14 +308,18 @@ export default {
       this.stompClient.subscribe(subscription, message => {
         let passedCards = JSON.parse(message.body);
 
+        let index = 0;
         for (const [id, card] of Object.entries(passedCards)) {
           console.log(`Assigning imgPath for card ID ${id}:`, card.imgPath);
           this.playerCards[id] = {
-            id: id,         
+            id: id,
+            name: card.name,
             suit: card.suit,
             value: card.value,
             imgPath: card.imgPath,
+            order: index
           };
+          index += 1;
         }
       });
     },
@@ -338,7 +359,15 @@ export default {
 
     },
     toggleCardSelection(cardID) {
-      if (this.selectedCards.includes(cardID)) {
+      if (!this.passPhase) {
+        if (this.selectedCards.length < 1) {
+          this.selectedCards.push(cardID);
+        } else {
+          this.selectedCards = []
+        }
+
+      }
+      else if (this.selectedCards.includes(cardID)) {
         // If already selected, remove from selectedCards
         this.selectedCards = this.selectedCards.filter(id => id !== cardID);
         this.playerPassCards = this.playerPassCards.filter(id => id !== cardID);
@@ -346,27 +375,26 @@ export default {
         this.selectedCards.push(cardID);
         this.playerPassCards.push(cardID);
       }
-
-      // Trigger passing logic if 3 cards are selected
-      if (this.selectedCards.length === 3) {
+    },
+    publishPassCards() {
+      if (this.passPhase) {
         const [card1, card2, card3] = this.selectedCards;
-        this.publishPassCards(card1, card2, card3);
-
+        console.log("Passing cards: ", this.selectedCards);
         delete this.playerCards[card1];
         delete this.playerCards[card2];
         delete this.playerCards[card3]; 
 
+        this.storeHand(this.playerCards);
+
+        this.stompClient.publish({
+          destination: "/app/passCards",
+          body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card1, card2, card3])})
+        });
+
         this.selectedCards = [];
-        this.playerPassCards = [];
+        this.playerPassCards = []; 
+        this.playerPassedCards = true;
       }
-    },
-    publishPassCards(card1, card2, card3) {
-      this.stompClient.publish({
-        destination: "/app/passCards",
-        body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card1, card2, card3])})
-      });
-      this.playerPassCards = []; 
-      this.playerPassedCards = true;
     },
     publishGetHand() {
       this.stompClient.publish({
@@ -374,14 +402,19 @@ export default {
         body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID': this.gameID})
       })
     },
-    publishPlayTurn(card) {
-      this.cardIDInPlay = card
+    publishPlayTurn() {
+      if (!this.passPhase && this.selectedCards != []) {
+        const [card] = this.selectedCards
+        this.selectedCards = [];
+        this.cardIDInPlay = card
 
-      if (this.trickWinnerName == null) {
-        this.stompClient.publish({
-          destination: "/app/playTurn",
-          body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card])})
-        });
+        // Dont allow user to start round until after announcment
+        if (this.trickWinnerName == null) {
+          this.stompClient.publish({
+            destination: "/app/playTurn",
+            body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card])})
+          });
+        }
       }
     },
   }
@@ -432,7 +465,7 @@ export default {
 .main-player-hand {
   position: relative;
   bottom: 0%;
-  transform: translate(0%, -100%);
+  transform: translate(-5%, -100%);
 }
 
 /* Players hand stacking formatting */

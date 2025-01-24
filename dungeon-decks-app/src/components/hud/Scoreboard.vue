@@ -64,9 +64,7 @@
     border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     text-align: left;
-    width: 300px;
-    max-width: 100%;
-    min-width: 250px;
+    width: 16%;
     box-sizing: border-box;
     margin: 0;
     overflow-y: auto;

@@ -175,6 +175,12 @@ public class HeartsController {
         List<Integer> cardIDs = cardsList.stream().map(Integer::parseInt).collect(Collectors.toList());
 
         Hearts hearts = GameManager.retreiveGame(gameID);
+
+        int playerIDInt = hearts.playerIDtoInt.get(playerID);
+        if (hearts.players[playerIDInt].didPassCards) {
+            return;
+        }
+
         UUID sentToID = hearts.passCards(playerID, cardIDs);
         GameManager.updateGame(gameID, hearts);
 

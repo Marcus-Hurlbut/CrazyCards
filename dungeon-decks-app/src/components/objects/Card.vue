@@ -32,8 +32,8 @@ export default {
 .card {
   display: inline-block;
   z-index: 0;
-  width: 120px;
-  height: 142px;
+  width: 7vw;
+  height: 16vh;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
