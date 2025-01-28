@@ -9,13 +9,13 @@
               <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('Default')"> Default
             </label>
             <label class="radio-label">
-              <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('Zebra')"> Zebra
+              <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('CHSD')"> C/H/S/D
             </label>
             <label class="radio-label">
-              <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('Tiger')"> Tiger
+              <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('SDCH')"> S/D/C/H
             </label>
             <label class="radio-label">
-              <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('Value')"> Value
+              <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('DCHS')"> D/C/H/S
             </label>
           </div>
         </div>
@@ -65,19 +65,19 @@ export default {
     return {
       selectedOption: 'Default',
       nameOrder: {
-        'ACE': 14,
-        'KING': 13,
-        'QUEEN': 12,
-        'JACK': 11,
-        'TEN': 10,
-        'NINE': 9,
-        'EIGHT': 8,
-        'SEVEN': 7,
-        'SIX': 6,
-        'FIVE': 5,
-        'FOUR': 4,
-        'THREE': 3,
-        'TWO': 2
+        'ACE': 11,
+        'KING': 10,
+        'QUEEN': 9,
+        'JACK': 8,
+        'TEN': 17,
+        'NINE': 6,
+        'EIGHT': 6,
+        'SEVEN': 5,
+        'SIX': 4,
+        'FIVE': 3,
+        'FOUR': 2,
+        'THREE': 1,
+        'TWO': 0
       },
     }
   },
@@ -96,9 +96,27 @@ export default {
     handleRadioChange(sortType) {
       if (sortType == 'Default') {
         this.defaultSort();
-      } else if (sortType == 'Tiger') {
-        this.tigerSort();
+      } else if (sortType == 'SDCH') {
+        this.SDCHSort();
+      } else if (sortType == 'CHSD') {
+        this.CHSDSort();
+      } else if (sortType == 'DCHS') {
+        this.DCHSSort();
       }
+    },
+    handleSort(suitOrder) {
+      let sortedCards = {};
+      for (const [id, card] of Object.entries(this.hand)) {
+        sortedCards[id] = {
+          id: id,
+          name: card.name,
+          suit: card.suit,
+          value: card.value,
+          imgPath: card.imgPath,
+          order: suitOrder[card.suit] + this.nameOrder[card.name]
+        };
+      }
+      return sortedCards;
     },
     defaultSort() {
         let sortedCards = {}
@@ -114,26 +132,35 @@ export default {
         }
         this.storeHand(sortedCards);
     },
-    tigerSort() {
-        const suitOrder = {
-            'SPADE': 0,
-            'DIAMOND': 15,
-            'CLUB': 29,
-            'HEART': 43
-        };
-
-        let sortedCards = {}
-        for (const [id, card] of Object.entries(this.hand)) {
-          sortedCards[id] = {
-            id: id,
-            name: card.name,
-            suit: card.suit,
-            value: card.value,
-            imgPath: card.imgPath,
-            order: suitOrder[card.suit] + this.nameOrder[card.name]
-          };
-        }
-        this.storeHand(sortedCards);
+    SDCHSort() {
+      const suitOrder = {
+        'SPADE': 0,
+        'DIAMOND': 12,
+        'CLUB': 25,
+        'HEART': 38
+      }
+      let sortedCards = this.handleSort(suitOrder);
+      this.storeHand(sortedCards);
+    },
+    CHSDSort() {
+      const suitOrder = {
+        'CLUB': 0,
+        'HEART': 12,
+        'SPADE': 25,
+        'DIAMOND': 38
+      };
+      let sortedCards = this.handleSort(suitOrder);
+      this.storeHand(sortedCards);
+    },
+    DCHSSort() {
+      const suitOrder = {
+        'DIAMOND': 0,
+        'CLUB': 12,
+        'HEART': 25,
+        'SPADE': 38
+      };
+      let sortedCards = this.handleSort(suitOrder);
+      this.storeHand(sortedCards);
     }
   }
 }
