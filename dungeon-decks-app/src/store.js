@@ -11,6 +11,7 @@ const store = createStore({
     username: "",
     gameID: "",
     hand: {},
+    playerCardFile: "",
   },
   mutations: {
     storeIsLobbyCreated(state, status) {
@@ -47,6 +48,9 @@ const store = createStore({
       state.hand = null;
       state.hand = hand;
     },
+    storePlayerCardFile(state, playerCardFile) {
+      state.playerCardFile = playerCardFile;
+    }
   },
   actions: {
     storeIsLobbyCreated({ commit }, status) {
@@ -79,6 +83,9 @@ const store = createStore({
     storeHand({ commit }, hand) {
       commit('storeHand', hand);
     },
+    storePlayerCardFile({ commit }, playerCardFile) {
+      commit('storePlayerCardFile', playerCardFile);
+    }
   },
   getters: {
     stompClient: (state) => state.stompClient,
@@ -88,7 +95,8 @@ const store = createStore({
     gameID: (state) => state.gameID,
     lobbyID: (state) => state.lobbyID,
     otherPlayers: (state) => state.otherPlayers,
-    hand: (state) => state.hand
+    hand: (state) => state.hand,
+    playerCardFile: (state) => state.playerCardFile,
   },
 });
 

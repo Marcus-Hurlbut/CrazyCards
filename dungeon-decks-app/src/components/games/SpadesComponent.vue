@@ -25,7 +25,7 @@
         <div class="player player-left" :class="{ highlight: otherPlayerNames[0] === playerNameInTurn }">
           <NumberIcon class="bid-number-icon" :value="playerBidValues[0]" :title="'Bid'"/>
           <h3>{{ otherPlayerNames[0] }}</h3>
-            <Card :fileName="'back_dark.png'" />
+            <Card :fileName="'card_back_black.png'" />
             <div v-if="this.voidCardsInPlay[otherPlayerNames[0]] != null" class="stacked-card" :style="getCardPosition(1)">
               <Card :fileName="voidCardsInPlay[otherPlayerNames[0]].imgPath" />
           </div>
@@ -34,7 +34,7 @@
         <div class="player player-top" :class="{ highlight: otherPlayerNames[1] === playerNameInTurn }">
           <NumberIcon class="bid-number-icon" :value="playerBidValues[1]" :title="'Bid'"/>
           <h3>{{ otherPlayerNames[1] }}</h3>
-            <Card :fileName="'back_dark.png'" />
+            <Card :fileName="'card_back_black.png'" />
             <div v-if="this.voidCardsInPlay[otherPlayerNames[1]] != null" class="stacked-card" :style="getCardPosition(1)">
               <Card :fileName="voidCardsInPlay[otherPlayerNames[1]].imgPath" />
           </div>
@@ -43,7 +43,7 @@
         <div class="player player-right" :class="{ highlight: otherPlayerNames[2] === playerNameInTurn }">
           <NumberIcon class="bid-number-icon" :value="playerBidValues[2]" :title="'Bid'"/>
           <h3>{{ otherPlayerNames[2] }}</h3>
-            <Card :fileName="'back_dark.png'" />
+            <Card :fileName="'card_back_black.png'" />
             <div v-if="this.voidCardsInPlay[otherPlayerNames[2]] != null" class="stacked-card" :style="getCardPosition(1)">
               <Card :fileName="voidCardsInPlay[otherPlayerNames[2]].imgPath" />
             </div>
@@ -64,7 +64,7 @@
         <div class="player main-player-void-cards" :class="{ highlight: this.$store.getters.username === playerNameInTurn }">
           <NumberIcon class="bid-number-icon" :value="playerBidValues[3]" :title="'Bid'"/>
           <h3> {{ this.$store.getters.username  }} </h3>
-            <Card :fileName="'back_light.png'" />
+            <Card :fileName="this.$store.getters.playerCardFile" />
             <div v-if="this.voidCardsInPlay[this.$store.getters.username] != null" class="stacked-card" :style="getCardPosition(1)">
               <Card :fileName="voidCardsInPlay[this.$store.getters.username].imgPath"/>
           </div>
@@ -103,7 +103,7 @@ import NumberIcon from '../hud/NumberIcon.vue';
       NumberIcon
     },
     computed: {
-      ...mapState(['isLobbyCreated', 'otherPlayers', 'username', 'stompClient', 'gameID', 'playerID', 'playerIndex', 'hand']),
+      ...mapState(['isLobbyCreated', 'otherPlayers', 'username', 'stompClient', 'gameID', 'playerID', 'playerIndex', 'hand', 'playerCardFile']),
     },
     props: {
       msg: String
@@ -147,6 +147,7 @@ import NumberIcon from '../hud/NumberIcon.vue';
       this.stompClient = this.$store.getters.stompClient;
       this.gameID = this.$store.getters.gameID;
       this.otherPlayerNames = this.$store.getters.otherPlayers;
+      this.storePlayerCardFile('card_back_black.png');
   
       this.displayName = this.$store.getters.username;
       this.gameStarted = true;
@@ -176,7 +177,7 @@ import NumberIcon from '../hud/NumberIcon.vue';
       this.publishGetHand();
     },
     methods: {
-      ...mapActions(['storeGameID', 'storeOtherPlayers', 'storeHand', 'storePlayerIndex']),
+      ...mapActions(['storeGameID', 'storeOtherPlayers', 'storeHand', 'storePlayerIndex', 'storePlayerCardFile']),
   
       setPlayerOrientationRing() {     
         if (this.$store.getters.playerIndex == 0) {

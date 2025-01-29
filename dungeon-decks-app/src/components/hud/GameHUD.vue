@@ -2,55 +2,97 @@
   <div class="game-hud">
     <h3 class="player-name">{{ username }}</h3>
       <div class="grid-container">
-        <div class="grid-item">Hand Sort</div>
-        <div class="grid-item">
+        <!-- <div class="grid-item">Hand Sort</div> -->
+        <div class="grid-item"> Hand Sort
           <div class="radio-container">
             <label class="radio-label">
-              <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('Default')"> Default
+              <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('Default')"><br>Default
             </label>
             <label class="radio-label">
-              <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('CHSD')"> C/H/S/D
+              <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('CHSD')"><br>C/H/S/D
             </label>
             <label class="radio-label">
-              <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('SDCH')"> S/D/C/H
+              <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('SDCH')"><br> S/D/C/H
             </label>
             <label class="radio-label">
-              <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('DCHS')"> D/C/H/S
+              <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('DCHS')"><br> D/C/H/S
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('HSDC')"><br> H/S/D/C
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('CDSH')"><br> C/D/S/H
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('SHCD')"><br> S/H/C/D
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="sort-action"  v-model="selectedOption" @change="handleRadioChange('DHCS')"><br> D/H/C/S
             </label>
           </div>
         </div>
+
         <div class="grid-item">
-          <strong>Score</strong>
+          <strong>Score</strong><br>
+          <span class="score">{{ score || 0 }} pts</span>
         </div>
         <div class="grid-item">
-          <span class="score">{{ score || 0 }}</span>
-        </div>
-        <div class="grid-item">
-          <strong>Round Number</strong>
-        </div>
-        <div class="grid-item">
+          <strong>Round </strong><br>
           <span class="round-number">0</span>
         </div>
         <div class="grid-item">
-          <!-- Pass Button with dynamic class -->
+          <strong>Card Color</strong><br>
+          <div>
+            <img 
+              class="card_color_select"
+              src="@/assets/player-card-backs/card_back_black.png"
+              @click="changePlayerCardColor('card_back_black.png')"
+            >
+            <img
+              class="card_color_select"
+              src="@/assets/player-card-backs/card_back_blue.png"
+              @click="changePlayerCardColor('card_back_blue.png')"
+            >
+            <img
+              class="card_color_select"
+              src="@/assets/player-card-backs/card_back_red.png"
+              @click="changePlayerCardColor('card_back_red.png')"
+            >
+            <img
+              class="card_color_select"
+              src="@/assets/player-card-backs/card_back_green.png"
+              @click="changePlayerCardColor('card_back_green.png')"
+            >
+            <img
+              class="card_color_select"
+              src="@/assets/player-card-backs/card_back_orange.png"
+              @click="changePlayerCardColor('card_back_orange.png')"
+            >
+            <img
+              class="card_color_select"
+              src="@/assets/player-card-backs/card_back_purple.png"
+              @click="changePlayerCardColor('card_back_purple.png')"
+            >
+          </div>
+        </div>
+        <div class="grid-item">
           <button
             class="pass-button"
             :class="{ 'gold-border': selected.length === 3 && passPhase }"
             @click="handlePass"
           >
-            Pass Cards
+            PASS
           </button>
         </div>
         <div class="grid-item">
-          <!-- Play Button with dynamic class -->
           <button
             class="play-button"
             :class="{ 'gold-border': selected.length === 1 && !passPhase }"
             @click="handlePlay"
           >
-          Play Card
-        </button>
-      </div>
+          PLAY
+          </button>
+        </div>
     </div>
   </div>
 </template>
@@ -90,9 +132,13 @@ export default {
     handlePass: Function,
     handlePlay: Function,
   },
-  methods: {
-    ...mapActions(['storeHand']),
 
+  methods: {
+    ...mapActions(['storeHand', 'storePlayerCardFile']),
+
+    changePlayerCardColor(filename) {
+      this.storePlayerCardFile(filename);
+    },
     handleRadioChange(sortType) {
       if (sortType == 'Default') {
         this.defaultSort();
@@ -102,6 +148,14 @@ export default {
         this.CHSDSort();
       } else if (sortType == 'DCHS') {
         this.DCHSSort();
+      } else if (sortType == 'HSDC') {
+        this.HSDCSort();
+      } else if (sortType == 'CDSH') {
+        this.CDSHSort();
+      } else if (sortType == 'SHCD') {
+        this.SHCDSort();
+      } else if (sortType == 'DHCS') {
+        this.DHCSSort();
       }
     },
     handleSort(suitOrder) {
@@ -161,6 +215,46 @@ export default {
       };
       let sortedCards = this.handleSort(suitOrder);
       this.storeHand(sortedCards);
+    },
+    HSDCSort() {
+      const suitOrder = {
+        'HEART': 0,
+        'SPADE': 12,
+        'DIAMOND': 25,
+        'CLUB': 38
+      };
+      let sortedCards = this.handleSort(suitOrder);
+      this.storeHand(sortedCards);
+    },
+    CDSHSort() {
+      const suitOrder = {
+        'CLUB': 0,
+        'DIAMOND': 12,
+        'SPADE': 25,
+        'HEART': 38
+      };
+      let sortedCards = this.handleSort(suitOrder);
+      this.storeHand(sortedCards);
+    },
+    SHCDSort() {
+      const suitOrder = {
+        'SPADE': 0,
+        'HEART': 12,
+        'CLUB': 25,
+        'DIAMOND': 38
+      };
+      let sortedCards = this.handleSort(suitOrder);
+      this.storeHand(sortedCards);
+    },
+    DHCSSort() {
+      const suitOrder = {
+        'DIAMOND': 0,
+        'HEART': 12,
+        'CLUB': 25,
+        'SPADE': 38
+      };
+      let sortedCards = this.handleSort(suitOrder);
+      this.storeHand(sortedCards);
     }
   }
 }
@@ -186,6 +280,7 @@ export default {
   color: white;
   font-family: Arial, sans-serif;
   z-index: 1000;
+  max-height: 60vh;
 }
 
 h3.player-name {
@@ -200,22 +295,27 @@ h3.player-name {
 
 .grid-container {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Two columns in grid HUD */
+  grid-template-columns: 1fr 1fr 2fr;
+  grid-template-rows: 2fr 1fr 1fr ;
   gap: 10px;
   text-align: center;
   font-size: 1em;
 }
 
 .grid-item {
-  padding: 8px;
+  padding: 2px;
   background: rgba(0, 0, 0, 0.3);
   border-radius: 5px;
 }
 
 .radio-container {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Two columns for radio buttons */
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 10px;
+}
+
+.grid-item:nth-child(1) {
+  grid-column: span 3; /* Span first grid item span across all columns */
 }
 
 .radio-label {
@@ -248,7 +348,6 @@ input[type="radio"] {
   text-shadow: 0px 0px 10px #00ffff, 0px 0px 20px #00ffff;
 }
 
-/* Gold border for selected buttons */
 .gold-border {
   border: 3px solid gold;
 }
@@ -256,6 +355,15 @@ input[type="radio"] {
 .score, .round-number {
   font-weight: bold;
   font-size: 1.5em;
+}
+
+.card_color_select {
+  max-width: 20px;
+  cursor:context-menu;
+}
+
+.card_color_select:hover {
+  border: 1px solid gold;
 }
 </style>
   

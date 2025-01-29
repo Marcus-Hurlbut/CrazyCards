@@ -23,7 +23,7 @@
 
       <div class="player player-left" :class="{ highlight: otherPlayerNames[0] === playerNameInTurn }">
         <h3>{{ otherPlayerNames[0] }}</h3>
-          <Card :fileName="'back_dark.png'" />
+          <Card :fileName="'card_back_black.png'" />
           <div v-if="this.voidCardsInPlay[otherPlayerNames[0]] != null" class="stacked-card" :style="getCardPosition(1)">
             <Card :fileName="voidCardsInPlay[otherPlayerNames[0]].imgPath" />
         </div>
@@ -31,7 +31,7 @@
 
       <div class="player player-top" :class="{ highlight: otherPlayerNames[1] === playerNameInTurn }">
         <h3>{{ otherPlayerNames[1] }}</h3>
-          <Card :fileName="'back_dark.png'" />
+          <Card :fileName="'card_back_black.png'" />
           <div v-if="this.voidCardsInPlay[otherPlayerNames[1]] != null" class="stacked-card" :style="getCardPosition(1)">
             <Card :fileName="voidCardsInPlay[otherPlayerNames[1]].imgPath" />
         </div>
@@ -39,7 +39,7 @@
 
       <div class="player player-right" :class="{ highlight: otherPlayerNames[2] === playerNameInTurn }">
         <h3>{{ otherPlayerNames[2] }}</h3>
-          <Card :fileName="'back_dark.png'" />
+          <Card :fileName="'card_back_black.png'" />
           <div v-if="this.voidCardsInPlay[otherPlayerNames[2]] != null" class="stacked-card" :style="getCardPosition(1)">
             <Card :fileName="voidCardsInPlay[otherPlayerNames[2]].imgPath" />
           </div>
@@ -59,7 +59,7 @@
 
       <div class="player main-player-void-cards" :class="{ highlight: this.$store.getters.username === playerNameInTurn }">
         <h3> {{ this.$store.getters.username  }} </h3>
-          <Card :fileName="'back_light.png'" />
+          <Card :fileName="this.$store.getters.playerCardFile" />
           <div v-if="this.voidCardsInPlay[this.$store.getters.username] != null" class="stacked-card" :style="getCardPosition(1)">
             <Card :fileName="voidCardsInPlay[this.$store.getters.username].imgPath"/>
         </div>
@@ -94,7 +94,7 @@ export default {
     GameHUD
   },
   computed: {
-    ...mapState(['isLobbyCreated', 'otherPlayers', 'username', 'stompClient', 'gameID', 'playerID', 'playerIndex', 'hand']),
+    ...mapState(['isLobbyCreated', 'otherPlayers', 'username', 'stompClient', 'gameID', 'playerID', 'playerIndex', 'hand', 'playerCardFile']),
   },
   props: {
     msg: String
@@ -128,6 +128,7 @@ export default {
     this.stompClient = this.$store.getters.stompClient;
     this.gameID = this.$store.getters.gameID;
     this.otherPlayerNames = this.$store.getters.otherPlayers;
+    this.storePlayerCardFile('card_back_black.png');
     this.setPlayerOrientationRing();
 
     this.displayName - this.$store.getters.username;
@@ -151,7 +152,7 @@ export default {
     this.publishGetHand();
   },
   methods: {
-    ...mapActions(['storeGameID', 'storeOtherPlayers', 'storeHand']),
+    ...mapActions(['storeGameID', 'storeOtherPlayers', 'storeHand', 'storePlayerCardFile']),
 
     setPlayerOrientationRing() {
       let otherPlayer_1 = this.otherPlayerNames[0]
