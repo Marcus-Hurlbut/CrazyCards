@@ -416,7 +416,7 @@ export default {
       })
     },
     publishPlayTurn() {
-      if (!this.passPhase && this.selectedCards != []) {
+      if (!this.passPhase && this.selectedCards != [] && this.playersTurn) {
         const [card] = this.selectedCards
         this.selectedCards = [];
         this.cardIDInPlay = card

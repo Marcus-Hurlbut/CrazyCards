@@ -14,6 +14,9 @@ import org.junit.jupiter.api.Test;
 import com.dungeondecks.marcushurlbut.Player;
 import com.dungeondecks.marcushurlbut.games.Hearts;
 import com.dungeondecks.marcushurlbut.games.Spades;
+import com.dungeondecks.marcushurlbut.games.card.Card;
+import com.dungeondecks.marcushurlbut.games.card.Name;
+import com.dungeondecks.marcushurlbut.games.card.Suit;
 import com.dungeondecks.marcushurlbut.util.TestUtils;
 import com.dungeondecks.marcushurlbut.utils.CardID;
 
@@ -267,6 +270,24 @@ public class SpadesTest {
         assertTrue(spades.playerInTurn == player4);
         assertTrue(spades.players[player4].tricks.get(CardID.CLUB_TWO.getOrdinal()) != null);
     };
+
+    @Test
+    public void calculateSpadesTrumpCardTest() {
+        setup();
+        startGame(spades, true, true, true);
+        int player2 = 1;
+        spades.playerInTurn = 0;
+        spades.startingTrickCard = new Card(Suit.HEART, Name.ACE, 1, "ace_of_hearts.png");
+
+        spades.addCardToVoidPile(0, new Card(Suit.HEART, Name.ACE, 1, "ace_of_hearts.png"));
+        spades.addCardToVoidPile(1, new Card(Suit.SPADE, Name.ACE, 1, "ace_of_spades.png"));
+        spades.addCardToVoidPile(2, new Card(Suit.DIAMOND, Name.ACE, 1, "ace_of_diamonds.png"));
+        spades.addCardToVoidPile(3, new Card(Suit.CLUB, Name.ACE, 1, "ace_of_clubs.png"));
+        
+        int winnerIntID = spades.calculateTrickWinner();
+
+        assertTrue(winnerIntID == player2);
+    }
 
     @Test
     public void trickAddedToWinnerTest() {

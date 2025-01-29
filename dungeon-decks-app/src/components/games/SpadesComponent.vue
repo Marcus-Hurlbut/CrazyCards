@@ -2,7 +2,7 @@
     <div class="spades">
       <div class ="playerIDDisplay">
         <!-- Uncomment to show player's UUID -->
-        <p>{{ playerID }}</p> 
+        <!-- <p>{{ playerID }}</p> -->
       </div>
       <div v-if="gameStarted" class="gameArea">
   
@@ -490,7 +490,7 @@ import NumberIcon from '../hud/NumberIcon.vue';
         })
       },
       publishPlayTurn() {
-        if (this.selectedCards != []) {
+        if (this.selectedCards != [] && this.playersTurn) {
           const [card] = this.selectedCards
           this.selectedCards = [];
           this.cardIDInPlay = card

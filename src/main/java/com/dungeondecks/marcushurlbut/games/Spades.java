@@ -220,6 +220,13 @@ public class Spades extends Game {
     public int calculateTrickWinner() {
         int maxValue = Integer.MIN_VALUE;
         int intPlayerID = -1;
+        boolean spadesInPlay = false;
+
+        for (Card card : voidCardPile) {
+            if (card.suit == Suit.SPADE) {
+                spadesInPlay = true;
+            }
+        }
 
         for (int i = 0; i < voidCardPile.size(); i++) {
             Card cardPlayed = voidCardPile.get(i);
@@ -227,7 +234,10 @@ public class Spades extends Game {
             if (cardPlayed != null) {
                 int cardValue = cardPlayed.name.ordinal();
 
-                if (cardValue > maxValue && (cardPlayed.suit == startingTrickCard.suit || cardPlayed.suit == Suit.SPADE)) {
+                if (cardValue > maxValue
+                    && (cardPlayed.suit == startingTrickCard.suit || cardPlayed.suit == Suit.SPADE)
+                    && (cardPlayed.suit == Suit.SPADE || !spadesInPlay))
+                {
                     maxValue = cardValue;
                     intPlayerID = i;
                 }

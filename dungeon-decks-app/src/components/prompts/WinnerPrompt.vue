@@ -44,7 +44,7 @@
   transform: translateX(-50%);
   box-sizing: border-box;
   margin: 0;
-  z-index: 10;
+  z-index: 10000;
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease, opacity 0.3s ease-in-out;
   opacity: 0; /* Start with hidden */
   animation: fadeIn 1s forwards; /* Add fadeIn animation */
