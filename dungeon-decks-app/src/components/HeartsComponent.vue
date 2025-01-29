@@ -21,8 +21,7 @@
         :selected="selectedCards"
       />
 
-
-      <div class="player player-left">
+      <div class="player player-left" :class="{ highlight: otherPlayerNames[0] === playerNameInTurn }">
         <h3>{{ otherPlayerNames[0] }}</h3>
           <Card :fileName="'back_dark.png'" />
           <div v-if="this.voidCardsInPlay[otherPlayerNames[0]] != null" class="stacked-card" :style="getCardPosition(1)">
@@ -30,7 +29,7 @@
         </div>
       </div>
 
-      <div class="player player-top">
+      <div class="player player-top" :class="{ highlight: otherPlayerNames[1] === playerNameInTurn }">
         <h3>{{ otherPlayerNames[1] }}</h3>
           <Card :fileName="'back_dark.png'" />
           <div v-if="this.voidCardsInPlay[otherPlayerNames[1]] != null" class="stacked-card" :style="getCardPosition(1)">
@@ -38,7 +37,7 @@
         </div>
       </div>
 
-      <div class="player player-right">
+      <div class="player player-right" :class="{ highlight: otherPlayerNames[2] === playerNameInTurn }">
         <h3>{{ otherPlayerNames[2] }}</h3>
           <Card :fileName="'back_dark.png'" />
           <div v-if="this.voidCardsInPlay[otherPlayerNames[2]] != null" class="stacked-card" :style="getCardPosition(1)">
@@ -58,7 +57,7 @@
         </div>
       </div>
 
-      <div class="player main-player-void-cards">
+      <div class="player main-player-void-cards" :class="{ highlight: this.$store.getters.username === playerNameInTurn }">
         <h3> {{ this.$store.getters.username  }} </h3>
           <Card :fileName="'back_light.png'" />
           <div v-if="this.voidCardsInPlay[this.$store.getters.username] != null" class="stacked-card" :style="getCardPosition(1)">
@@ -114,7 +113,9 @@ export default {
       otherPlayerNames: null,
       numOfSubscribtionNotifyVoidCards: 0,  // Used for sorting void cards in play
       voidCardsInPlay: {},  // Cards in middle that are in play
+
       playersTurn: false,  // Toggles when player is in turn
+      playerNameInTurn: '',
       usernameToScore: {},
       validTurn: true,
       invalidTurn: false,
@@ -140,9 +141,11 @@ export default {
     this.subscribeNotifyPassingPhase();
     this.subscribeNotifyVoidCards();
     this.subscribeNotifyPlayersTurn();
+    this.subscribeNotifyNameInTurn();
     this.subscribeNotifyEndOfTrick();
     this.subscribeNotifyEndOfRound();
-    this.subscribeNotifyEndOfGame();
+
+    this.subscribeNotifyGameEnded();
 
     this.subscribeUpdateScoreboard()
     this.publishGetHand();
@@ -237,9 +240,18 @@ export default {
               suit: card.suit,
               value: card.value,
               imgPath: card.imgPath,
-            };
+          };
+          this.storeHand(this.playerCards);
         }
         }
+      });
+    },
+    subscribeNotifyNameInTurn() {
+      let subscription = '/topic/hearts/notifyNameInTurn/' + this.gameID.toString();
+      this.stompClient.subscribe(subscription, message => {
+        let name = JSON.parse(message.body);
+        console.log("Player now in turn: ", name);
+        this.playerNameInTurn = name;
       });
     },
     subscribeNotifyPlayersTurn() {
@@ -321,6 +333,7 @@ export default {
           };
           index += 1;
         }
+        this.storeHand(this.playerCards);
       });
     },
     subscribeNotifyEndOfTrick() {
@@ -350,11 +363,11 @@ export default {
         this.usernameToScore = scoreboardMap;
       })
     },
-    subscribeNotifyEndOfGame() {
-      let subscription = '/topic/hearts/subscribeNotifyEndOfGame/' + this.gameID.toString();
+    subscribeNotifyGameEnded() {
+      let subscription = '/topic/hearts/notifyGameEnded/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
         this.winnerName = JSON.parse(message.body);
-        console.log(`[topic/hearts/subscribeNotifyEndOfGame/${this.gameID.toString()}] - winner name: `, this.winnerName)
+        console.log(`[topic/hearts/notifyGameEnded/${this.gameID.toString()}] - winner name: `, this.winnerName)
       })
 
     },
@@ -522,5 +535,23 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   text-shadow: 0px 0px 10px #00ffff, 0px 0px 20px #00b7ff;
+}
+
+@keyframes glowingBorder {
+  0% {
+    box-shadow: 0 0 5px gold, 0 0 10px gold;
+  }
+  50% {
+    box-shadow: 0 0 10px gold, 0 0 25px gold;
+  }
+  100% {
+    box-shadow: 0 0 5px gold, 0 0 10px gold;
+  }
+}
+
+.highlight {
+  transition: all 0.3s ease;
+  animation: glowingBorder 5s infinite alternate;
+  border: 1px solid gold;
 }
 </style>

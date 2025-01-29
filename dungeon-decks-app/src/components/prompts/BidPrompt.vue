@@ -61,6 +61,7 @@
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease;
     left: 50%;
     transform: translateX(-50%);
+    opacity: .8;
   }
   
   .bid-prompt .prompt-content {

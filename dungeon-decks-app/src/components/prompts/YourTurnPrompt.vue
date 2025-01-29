@@ -17,12 +17,20 @@ export default {
 };
 </script>
 
-<style scoped> 
+<style scoped>
+@font-face {
+  font-family: 'FancyFont';
+  src: url('@/assets/ttf/Embossed-Germanica.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .yourTurnPrompt {
   position: fixed;
   bottom: 25vh;
-  background: linear-gradient(to bottom right, #6A4C9C, red);
-  color: white;
+  background: linear-gradient(to bottom right, #294ffc, red);
+  text-shadow: 0px 0px 2px #f6f8f8, 0px 0px 2px #ffffff;
+  color: black;
   font-family: 'Roboto', sans-serif;
   font-size: 20px;
   font-weight: 600;
@@ -37,6 +45,7 @@ export default {
   margin: 0;
   z-index: 1000;
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease;
+  opacity: 0.8;
 }
 
 .yourTurnPrompt .prompt-content {

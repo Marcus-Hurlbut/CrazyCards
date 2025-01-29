@@ -10,10 +10,10 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import com.dungeondecks.marcushurlbut.Card;
 import com.dungeondecks.marcushurlbut.PassingPhase;
 import com.dungeondecks.marcushurlbut.Player;
 import com.dungeondecks.marcushurlbut.games.Hearts;
+import com.dungeondecks.marcushurlbut.games.card.Card;
 import com.dungeondecks.marcushurlbut.util.TestUtils;
 import com.dungeondecks.marcushurlbut.utils.CardID;
 
@@ -329,6 +329,7 @@ public class HeartsTest {
         simulateTrick(hearts, testUtils.getFirstSimulatedTrickCardIDs());
 
         assertTrue(hearts.playerInTurn == player4);
+        assertTrue(hearts.players[player4].tricks.get(CardID.CLUB_TWO.getOrdinal()) != null);
     }
 
     @Test
@@ -407,7 +408,7 @@ public class HeartsTest {
         // play a valid turn to trigger the end game logic
         hearts.playTurn(hearts.players[0].getPlayerID(), CardID.CLUB_TWO.getOrdinal());
 
-        assertTrue(hearts.isGameEnded());
+        assertTrue(hearts.gameEnded);
         assertTrue(hearts.isGameOver());
     };
 

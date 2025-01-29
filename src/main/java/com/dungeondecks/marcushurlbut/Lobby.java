@@ -1,6 +1,5 @@
 package com.dungeondecks.marcushurlbut;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 import com.dungeondecks.marcushurlbut.games.Hearts;
@@ -8,7 +7,7 @@ import com.dungeondecks.marcushurlbut.games.Spades;
 
 public class Lobby {
     private int id;
-    private GameType type;
+    public GameType type;
     public Player[] players = new Player[4];
     public int playerIndex = 0;
     public int maxPlayers = Integer.MAX_VALUE;

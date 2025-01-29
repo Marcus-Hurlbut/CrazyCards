@@ -4,41 +4,31 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.dungeondecks.marcushurlbut.Card;
-import com.dungeondecks.marcushurlbut.Deck;
 import com.dungeondecks.marcushurlbut.Game;
 import com.dungeondecks.marcushurlbut.PassingPhase;
 import com.dungeondecks.marcushurlbut.Player;
-import com.dungeondecks.marcushurlbut.Suit;
-import com.dungeondecks.marcushurlbut.card.Name;
+import com.dungeondecks.marcushurlbut.games.card.Card;
+import com.dungeondecks.marcushurlbut.games.card.Name;
+import com.dungeondecks.marcushurlbut.games.card.Suit;
+import com.dungeondecks.marcushurlbut.games.deck.Deck;
 import com.dungeondecks.marcushurlbut.utils.CardID;
 
 public class Hearts extends Game {
     public Deck deck = new Deck();
     int roundNumber = 0;
-    // public Player[] players = new Player[4];
-    // public HashMap<UUID, Integer> playerIDtoInt = new HashMap<UUID, Integer>();
-
-    // public UUID gameID;
     public PassingPhase roundPassingType;
 
     int cardsPlayedThisTrick = 0;
     public Card startingTrickCard  = new Card(Suit.CLUB, Name.TWO, 2, "2_of_clubs.png");
     public List<Card> voidCardPile = new ArrayList<Card>(4);
 
-    // public boolean active = false;
     public boolean passingPhaseComplete = false;
     public boolean endOfTrick = false;
     public boolean firstTrick = true;
 
-    // private boolean gameEnded = false;
-    // public Player gameWinner = null;
-
-    Hearts() {}
     public Hearts(UUID gameID) {
         this.gameID = gameID;
     }
@@ -228,9 +218,6 @@ public class Hearts extends Game {
         players[sourceID].didPassCards = true;
         players[targetID].didReceiveCards = true;
         players[targetID].passedCards = passedCards;
-
-        // UUID targetUUID = players[targetID].ID;
-        // System.out.println("Player with ID: " + targetUUID + " received Cards passed from other player");
     }
 
     public UUID passCards(UUID playerID, List<Integer> cardIDs) {
@@ -308,10 +295,6 @@ public class Hearts extends Game {
         return (firstTrick && cardID == CardID.SPADE_QUEEN.getOrdinal());
     }
 
-    public boolean isGameEnded() {
-        return gameEnded;
-    }
-
     public void setGameWinner() {
         int winner = 0;
         if (gameEnded) {
@@ -329,10 +312,6 @@ public class Hearts extends Game {
             }
             gameWinner = players[winner];
         }
-    }
-
-    public Player getGameWinner() {
-        return gameWinner;
     }
 
     public Boolean playTurn(UUID playerID, int cardID) {
@@ -355,7 +334,7 @@ public class Hearts extends Game {
         }
 
         // First turn of new Round - Must be 2 of clubs
-        if (endOfRound && playerIDindex == playerInTurn) {
+        if (endOfRound) {
             if (cardID != CardID.CLUB_TWO.getOrdinal()) {
                 return false;
             }
@@ -365,7 +344,7 @@ public class Hearts extends Game {
         }
 
         // First turn of new trick
-        else if (endOfTrick && playerIDindex == playerInTurn) {
+        else if (endOfTrick) {
             endOfTrick = false;
             startingTrickCard = card;
         }
@@ -392,7 +371,7 @@ public class Hearts extends Game {
             if (isEndOfRound()) {
                 resetRoundFields();
                 calculateScore(); 
-                shuffleAndDeal(); 
+                shuffleAndDeal();
             }
 
             if (isGameOver()) {

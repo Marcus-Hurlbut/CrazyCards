@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import com.dungeondecks.marcushurlbut.Card;
 import com.dungeondecks.marcushurlbut.Player;
-import com.dungeondecks.marcushurlbut.Suit;
-import com.dungeondecks.marcushurlbut.card.Name;
+import com.dungeondecks.marcushurlbut.games.card.Card;
+import com.dungeondecks.marcushurlbut.games.card.Name;
+import com.dungeondecks.marcushurlbut.games.card.Suit;
 import com.dungeondecks.marcushurlbut.utils.CardID;
 
 public class TestUtils {

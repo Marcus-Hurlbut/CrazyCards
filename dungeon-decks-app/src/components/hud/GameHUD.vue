@@ -167,6 +167,13 @@ export default {
 </script>
   
 <style scoped>
+@font-face {
+  font-family: 'GatsbyFont';
+  src: url('@/assets/ttf/HeraldSquareTwoNF.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .game-hud {
   position: fixed;
   bottom: 1%;
@@ -183,7 +190,11 @@ export default {
 
 h3.player-name {
   text-align: center;
-  font-size: 1.2em;
+  color: rgb(0, 0, 0);
+  text-shadow: 0px 0px 2px #f6f8f8, 0px 0px 2px #ffffff;
+  font-family: 'GatsbyFont', sans-serif;
+  font-size: 2.7em;
+  max-width: 25vw;
   margin: 0 0 10px;
 }
 

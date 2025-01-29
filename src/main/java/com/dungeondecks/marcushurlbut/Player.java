@@ -1,6 +1,8 @@
 package com.dungeondecks.marcushurlbut;
 import java.util.*;
 
+import com.dungeondecks.marcushurlbut.games.card.Card;
+
 public class Player {
     public UUID ID;
     String username;
@@ -12,6 +14,7 @@ public class Player {
     private int score = 0;
     public UUID teammate;
     public Integer bid = null;
+    public int bags = 0;
 
     public Player(UUID ID) {
         this.ID = ID;

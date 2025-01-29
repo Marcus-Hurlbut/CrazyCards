@@ -1,8 +1,9 @@
 package com.dungeondecks.marcushurlbut;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
+
+import com.dungeondecks.marcushurlbut.games.card.Card;
 
 public class Game {
     public Player[] players = new Player[4];
@@ -47,6 +48,10 @@ public class Game {
             return offset;
         }
         return (card.name.ordinal() + offset);
+    }
+
+    public Player getGameWinner() {
+        return gameWinner;
     }
     
 }

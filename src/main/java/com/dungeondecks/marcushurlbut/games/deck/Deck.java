@@ -1,8 +1,11 @@
-package com.dungeondecks.marcushurlbut;
+package com.dungeondecks.marcushurlbut.games.deck;
 
 import java.util.*;
 
-import com.dungeondecks.marcushurlbut.card.Name;
+import com.dungeondecks.marcushurlbut.Player;
+import com.dungeondecks.marcushurlbut.games.card.Card;
+import com.dungeondecks.marcushurlbut.games.card.Name;
+import com.dungeondecks.marcushurlbut.games.card.Suit;
 
 public class Deck {
 

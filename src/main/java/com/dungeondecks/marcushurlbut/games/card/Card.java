@@ -1,6 +1,4 @@
-package com.dungeondecks.marcushurlbut;
-
-import com.dungeondecks.marcushurlbut.card.Name;
+package com.dungeondecks.marcushurlbut.games.card;
 
 public class Card {
     public Suit suit;

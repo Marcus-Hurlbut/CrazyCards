@@ -79,6 +79,13 @@ export default {
 </script>
 
 <style scoped>
+@font-face {
+  font-family: 'DungeonDecksFont';
+  src: url('@/assets/ttf/Romantiques.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 html, body {
   height: 100%;
   margin: 0;
@@ -86,9 +93,9 @@ html, body {
 }
 
 .dungeon-decks {
-  background: linear-gradient(to bottom right, #b40e40, #9C27B0);
+  background: linear-gradient(to bottom right, #b40e2a,  #b40e40, #b0278e, #3D5AFE, #3D5AFE);
   animation: gradientAnimation 10s ease-in-out infinite;
-  color: white;
+  color: rgb(10, 10, 10);
   text-align: center;
   text-shadow: 0px 0px 10px #00ffff, 0px 0px 20px #00ffff;
 }
@@ -102,15 +109,20 @@ html, body {
 }
 
 .app-title {
-  color: white;
-  padding: 5px 0;
+  position: relative;
+  color: linear-gradient(to bottom right, #b40e2a,  #b40e40, #b0278e, #3D5AFE, #3D5AFE);
   font-size: 3em;
-  font-weight: bold;
-  font-family:'Courier New', Courier, monospace;
+  text-shadow: 0px 0px 3px #ffffff, 0px 0px 3px #ffffff;
+  font-family: 'DungeonDecksFont', sans-serif;
   text-align: center;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 20px;
+}
+
+.app-title h1 {
+  position: absolute;
+  font-size: 20px;
 }
 
 .banner-logo {
@@ -173,6 +185,7 @@ html, body {
 
 .has-sublist:hover .sublist {
   display: block;
+  text-shadow: 0px 0px 10px #00ffff, 0px 0px 20px #00ffff;
 }
 
 .sublist {
@@ -194,10 +207,6 @@ html, body {
   padding: 8px;
   cursor: pointer;
   color: white;
-}
-
-.sublist li:hover {
-  background-color: #b40e40;
 }
 
 /* Second-level sublist under "Hearts" */

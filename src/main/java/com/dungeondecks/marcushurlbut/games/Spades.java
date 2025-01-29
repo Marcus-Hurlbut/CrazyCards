@@ -5,16 +5,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-import com.dungeondecks.marcushurlbut.Card;
-import com.dungeondecks.marcushurlbut.Deck;
 import com.dungeondecks.marcushurlbut.Game;
 import com.dungeondecks.marcushurlbut.Player;
-import com.dungeondecks.marcushurlbut.Suit;
-import com.dungeondecks.marcushurlbut.card.Name;
-import com.dungeondecks.marcushurlbut.utils.CardID;
+import com.dungeondecks.marcushurlbut.games.card.Card;
+import com.dungeondecks.marcushurlbut.games.card.Suit;
+import com.dungeondecks.marcushurlbut.games.deck.Deck;
 
 public class Spades extends Game {
     public Deck deck = new Deck();
@@ -32,6 +29,8 @@ public class Spades extends Game {
 
     public List<String> team1Names = new ArrayList<String>();
     public List<String> team2Names = new ArrayList<String>();
+
+    public List<Player> gameWinners = new ArrayList<Player>();
     
     public Spades(UUID gameID) {
         this.gameID = gameID;
@@ -123,8 +122,8 @@ public class Spades extends Game {
         // Ensure there are exactly 2 players left to pair up
         if (remainingPlayers.size() == 2) {
             // Assign the teammates for the second team
-            remainingPlayers.get(0).teammate = remainingPlayers.get(1).ID;
-            remainingPlayers.get(1).teammate = remainingPlayers.get(0).ID;
+            remainingPlayers.get(0).teammate = remainingPlayers.get(1).getPlayerID();
+            remainingPlayers.get(1).teammate = remainingPlayers.get(0).getPlayerID();
 
             players[playerIDtoInt.get(remainingPlayers.get(0).ID)] = remainingPlayers.get(0);
             players[playerIDtoInt.get(remainingPlayers.get(1).ID)] = remainingPlayers.get(1);
@@ -251,40 +250,76 @@ public class Spades extends Game {
 
         for (Player player : players) {
             player.bid = null;
+            player.tricks = new HashMap<Integer, Card>();
+
+            int bags = player.bags;
+            if (bags >= 10) {
+                player.bags = (bags % 10);
+            }
         }
     }
 
-    public void deducePoints(Player[] team) {
-        int tricksGuessed = 0;
-        HashMap<Integer, Card> combinedTricks = new HashMap<>();
-        for (Player player : team) {
+    public void checkBagPenalty(Player player) {
+        if (player.bags >= 10) {
+            int score = player.getScore() - 100;
+            player.setScore(score);
+        }
+    }
+
+    public boolean checkNilBid(Player player, Player teammate) {
+        if (player.bid == 0) {
+            if (player.tricks.size() > 0) {
+                player.setScore(player.getScore() - 100);
+            }
+            else {
+                player.setScore(player.getScore() + 100);
+            }
+            return true;
+        }
+
+        if (teammate.bid == 0) {
+            if (teammate.tricks.size() > 0) {
+                player.setScore(player.getScore() - 100);
+            }
+            else {
+                player.setScore(player.getScore() + 100);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public void deducePoints(Player player, UUID teammateID) {
+        Player teammate = players[playerIDtoInt.get(teammateID)];
+        
+        if (checkNilBid(player, teammate) == false) {
+            int guess = player.bid + teammate.bid;
+            int score = 0;
+            int bags = 0;
+
+            HashMap<Integer, Card> combinedTricks = new HashMap<>();
             combinedTricks.putAll(player.tricks);
-            tricksGuessed += player.bid;
-        }
+            combinedTricks.putAll(teammate.tricks);
 
-        int tricksWon = combinedTricks.size();
-        int score;
-        if (tricksWon < tricksGuessed) {
-            score = 0;
-        } else {
-            int overtricks = tricksGuessed - tricksWon;
-            score = (tricksGuessed * 10) + overtricks;
-        }
+            int won = (combinedTricks.keySet().size() / 4);
 
-        for (Player player : team) {
-            int id = playerIDtoInt.get(player.ID);
-            players[id].setScore(score);
+            if (won >= guess) {
+                bags = guess - guess;
+                score = (guess * 10) + bags;
+                player.setScore(score);
+                player.bags += bags;
+            }
+
+            checkBagPenalty(player);
         }
     }
+
+    
 
     public void calculateScore() {
-        teammate.forEach((p1, p2) -> {
-            Player player1 = players[playerIDtoInt.get(p1)];
-            Player player2 = players[playerIDtoInt.get(p2)];
-
-            Player[] team = new Player[] { player1, player2 };
-            deducePoints(team);
-        });
+        for (Player player: players) {
+            deducePoints(player, player.teammate);
+        }
     }
 
     public void setGameWinner() {
@@ -299,22 +334,23 @@ public class Spades extends Game {
                     winner = playerindex;
                     highest = playerScore;
                 }
-
                 playerindex++;
             }
-            gameWinner = players[winner];
-        }
-    }
 
-    public Player getGameWinner() {
-        return gameWinner;
+            gameWinners.add(players[winner]);
+            gameWinners.add(players[playerIDtoInt.get(players[winner].teammate)]);
+        }
     }
     
     public boolean playTurn(UUID playerID, int cardID) {
         int playerIDindex = playerIDtoInt.get(playerID);
         Card card = players[playerIDindex].hand.get(cardID);
 
-        if (!teamSelectionPhaseComplete || playerIDindex != playerInTurn) {
+        if (!teamSelectionPhaseComplete || !biddingPhaseComplete) {
+            return false;
+        }
+
+        if (playerIDindex != playerInTurn) {
             System.err.println("Error: Player not in turn");
             return false;
         }
@@ -356,8 +392,8 @@ public class Spades extends Game {
 
             // End of round requires a re-shuffle & new pass phase
             if (isEndOfRound()) {
-                resetRoundFields();
                 calculateScore(); 
+                resetRoundFields();
                 shuffleAndDeal(); 
             }
 

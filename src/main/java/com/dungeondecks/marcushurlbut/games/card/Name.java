@@ -1,4 +1,4 @@
-package com.dungeondecks.marcushurlbut.card;
+package com.dungeondecks.marcushurlbut.games.card;
 
 public enum Name {
     TWO,

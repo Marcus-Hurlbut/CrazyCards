@@ -22,7 +22,7 @@
           :selected="selectedCards"
         />
   
-        <div class="player player-left">
+        <div class="player player-left" :class="{ highlight: otherPlayerNames[0] === playerNameInTurn }">
           <NumberIcon class="bid-number-icon" :value="playerBidValues[0]" :title="'Bid'"/>
           <h3>{{ otherPlayerNames[0] }}</h3>
             <Card :fileName="'back_dark.png'" />
@@ -31,7 +31,7 @@
           </div>
         </div>
   
-        <div class="player player-top">
+        <div class="player player-top" :class="{ highlight: otherPlayerNames[1] === playerNameInTurn }">
           <NumberIcon class="bid-number-icon" :value="playerBidValues[1]" :title="'Bid'"/>
           <h3>{{ otherPlayerNames[1] }}</h3>
             <Card :fileName="'back_dark.png'" />
@@ -40,7 +40,7 @@
           </div>
         </div>
   
-        <div class="player player-right">
+        <div class="player player-right" :class="{ highlight: otherPlayerNames[2] === playerNameInTurn }">
           <NumberIcon class="bid-number-icon" :value="playerBidValues[2]" :title="'Bid'"/>
           <h3>{{ otherPlayerNames[2] }}</h3>
             <Card :fileName="'back_dark.png'" />
@@ -61,7 +61,7 @@
           </div>
         </div>
   
-        <div class="player main-player-void-cards">
+        <div class="player main-player-void-cards" :class="{ highlight: this.$store.getters.username === playerNameInTurn }">
           <NumberIcon class="bid-number-icon" :value="playerBidValues[3]" :title="'Bid'"/>
           <h3> {{ this.$store.getters.username  }} </h3>
             <Card :fileName="'back_light.png'" />
@@ -122,6 +122,7 @@ import NumberIcon from '../hud/NumberIcon.vue';
         
         playersTurn: false,  // Toggles when player is in turn
         playersBidTurn: false,
+        playerNameInTurn: '',
         
         bidValue: 0,
         playerBidValues: [],
@@ -163,9 +164,11 @@ import NumberIcon from '../hud/NumberIcon.vue';
 
       this.subscribeNotifyVoidCards();
       this.subscribeNotifyPlayersTurn();
+      this.subscribeNotifyNameInTurn();
+
       this.subscribeNotifyEndOfTrick();
       this.subscribeNotifyEndOfRound();
-      this.subscribeNotifyEndOfGame();
+      this.subscribeNotifyGameEnded();
 
       this.subscribeOrientationChange();
   
@@ -354,6 +357,14 @@ import NumberIcon from '../hud/NumberIcon.vue';
           this.bidPhase = Boolean(body);
         });
       },
+      subscribeNotifyNameInTurn() {
+        let subscription = '/topic/spades/notifyNameInTurn/' + this.gameID.toString();
+        this.stompClient.subscribe(subscription, message => {
+          let name = JSON.parse(message.body);
+          console.log("Player now in turn: ", name);
+          this.playerNameInTurn = name;
+        });
+      },
       subscribeNotifyPlayersTurn() {
         let subscription = '/topic/spades/notifyPlayersTurn/' + this.gameID.toString() + '/' + this.$store.getters.playerID.toString();
         this.stompClient.subscribe(subscription, message => {
@@ -457,8 +468,8 @@ import NumberIcon from '../hud/NumberIcon.vue';
           this.usernameToScore = scoreboardMap;
         })
       },
-      subscribeNotifyEndOfGame() {
-        let subscription = '/topic/spades/subscribeNotifyEndOfGame/' + this.gameID.toString();
+      subscribeNotifyGameEnded() {
+        let subscription = '/topic/spades/notifyGameEnded/' + this.gameID.toString();
         this.stompClient.subscribe(subscription, message => {
           this.winnerName = JSON.parse(message.body);
           console.log(`[topic/subscribeNotifyEndOfGame/${this.gameID.toString()}] - winner name: `, this.winnerName)
@@ -610,30 +621,47 @@ import NumberIcon from '../hud/NumberIcon.vue';
   }
   
   /* Players name tags */
-  .player-left h3, .player-right h3, .player-top h3, .main-player-void-cards h3 {
-    position: absolute;
-    color: #f9e3fc;
-    font-size: 20px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    z-index: 10;
-    font-family: 'Lobster', sans-serif;
-    text-align: center;
-    padding: 6px 10px;
-    border-radius: 12px;
-    background: linear-gradient(45deg, #5d5bee, #fa00d0);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    text-shadow: 0px 0px 10px #00ffff, 0px 0px 20px #00b7ff;
-  }
+.player-left h3, .player-right h3, .player-top h3, .main-player-void-cards h3 {
+  position: absolute;
+  color: #f9e3fc;
+  font-size: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  z-index: 10;
+  font-family: 'Lobster', sans-serif;
+  text-align: center;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: linear-gradient(45deg, #5d5bee, #fa00d0);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-shadow: 0px 0px 10px #00ffff, 0px 0px 20px #00b7ff;
+}
 
-  .bid-number-icon {
-    position: absolute;
-    left: 28%;
-    bottom: 20%;
-    z-index: 1000;
+.bid-number-icon {
+  position: absolute;
+  left: 28%;
+  bottom: 20%;
+  z-index: 1000;
+}
+
+@keyframes glowingBorder {
+  0% {
+    box-shadow: 0 0 5px gold, 0 0 10px gold;
   }
-  
-  </style>
+  50% {
+    box-shadow: 0 0 10px gold, 0 0 25px gold;
+  }
+  100% {
+    box-shadow: 0 0 5px gold, 0 0 10px gold;
+  }
+}
+
+.highlight {
+  transition: all 0.3s ease;
+  animation: glowingBorder 5s infinite alternate;
+  border: 1px solid gold;
+}
+</style>
   

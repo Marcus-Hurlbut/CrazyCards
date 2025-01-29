@@ -12,13 +12,13 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-import com.dungeondecks.marcushurlbut.Card;
 import com.dungeondecks.marcushurlbut.GameManager;
 import com.dungeondecks.marcushurlbut.GameType;
 import com.dungeondecks.marcushurlbut.Lobby;
 import com.dungeondecks.marcushurlbut.Message;
 import com.dungeondecks.marcushurlbut.Player;
 import com.dungeondecks.marcushurlbut.games.Spades;
+import com.dungeondecks.marcushurlbut.games.card.Card;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -49,7 +49,7 @@ public class SpadesController {
 
         // Add to lobby
         Player player = new Player(playerID, username);
-        boolean gameFull = GameManager.joinLobby(player, roomID);
+        boolean gameFull = GameManager.joinLobby(player, roomID, GameType.Spades);
         Lobby lobby = GameManager.retreiveLobby(roomID);
 
         // Notify others in lobby
@@ -134,8 +134,6 @@ public class SpadesController {
             };
             
             notifyTeams(gameID, teams);
-            // notifyBiddingPhase(gameID, true);
-            // notifyPlayersBid(gameID, spades.players[spades.playerInTurn].ID);
         }
     }
 
@@ -178,6 +176,7 @@ public class SpadesController {
         if (spades.teamSelectionPhaseComplete) {
             notifyBiddingPhase(gameID, true);
             notifyPlayersBid(gameID, spades.players[spades.playerInTurn].ID);
+            notifyNameInTurn(gameID, spades.players[spades.playerInTurn].getUsername());
         }
     }
 
@@ -205,6 +204,7 @@ public class SpadesController {
 
         if (validBid && !spades.biddingPhaseComplete) {
             notifyPlayersBid(gameID, spades.players[spades.playerInTurn].ID);
+            notifyNameInTurn(gameID, spades.players[spades.playerInTurn].getUsername());
         }
 
         if (validBid) {
@@ -214,6 +214,7 @@ public class SpadesController {
         if (spades.biddingPhaseComplete) {
             notifyBiddingPhase(gameID, false);
             notifyPlayersTurn(gameID, spades.players[spades.playerInTurn].getPlayerID());
+            notifyNameInTurn(gameID, spades.players[spades.playerInTurn].getUsername());
         }
 
         String destination = "/topic/spades/placeBid/" + gameID.toString() + "/" + playerID.toString(); 
@@ -254,6 +255,7 @@ public class SpadesController {
 
             if (!spades.endOfRound) {
                 notifyPlayersTurn(gameID, spades.players[spades.playerInTurn].ID);
+                notifyNameInTurn(gameID, spades.players[spades.playerInTurn].getUsername());
             }
 
             if (spades.endOfTrick) {
@@ -265,6 +267,7 @@ public class SpadesController {
                 updateScoreboard(gameID, spades.players);
                 notifyBiddingPhase(gameID, true);
                 notifyPlayersBid(gameID, spades.players[spades.playerInTurn].ID);
+                notifyNameInTurn(gameID, spades.players[spades.playerInTurn].getUsername());
             }
 
             if (spades.gameEnded) {
@@ -286,6 +289,11 @@ public class SpadesController {
 
         String destination = "/topic/spades/getHand/" + playerID.toString(); 
         messagingTemplate.convertAndSend(destination, json);
+    }
+
+    public void notifyNameInTurn(UUID gameID, String name) {
+        String destination2 = "/topic/spades/notifyNameInTurn/" + gameID.toString();
+        messagingTemplate.convertAndSend(destination2, toJSON(name));
     }
 
     public void notifyPlayersBid(UUID gameID, UUID playerID) {

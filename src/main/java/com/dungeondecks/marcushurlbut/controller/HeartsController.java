@@ -1,4 +1,4 @@
-package com.dungeondecks.marcushurlbut;
+package com.dungeondecks.marcushurlbut.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +13,14 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
+import com.dungeondecks.marcushurlbut.GameManager;
+import com.dungeondecks.marcushurlbut.GameType;
+import com.dungeondecks.marcushurlbut.Lobby;
+import com.dungeondecks.marcushurlbut.Message;
+import com.dungeondecks.marcushurlbut.PassingPhase;
+import com.dungeondecks.marcushurlbut.Player;
 import com.dungeondecks.marcushurlbut.games.Hearts;
+import com.dungeondecks.marcushurlbut.games.card.Card;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -44,15 +51,13 @@ public class HeartsController {
 
         // Add to lobby
         Player player = new Player(playerID, username);
-        boolean gameFull = GameManager.joinLobby(player, roomID);
+        boolean gameFull = GameManager.joinLobby(player, roomID, GameType.Hearts);
         Lobby lobby = GameManager.retreiveLobby(roomID);
 
         // Notify others in lobby
         notifyPlayerJoined(player, roomID);
 
         Player[] currentPlayers = lobby.players;
-
-        // ArrayList<Player> currentPlayers = GameManager.retreiveLobby(roomID);
         ArrayList<String> otherPlayerNames = new ArrayList<>();
 
         // Return current player list to this player
@@ -61,12 +66,9 @@ public class HeartsController {
                 otherPlayerNames.add(existingPlayer.getUsername());
             }
         }
-        
-        System.out.println("otherPlayerNames: " + otherPlayerNames.toString());
-        String json = toJSON(otherPlayerNames);
 
         String destination = "/topic/hearts/joinLobby/" + playerID.toString(); 
-        messagingTemplate.convertAndSend(destination, json);
+        messagingTemplate.convertAndSend(destination, toJSON(otherPlayerNames));
         
         // Start Game & notify game start
         if (gameFull) {
@@ -80,7 +82,7 @@ public class HeartsController {
     public void updateScoreboard(UUID gameID, Player[] players) throws Exception {
         HashMap<String, String> userScores = new HashMap<String, String>();
         for (Player player: players) {
-            userScores.put(player.username, String.valueOf(player.getScore()));
+            userScores.put(player.getUsername(), String.valueOf(player.getScore()));
         }
         String destination = "/topic/hearts/updateScoreboard/" + gameID.toString();
         messagingTemplate.convertAndSend(destination, toJSON(userScores));
@@ -117,7 +119,7 @@ public class HeartsController {
 
             // Need to re-shuffle first & pass
             if (!hearts.endOfRound) {
-                notifyPlayersTurn(gameID, hearts.players[hearts.playerInTurn].ID);
+                notifyPlayersTurn(gameID, hearts.players[hearts.playerInTurn].ID, hearts.players[hearts.playerInTurn].getUsername());
             }
 
             if (hearts.endOfTrick) {
@@ -134,12 +136,12 @@ public class HeartsController {
                     hearts.onEndOfPassingPhase();
                     GameManager.updateGame(gameID, hearts);
                     notifyPassingPhase(gameID, false);
-                    notifyPlayersTurn(gameID, hearts.players[hearts.playerInTurn].ID);
+                    notifyPlayersTurn(gameID, hearts.players[hearts.playerInTurn].ID, hearts.players[hearts.playerInTurn].getUsername());
                 }
             }
 
-            if (hearts.isGameEnded()) {
-                notifyGameEnded(gameID, hearts.getGameWinner().username);
+            if (hearts.gameEnded) {
+                notifyGameEnded(gameID, hearts.getGameWinner().getUsername());
             }
         }
     }
@@ -220,15 +222,18 @@ public class HeartsController {
             hearts.onEndOfPassingPhase();
             GameManager.updateGame(gameID, hearts);
             notifyPassingPhase(gameID, false);
-            notifyPlayersTurn(gameID, hearts.players[hearts.playerInTurn].ID);
+            notifyPlayersTurn(gameID, hearts.players[hearts.playerInTurn].ID, hearts.players[hearts.playerInTurn].getUsername());
         }
     }
 
-    public void notifyPlayersTurn(UUID gameID, UUID playerID) {
+    public void notifyPlayersTurn(UUID gameID, UUID playerID, String name) {
         try {
             String destination = "/topic/hearts/notifyPlayersTurn/" + gameID.toString() + "/" + playerID.toString();
             System.out.println("\nNotifying playerID " + playerID + " it's their turn\n - destination: "  + destination);
             messagingTemplate.convertAndSend(destination, toJSON(true));
+
+            String destination2 = "/topic/hearts/notifyNameInTurn/" + gameID.toString();
+            messagingTemplate.convertAndSend(destination2, toJSON(name));
         } catch(Exception e) {
             e.printStackTrace();
         }
