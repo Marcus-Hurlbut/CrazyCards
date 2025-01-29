@@ -22,7 +22,7 @@ export default {
   },
   computed: {
     imageSrc() {
-      return require(`@/components/card-images/PNG-cards/${this.fileName}`);
+      return require('@/assets/card-images/PNG-cards/' + this.fileName);
     }
   }
 }
@@ -35,6 +35,7 @@ export default {
   width: 7vw;
   height: 16vh;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border: 2px solid transparent;
 }
 
 .card:hover {
@@ -45,7 +46,7 @@ export default {
 .selected-card {
   border: 2px solid gold;
   border-radius: 5px;
-  transform: scale(1.1);
+  transform: none;
   box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
 }
 </style>
