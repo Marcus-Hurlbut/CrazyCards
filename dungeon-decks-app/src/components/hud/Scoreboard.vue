@@ -51,31 +51,41 @@
   </script>
   
   <style scoped>
+@font-face {
+  font-family: 'GatsbyFont';
+  src: url('@/assets/ttf/HeraldSquareTwoNF.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
   .scoreboard {
     position: fixed;
     bottom: 20px;
     left: 20px;
     background: linear-gradient(135deg, purple, #be0130, #1d3dcc);
     color: white;
+    text-shadow: 0px 0px 2px #f6f8f8, 0px 0px 2px #ffffff;
     font-family: 'Arial', sans-serif;
     font-size: 18px;
     font-weight: bold;
-    padding: 10px;
+    padding: 15px;
     border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     text-align: left;
     width: 16%;
     box-sizing: border-box;
     margin: 0;
-    overflow-y: auto;
     max-height: 90%;
     z-index: 0;
+    opacity: .9;
   }
   
   .scoreboard h3 {
+    color: black;
+    font-family: 'GatsbyFont', sans-serif;
     text-align: center;
-    font-size: 20px;
-    margin-bottom: 1px;
+    font-size: 1.5em;
+    margin-bottom: 5px;
     text-transform: uppercase;
   }
   
@@ -107,7 +117,7 @@
   }
   
   .player-name {
-    font-size: 16px;
+    font-size: 1em;
     font-weight: normal;
     text-transform: capitalize;
   }

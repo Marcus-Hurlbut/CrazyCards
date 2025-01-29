@@ -1,4 +1,4 @@
-package com.dungeondecks.marcushurlbut;
+package com.dungeondecks.marcushurlbut.games.card;
 
 public class Card {
     public Suit suit;
@@ -6,7 +6,7 @@ public class Card {
     public int value;
     public String imgPath;
 
-    Card() {}
+    public Card() {}
 
     public Card(Suit suit, Name name, int value, String imgPath) {
         this.suit = suit;

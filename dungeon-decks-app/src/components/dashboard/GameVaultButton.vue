@@ -9,21 +9,29 @@
 </script>
 
 <style scoped>
+@font-face {
+  font-family: 'GameVaultFont';
+  src: url('@/assets/ttf/Broadway3D-Italic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .game-vault-btn {
   background: linear-gradient(to right, #9C27B0, #D50032, #3D5AFE);
-  color: white;
-  font-size: 2em;
+  color: black;
+  font-size: 4em;
   font-weight: 700;
   padding: 25px 80px;
   border: none;
   border-radius: 50px;
   cursor: pointer;
+  font-family: 'GameVaultFont', sans-serif;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   transition: all 0.4s ease;
   position: relative;
   text-transform: uppercase;
   letter-spacing: 2px;
-  text-shadow: 0px 0px 15px #00ffff, 0px 0px 25px #00ffff, 0px 0px 30px #ff0080;
+  text-shadow: 0px 0px 3px #ffffff, 0px 0px 3px #ffffff;
 }
 
 .game-vault-btn::before {

@@ -21,8 +21,7 @@
         :selected="selectedCards"
       />
 
-
-      <div class="player player-left">
+      <div class="player player-left" :class="{ highlight: otherPlayerNames[0] === playerNameInTurn }">
         <h3>{{ otherPlayerNames[0] }}</h3>
           <Card :fileName="'back_dark.png'" />
           <div v-if="this.voidCardsInPlay[otherPlayerNames[0]] != null" class="stacked-card" :style="getCardPosition(1)">
@@ -30,7 +29,7 @@
         </div>
       </div>
 
-      <div class="player player-top">
+      <div class="player player-top" :class="{ highlight: otherPlayerNames[1] === playerNameInTurn }">
         <h3>{{ otherPlayerNames[1] }}</h3>
           <Card :fileName="'back_dark.png'" />
           <div v-if="this.voidCardsInPlay[otherPlayerNames[1]] != null" class="stacked-card" :style="getCardPosition(1)">
@@ -38,7 +37,7 @@
         </div>
       </div>
 
-      <div class="player player-right">
+      <div class="player player-right" :class="{ highlight: otherPlayerNames[2] === playerNameInTurn }">
         <h3>{{ otherPlayerNames[2] }}</h3>
           <Card :fileName="'back_dark.png'" />
           <div v-if="this.voidCardsInPlay[otherPlayerNames[2]] != null" class="stacked-card" :style="getCardPosition(1)">
@@ -58,7 +57,7 @@
         </div>
       </div>
 
-      <div class="player main-player-void-cards">
+      <div class="player main-player-void-cards" :class="{ highlight: this.$store.getters.username === playerNameInTurn }">
         <h3> {{ this.$store.getters.username  }} </h3>
           <Card :fileName="'back_light.png'" />
           <div v-if="this.voidCardsInPlay[this.$store.getters.username] != null" class="stacked-card" :style="getCardPosition(1)">
@@ -114,7 +113,9 @@ export default {
       otherPlayerNames: null,
       numOfSubscribtionNotifyVoidCards: 0,  // Used for sorting void cards in play
       voidCardsInPlay: {},  // Cards in middle that are in play
+
       playersTurn: false,  // Toggles when player is in turn
+      playerNameInTurn: '',
       usernameToScore: {},
       validTurn: true,
       invalidTurn: false,
@@ -140,9 +141,11 @@ export default {
     this.subscribeNotifyPassingPhase();
     this.subscribeNotifyVoidCards();
     this.subscribeNotifyPlayersTurn();
+    this.subscribeNotifyNameInTurn();
     this.subscribeNotifyEndOfTrick();
     this.subscribeNotifyEndOfRound();
-    this.subscribeNotifyEndOfGame();
+
+    this.subscribeNotifyGameEnded();
 
     this.subscribeUpdateScoreboard()
     this.publishGetHand();
@@ -198,7 +201,7 @@ export default {
       };
     },
     subscribeGetHand() {
-      let subscription = '/topic/getHand/' + this.$store.getters.playerID.toString();
+      let subscription = '/topic/hearts/getHand/' + this.$store.getters.playerID.toString();
       this.stompClient.subscribe(subscription, message => {
         let hand = JSON.parse(message.body);
         this.playerCards = {}
@@ -221,7 +224,7 @@ export default {
       });
     },
     subscribePassCards() {
-      let subscription = '/topic/passCards/' + this.$store.getters.playerID.toString();
+      let subscription = '/topic/hearts/passCards/' + this.$store.getters.playerID.toString();
       this.stompClient.subscribe(subscription, message => {
         let passedCards = JSON.parse(message.body);
 
@@ -237,13 +240,22 @@ export default {
               suit: card.suit,
               value: card.value,
               imgPath: card.imgPath,
-            };
+          };
+          this.storeHand(this.playerCards);
         }
         }
       });
     },
+    subscribeNotifyNameInTurn() {
+      let subscription = '/topic/hearts/notifyNameInTurn/' + this.gameID.toString();
+      this.stompClient.subscribe(subscription, message => {
+        let name = JSON.parse(message.body);
+        console.log("Player now in turn: ", name);
+        this.playerNameInTurn = name;
+      });
+    },
     subscribeNotifyPlayersTurn() {
-      let subscription = '/topic/notifyPlayersTurn/' + this.gameID.toString() + '/' + this.$store.getters.playerID.toString();
+      let subscription = '/topic/hearts/notifyPlayersTurn/' + this.gameID.toString() + '/' + this.$store.getters.playerID.toString();
       this.stompClient.subscribe(subscription, message => {
         let isPlayersTurn = JSON.parse(message.body);
         console.log("isPlayersTurn: ", isPlayersTurn);
@@ -251,7 +263,7 @@ export default {
       });
     },
     subscribePlayTurn() {
-      let subscription = '/topic/playTurn/' + this.$store.getters.playerID.toString();
+      let subscription = '/topic/hearts/playTurn/' + this.$store.getters.playerID.toString();
       this.stompClient.subscribe(subscription, message => {
         this.validTurn = JSON.parse(message.body);
         console.log('Card placed was valid: ', this.validTurn);
@@ -270,7 +282,7 @@ export default {
       });
     },
     subscribeNotifyVoidCards() {
-      let subscription = '/topic/notifyVoidCards/' + this.gameID.toString();
+      let subscription = '/topic/hearts/notifyVoidCards/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
         let usernameToVoidCards = JSON.parse(message.body);
         console.log("Void cards in play updated: ", usernameToVoidCards);
@@ -292,7 +304,7 @@ export default {
       });
     },
     subscribeNotifyPassingPhase() {
-      let subscription = '/topic/notifyPassingPhase/' + this.gameID.toString();
+      let subscription = '/topic/hearts/notifyPassingPhase/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
         let inPassPhase = JSON.parse(message.body);
         console.log('Notified of passing phase - In pass phase: ', inPassPhase);
@@ -304,7 +316,7 @@ export default {
       });
     },
     subscribeNotifyPassCardsReceived() {
-      let subscription = '/topic/notifyPassCardsReceived/' + this.$store.getters.playerID.toString();
+      let subscription = '/topic/hearts/notifyPassCardsReceived/' + this.$store.getters.playerID.toString();
       this.stompClient.subscribe(subscription, message => {
         let passedCards = JSON.parse(message.body);
 
@@ -321,40 +333,41 @@ export default {
           };
           index += 1;
         }
+        this.storeHand(this.playerCards);
       });
     },
     subscribeNotifyEndOfTrick() {
-      let subscription = '/topic/notifyEndOfTrick/' + this.gameID.toString();
+      let subscription = '/topic/hearts/notifyEndOfTrick/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
         let name = JSON.parse(message.body);
-        console.log(`[topic/notifyEndOfTrick/${this.gameID.toString()}] - trick winner name received: `, name);
+        console.log(`[topic/hearts/notifyEndOfTrick/${this.gameID.toString()}] - trick winner name received: `, name);
         
         // this.voidCardsInPlay = {}
         this.announceTrickWinner(name)
       })
     },
     subscribeNotifyEndOfRound() {
-      let subscription = '/topic/notifyEndOfRound/' + this.gameID.toString();
+      let subscription = '/topic/hearts/notifyEndOfRound/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
         let isEndOfRound = JSON.parse(message.body);
-        console.log(`[topic/notifyEndOfRound/${this.gameID.toString()}] - message received: `, isEndOfRound)
+        console.log(`[topic/hearts/notifyEndOfRound/${this.gameID.toString()}] - message received: `, isEndOfRound)
         
         this.publishGetHand();
       })
     },
     subscribeUpdateScoreboard() {
-      let subscription = '/topic/updateScoreboard/' + this.gameID.toString();
+      let subscription = '/topic/hearts/updateScoreboard/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
         let scoreboardMap = JSON.parse(message.body);
-        console.log(`[topic/updateScoreboard/${this.gameID.toString()}] - message received: `, scoreboardMap)
+        console.log(`[topic/hearts/updateScoreboard/${this.gameID.toString()}] - message received: `, scoreboardMap)
         this.usernameToScore = scoreboardMap;
       })
     },
-    subscribeNotifyEndOfGame() {
-      let subscription = '/topic/subscribeNotifyEndOfGame/' + this.gameID.toString();
+    subscribeNotifyGameEnded() {
+      let subscription = '/topic/hearts/notifyGameEnded/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
         this.winnerName = JSON.parse(message.body);
-        console.log(`[topic/subscribeNotifyEndOfGame/${this.gameID.toString()}] - winner name: `, this.winnerName)
+        console.log(`[topic/hearts/notifyGameEnded/${this.gameID.toString()}] - winner name: `, this.winnerName)
       })
 
     },
@@ -387,7 +400,7 @@ export default {
         this.storeHand(this.playerCards);
 
         this.stompClient.publish({
-          destination: "/app/passCards",
+          destination: "/app/hearts/passCards",
           body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card1, card2, card3])})
         });
 
@@ -398,12 +411,12 @@ export default {
     },
     publishGetHand() {
       this.stompClient.publish({
-        destination: "/app/getHand",
+        destination: "/app/hearts/getHand",
         body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID': this.gameID})
       })
     },
     publishPlayTurn() {
-      if (!this.passPhase && this.selectedCards != []) {
+      if (!this.passPhase && this.selectedCards != [] && this.playersTurn) {
         const [card] = this.selectedCards
         this.selectedCards = [];
         this.cardIDInPlay = card
@@ -411,7 +424,7 @@ export default {
         // Dont allow user to start round until after announcment
         if (this.trickWinnerName == null) {
           this.stompClient.publish({
-            destination: "/app/playTurn",
+            destination: "/app/hearts/playTurn",
             body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card])})
           });
         }
@@ -522,5 +535,23 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   text-shadow: 0px 0px 10px #00ffff, 0px 0px 20px #00b7ff;
+}
+
+@keyframes glowingBorder {
+  0% {
+    box-shadow: 0 0 5px gold, 0 0 10px gold;
+  }
+  50% {
+    box-shadow: 0 0 10px gold, 0 0 25px gold;
+  }
+  100% {
+    box-shadow: 0 0 5px gold, 0 0 10px gold;
+  }
+}
+
+.highlight {
+  transition: all 0.3s ease;
+  animation: glowingBorder 5s infinite alternate;
+  border: 1px solid gold;
 }
 </style>

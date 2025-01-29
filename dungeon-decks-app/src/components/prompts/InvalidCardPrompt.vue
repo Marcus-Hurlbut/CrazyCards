@@ -27,12 +27,20 @@
 </script>
 
 <style scoped>
+@font-face {
+  font-family: 'FancyFont';
+  src: url('@/assets/ttf/Embossed-Germanica.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .invalidTurnPrompt {
   position: fixed;
   bottom: 25vh;
-  background: linear-gradient(to bottom right, #6A4C9C, red);
-  color: white;
-  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(to bottom right, #294ffc, red);
+  color: black;
+  text-shadow: 0px 0px 2px #f6f8f8, 0px 0px 2px #ffffff;
+  font-family: 'FancyFont', sans-serif;
   font-size: 20px;
   font-weight: 600;
   padding: 5px;
@@ -48,6 +56,7 @@
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease;
   left: 50%;
   transform: translateX(-50%);
+  opacity: 0.8;
 }
 
 .invalidTurnPrompt .prompt-content {
