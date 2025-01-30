@@ -34,6 +34,10 @@ export default {
   z-index: 0;
   width: 7vw;
   height: 16vh;
+  max-width: 180px;
+  max-height: 600px;
+  min-width: 80px;
+  min-height: 150px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   border: 2px solid transparent;
 }
@@ -44,9 +48,9 @@ export default {
 }
 
 .selected-card {
-  border: 2px solid gold;
+  border: 4px solid gold;
   border-radius: 5px;
   transform: none;
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
 }
 </style>

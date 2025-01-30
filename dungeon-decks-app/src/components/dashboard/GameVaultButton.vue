@@ -1,11 +1,21 @@
 <template>
-  <button class="game-vault-btn">Game Vault</button>
+  <ButtonAnimation :title="'Game Vault'">
+      <template #button>
+        <button class="game-vault-btn">Game Vault</button>
+      </template>
+    </ButtonAnimation>
 </template>
 
 <script>
-  export default {
-    name: "GameVaultButton"
-  };
+import ButtonAnimation from '../animations/ButtonAnimation.vue';
+
+export default {
+  name: "GameVaultButton",
+  components: {
+    ButtonAnimation
+  }
+
+};
 </script>
 
 <style scoped>
@@ -17,7 +27,7 @@
 }
 
 .game-vault-btn {
-  background: linear-gradient(to right, #9C27B0, #D50032, #3D5AFE);
+  background: linear-gradient(to right, #000000, #D50032, #3D5AFE, #000000);
   color: black;
   font-size: 4em;
   font-weight: 700;
@@ -31,7 +41,7 @@
   position: relative;
   text-transform: uppercase;
   letter-spacing: 2px;
-  text-shadow: 0px 0px 3px #ffffff, 0px 0px 3px #ffffff;
+  text-shadow: 0px 0px 3px #3D5AFE, 0px 0px 3px #ffffff;
 }
 
 .game-vault-btn::before {

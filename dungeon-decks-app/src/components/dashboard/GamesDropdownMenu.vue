@@ -69,21 +69,37 @@ export default {
   font-style: normal;
 }
 
-/* List of games */
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 25px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: purple;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3ba1f5;
+}
+
 .games-list {
   list-style-type: none;
   padding: 0;
   margin: 0;
   text-align: center;
   font-family: 'GameVaultFont', sans-serif;
-  max-height: 50vh;
+  max-height: 35vh;
   scroll-behavior: auto;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
 .game-item {
-  font-size: 2.5em;
+  font-size: 3.2em;
   color: black;
   padding: 8px 30px;
   cursor: pointer;
@@ -95,11 +111,10 @@ export default {
 .game-item:hover {
   padding-bottom: 1em;
   transform: scale(1.05);
-  text-shadow: 0px 0px 10px #00ffff, 0px 0px 20px #3ba1f5;
+  text-shadow: 0px 0px 10px #008cff, 0px 0px 20px #3ba1f5;
 }
 
 /* Submenu Dropdown for Create/Join Lobby */
-
 .submenu-dropdown {
   padding: 20px 0px;
   display: flexbox;
@@ -118,8 +133,8 @@ export default {
   font-family: 'GameVaultFont', sans-serif;
   font-size: .8em;
   letter-spacing: 1px;
-  text-shadow: 0px 0px 10px #e97dff, 0px 0px 20px #e97dff;
-  box-shadow: 0 0 10px rgba(173, 1, 253, 0.6), 0 0 20px rgba(255, 0, 34, 0.8);
+  text-shadow: 0px 0px 10px #fd2739, 0px 0px 20px #e9224d;
+  box-shadow: 0 0 10px rgba(253, 1, 198, 0.815), 0 0 20px rgba(255, 0, 34, 0.8);
 }
 
 .menu-button:hover {

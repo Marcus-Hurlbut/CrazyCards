@@ -1,10 +1,18 @@
 <template>
   <div class="dungeon-decks">
     <div class="dashboard">
+    
       <h1 class="app-title">
-        Dungeon Decks
-        <img alt="Crazy Cards logo" src="@/assets/card_icon.png" class="banner-logo" />
+        <FlameAnimation class="flame-left"/>
+          <span></span>
+          <span></span>
+          Dungeon Decks
+        <!-- <img alt="Crazy Cards logo" src="@/assets/card_icon.png" class="banner-logo" /> -->
+
+        <!-- <span></span> -->
+        <FlameAnimation />
       </h1>
+      <BirdsAnimation />
       <div class="dropdown-container">
         <button class="dropdown-button">
           <img src="@/assets/burger-menu.png" alt="Menu" class="menu-icon" />
@@ -50,13 +58,18 @@
 <script>
 import { mapState } from 'vuex';
 import { mapActions } from 'vuex';
+import FlameAnimation from './animations/FlameAnimation.vue';
+import BirdsAnimation from './animations/BirdsAnimation.vue';
 
 export default {
   name: 'DungeonDecks',
   computed: {
     ...mapState(['stompClient', 'isLobbyCreated'])
   },
-  components: {},
+  components: {
+    FlameAnimation,
+    BirdsAnimation
+  },
   props: {
     msg: String
   },
@@ -129,6 +142,10 @@ html, body {
   height: 60px;
   width: auto;
 }
+.flame-left {
+  position: a;
+  transform: translateX(50%);
+}
 
 /* Dropdown styles */
 .dropdown-container {
@@ -180,7 +197,7 @@ html, body {
 
 /* Sublist for Game Vault */
 .has-sublist {
-  position: relative; /* Ensures sublist is positioned correctly */
+  position: relative;
 }
 
 .has-sublist:hover .sublist {
