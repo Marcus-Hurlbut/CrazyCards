@@ -228,7 +228,7 @@ export default {
         let passedCards = JSON.parse(message.body);
 
         if (passedCards === false) {
-          console.log("Still waiting on passed cards - subscribing to topic notifyPassCardsReceived");
+          console.log("Still waiting on passed cards");
           this.subscribeNotifyPassCardsReceived();
         } else {
           console.log('Passed Cards received: ', passedCards);
@@ -338,7 +338,7 @@ export default {
       let subscription = '/topic/hearts/notifyEndOfTrick/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
         let name = JSON.parse(message.body);
-        console.log(`[topic/hearts/notifyEndOfTrick/${this.gameID.toString()}] - trick winner name received: `, name);
+        console.log(`[Trick winner name: `, name);
         this.announceTrickWinner(name)
       })
     },
@@ -346,7 +346,7 @@ export default {
       let subscription = '/topic/hearts/notifyEndOfRound/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
         let isEndOfRound = JSON.parse(message.body);
-        console.log(`[topic/hearts/notifyEndOfRound/${this.gameID.toString()}] - message received: `, isEndOfRound)
+        console.log(`End of round message received: `, isEndOfRound)
         
         this.publishGetHand();
       })
@@ -385,7 +385,7 @@ export default {
       }
     },
     publishPassCards() {
-      if (this.passPhase) {
+      if (this.passPhase && this.selectedCards.length == 3) {
         const [card1, card2, card3] = this.selectedCards;
         console.log("Passing cards: ", this.selectedCards);
         delete this.playerCards[card1];

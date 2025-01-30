@@ -2,7 +2,6 @@
   <div class="game-hud">
     <h3 class="player-name">{{ username }}</h3>
       <div class="grid-container">
-        <!-- <div class="grid-item">Hand Sort</div> -->
         <div class="grid-item"> Hand Sort
           <div class="radio-container">
             <label class="radio-label">

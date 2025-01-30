@@ -112,7 +112,7 @@ html, body {
   position: relative;
   color: linear-gradient(to bottom right, #b40e2a,  #b40e40, #b0278e, #3D5AFE, #3D5AFE);
   font-size: 3em;
-  text-shadow: 0px 0px 3px #ffffff, 0px 0px 3px #ffffff;
+  text-shadow: 0 0 5px rgb(60, 137, 224), 0 0 10px rgb(0, 183, 255);
   font-family: 'DungeonDecksFont', sans-serif;
   text-align: center;
   display: flex;
