@@ -3,7 +3,8 @@
   <div class="heartsLobby">
     <div v-if="isLobbyCreated" class="lobbyPlayerList" >
       <h1>Waiting for other players...</h1>
-      <h2>Game Code: {{ lobbyID }}</h2>
+      <h3>Game Code</h3>
+      <h2>{{ lobbyID }}</h2>
       <ul>
         <li> {{ displayName || 'Waiting..'}}</li>
         <li> {{ otherPlayerNames[0] || 'Waiting..'}}</li>
@@ -21,6 +22,7 @@ import { mapState } from 'vuex';
 import { mapActions } from 'vuex';
 import BubbleBackground from './animations/BubbleBackground.vue';
 import { v4 as uuidv4 } from 'uuid';
+import '@/assets/styles/global.css';
 
 export default {
   name: 'LobbyComponent',
@@ -161,11 +163,14 @@ export default {
   display: inline-block;
   padding: 30px 40px;
   text-align: center;
-  background: linear-gradient(to bottom right, #C2185B, #9C27B0);
+  background: linear-gradient(to bottom right, #b1031a, #a30c8a, #2762b0);
   border-radius: 15px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   width: 100%;
-  max-width: 450px;
+  height: 100%;
+  max-width: 35vw;
+  max-height: 80vh;
+  height: auto;
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease;
   z-index: 100;
 }
@@ -173,40 +178,54 @@ export default {
 .lobbyPlayerList:hover {
   transform: translate(-50%, -51%);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
-  background: linear-gradient(to bottom right, #C2185B, rgb(177, 52, 199));
+  background: linear-gradient(to bottom right, #b1031a, #8a0cb1, #2762b0);
 }
 
-h1, h2 {
-  color: white;
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+h1, h3 {
+  color: black;
+  font-family: 'GatsbyFont';
+  animation: glowingBorder 2s infinite alternate;
+  text-shadow: 0px 0px 4px rgb(60, 137, 224), 0px 0px 3px rgb(0, 183, 255);;
 }
 
 h1 {
-  font-size: 2.5em;
+  font-size: 3.2em;
   font-weight: bold;
   margin-bottom: 15px;
 }
 
 h2 {
-  font-size: 1.5em;
+  font-size: 3.2em;
   font-weight: bold;
   margin-bottom: 20px;
+  color: black;
+  font-family: 'FancyFont';
+  text-shadow: 0 0 5px rgb(60, 137, 224), 0 0 10px rgb(0, 183, 255);
+}
+
+h3 {
+  font-size: 2em;
+  font-weight: bold;
+  margin-bottom: -25px;
 }
 
 ul {
   list-style-type: none;
   margin: 0;
-  padding: 0;
+  padding: 10px;
 }
 
 ul li {
-  font-size: 1.2em;
-  color: white;
+  font-family: 'FancyFont';
+  animation: neonGlowingBorder 2s infinite alternate;
+  font-size: 2em;
+  color: black;
   padding: 10px;
   margin: 8px 0;
   background: rgba(0, 0, 0, 0.4);
   border-radius: 10px;
   transition: background-color 0.3s, transform 0.3s;
+  text-shadow: 0px 0px 4px #44c9e0, 0px 0px 3px #ffffff;
 }
 
 ul li:hover {

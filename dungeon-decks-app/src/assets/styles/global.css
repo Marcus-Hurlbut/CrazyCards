@@ -1,0 +1,37 @@
+@font-face {
+  font-family: 'FancyFont';
+  src: url('@/assets/ttf/Embossed-Germanica.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+    font-family: 'GatsbyFont';
+    src: url('@/assets/ttf/HeraldSquareTwoNF.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+@keyframes goldGlowingBorder {
+    0% {
+      box-shadow: 0 0 5px gold, 0 0 10px gold;
+    }
+    50% {
+      box-shadow: 0 0 10px gold, 0 0 25px gold;
+    }
+    100% {
+      box-shadow: 0 0 5px gold, 0 0 10px gold;
+    }
+}
+
+@keyframes neonGlowingBorder {
+    0% {
+      box-shadow: 0 0 5px rgb(60, 137, 224), 0 0 10px rgb(0, 110, 255);
+    }
+    50% {
+      box-shadow: 0 0 25px rgb(60, 137, 224), 0 0 25px rgb(0, 110, 255);
+    }
+    100% {
+      box-shadow: 0 0 15px rgb(60, 137, 224), 0 0 10px rgb(0, 183, 255);
+    }
+}

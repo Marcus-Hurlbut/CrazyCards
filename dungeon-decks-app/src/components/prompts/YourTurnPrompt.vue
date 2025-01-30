@@ -27,7 +27,7 @@ export default {
 
 .yourTurnPrompt {
   position: fixed;
-  bottom: 25vh;
+  bottom: 27vh;
   background: linear-gradient(to bottom right, #294ffc, red);
   text-shadow: 0px 0px 3px #f6f8f8, 0px 0px 3px #ffffff;
   color: black;

@@ -9,78 +9,82 @@
     </div>
   </template>
   
-  <script>
-    import { mapActions } from 'vuex';
-    import BubbleBackground from '../animations/BubbleBackground.vue';
-    export default {
-      name: "CreateLobbyForm",
-      components: {
-        BubbleBackground,
-      },
-      data() {
-        return {
-          displayName: ''
-        };
-      },
-      props: {
-        isLobbyCreated: Boolean,
-      },
-      methods: {
-        ...mapActions(['storeUsername', 'storePlayerIndex']),
-        handleSubmit() {
-          this.storeUsername(this.displayName);
-          this.storePlayerIndex(0);
-          this.$emit('submit', this.displayName); 
-
-          this.$router.push({
-            path: '/lobby',
-            query: {
-              ...this.$route.query
-            }
-          });
-        }
-      }
+<script>
+import '@/assets/styles/global.css';
+import { mapActions } from 'vuex';
+import BubbleBackground from '../animations/BubbleBackground.vue';
+export default {
+  name: "CreateLobbyForm",
+  components: {
+    BubbleBackground,
+  },
+  data() {
+    return {
+      displayName: ''
     };
-  </script>
+  },
+  props: {
+    isLobbyCreated: Boolean,
+  },
+  methods: {
+    ...mapActions(['storeUsername', 'storePlayerIndex']),
+    handleSubmit() {
+      this.storeUsername(this.displayName);
+      this.storePlayerIndex(0);
+      this.$emit('submit', this.displayName); 
+
+      this.$router.push({
+        path: '/lobby',
+        query: {
+          ...this.$route.query
+        }
+      });
+    }
+  }
+};
+</script>
   
-  <style scoped>
+<style scoped>
   .createLobbyForm {
     position: absolute;
     top: 50%;
     left: 50%; 
     transform: translate(-50%, -50%);
     display: inline-block;
-    padding: 30px 50px;
-    background: linear-gradient(135deg, #6a1b9a, #ff1744);
+    font-family: 'FancyFont', sans-serif;
+    padding: 50px 80px;
+    background: linear-gradient(135deg, #1b479a ,#6a1b9a, #ff1744);
     border-radius: 15px;
     border: 3px solid #ffffff;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
     text-align: center;
-    color: #fff;
+    color: black;
     width: 300px;
     transition: all 0.3s ease-in-out;
     z-index: 100;
   }
   
   .createLobbyForm label {
-    font-size: 1.1em;
-    margin-bottom: 10px;
+    font-size: 2em;
+    margin-bottom: 40px;
     display: block;
-    font-weight: bold;
-    color: #ffffff;
+    color: black;
+    position: relative;
+    text-shadow: 0px 0px 2px #f6f8f8, 0px 0px 2px #ffffff;
   }
   
   .createLobbyForm input {
     width: 100%;
     padding: 12px;
-    margin: 10px 0;
+    margin: 20px -50px;
     border-radius: 8px;
     border: 2px solid #fff;
     font-size: 1em;
     background: rgba(255, 255, 255, 0.3);
     color: #fff;
     text-align: center;
-    transition: background 0.3s ease;
+    transition: 0.3s ease;
+    left: 50%;
   }
   
   .createLobbyForm input::placeholder {
@@ -92,26 +96,30 @@
     background: rgba(255, 255, 255, 0.5);
   }
   
-  .createLobbyForm button {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    background-color: rgba(120, 101, 233, 0.507);
-    color: #fff;
-    border: none;
-    font-size: 1.1em;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
-  }
+.createLobbyForm button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: rgba(201, 84, 201, 0.507);
+  color: black;
+  font-weight: bold;
+  text-shadow: 0px 0px 1px #f6f8f8, 0px 0px 1px #ffffff;
+  border: none;
+  font-size: 1.8em;
+  cursor: pointer;
+  transition: 0.3s ease, transform 0.2s ease;
+  font-family: 'FancyFont', sans-serif;
+}
   
-  .createLobbyForm button:hover {
-    background-color: rgba(107, 82, 250, 0.507);;
-    transform: scale(1.05);
-  }
+.createLobbyForm button:hover {
+  background-color: rgba(35, 68, 214, 0.507);
+  transform: scale(1.05);
+  animation: neonGlowingBorder 2s infinite alternate;
+}
   
-  .createLobbyForm button:active {
-    background-color: rgba(120, 101, 233, 0.507);
-  }
+.createLobbyForm button:active {
+  background-color: rgba(120, 101, 233, 0.507);
+}
   
-  </style>
+</style>
   

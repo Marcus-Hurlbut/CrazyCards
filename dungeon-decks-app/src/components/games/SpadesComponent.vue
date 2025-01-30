@@ -272,12 +272,10 @@ import NumberIcon from '../hud/NumberIcon.vue';
 
           if (this.team1.includes(this.displayName)) {
             this.team = 0;
-            // Loop through team1 and find the teammate by excluding the displayName
             this.teammateName = this.team1.find(e => e !== this.displayName);
           } 
           else if (this.team2.includes(this.displayName)) {
             this.team = 1;
-            // Loop through team2 and find the teammate by excluding the displayName
             this.teammateName = this.team2.find(e => e !== this.displayName);
             console.log('Teammate found: ', this.teammateName);
           }
@@ -296,11 +294,8 @@ import NumberIcon from '../hud/NumberIcon.vue';
             
           for (let i = 0; i < playerList.length; i++) {
             let entry = playerList[i];
-
             if (entry == this.displayName) {
                 this.storePlayerIndex(i);
-                console.log("Setting new player index to: ", this.$store.getters.playerIndex)
-    
                 let j = 0;
                 for (let i = 0; i < this.otherPlayerNames.length; i++) {
                     if (this.otherPlayerNames[i] != this.teammateName) {
@@ -380,19 +375,14 @@ import NumberIcon from '../hud/NumberIcon.vue';
           let bidData = JSON.parse(message.body);
           for (let username in bidData) {
             if (Object.prototype.hasOwnProperty.call(bidData, username)) {
-                let bidAmount = bidData[username]; // Get the bid amount associated with the username
-                console.log('Username:', username);
-                console.log('Bid Amount:', bidAmount);
+                let bidAmount = bidData[username];
 
                 if (username === this.displayName) {
                     this.playerBidValues[3] = bidAmount;
                 }
                 let i = 0
                 for (let name of this.otherPlayerNames) {
-                    console.log('name in origin map:', name);
-                    console.log('json username:', username);
                     if (username === name) {
-                        console.log('Found! ', username);
                         this.playerBidValues[i] = bidAmount;
                         break;
                     }
@@ -518,10 +508,8 @@ import NumberIcon from '../hud/NumberIcon.vue';
         })
       },
       publishPlaceBid(bid) {
-        console.log("playersBid: ", this.playersBidTurn)
-
         if (this.playersBidTurn && this.bidPhase) {
-            console.log('placing bid with value: ', bid);
+          console.log('Players Bid: ', bid);
           this.bidValue = bid;
           this.stompClient.publish({
             destination: "/app/spades/placeBid",
@@ -534,90 +522,89 @@ import NumberIcon from '../hud/NumberIcon.vue';
 </script>
   
 <style scoped>
-  .spades {
-    height: 100vh;
-    color: white;
-    text-align: center;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: center; 
-    align-items: center; 
-  }
+.spades {
+  height: 100vh;
+  color: white;
+  text-align: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: center; 
+}
   
-  .playerIDDisplay {
-    position: absolute;
-    top: 18%;
-    left: 1%;
-    color: wheat;
-    background-color: black;
-  }
+.playerIDDisplay {
+  position: absolute;
+  top: 18%;
+  left: 1%;
+  color: wheat;
+  background-color: black;
+}
   
-  .gameArea {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+.gameArea {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
   
-  .player {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-  }
-  /* Main player positioning */
-  .main-player {
-    bottom: 0%;
-    position: absolute;
-  }
+.player {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+}
+/* Main player positioning */
+.main-player {
+  bottom: 0%;
+  position: absolute;
+}
   
-  .main-player-hand {
-    position: relative;
-    bottom: 0%;
-    transform: translate(-5%, -100%);
-  }
+.main-player-hand {
+  position: relative;
+  bottom: 0%;
+  transform: translate(-5%, -100%);
+}
   
   /* Players hand stacking formatting */
-  .hand {
-    width: 50px;
-    height: 70px;
-    border-radius: 5px;
-    margin: 5px;
-    display: inline-block;
-    z-index: 0;
-  }
+.hand {
+  width: 50px;
+  height: 70px;
+  border-radius: 5px;
+  margin: 5px;
+  display: inline-block;
+  z-index: 0;
+}
   
-  .main-player-void-cards {
-    position: absolute;
-    top: 25%;
-  }
+.main-player-void-cards {
+  position: absolute;
+  top: 25%;
+}
   
-  .stacked-card {
-    position: absolute;
-    top: 0;
-    left: 0;
-    transition: transform 0.3s ease-in-out;
-  }
+.stacked-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: transform 0.3s ease-in-out;
+}
+
+.player-top {
+  top: 2%;
+}
   
-  /* Other players cards position */
-  .player-top {
-    top: 2%;
-  }
+.player-right {
+  right: 30%;
+  bottom: 70%;
+}
   
-  .player-right {
-    right: 30%;
-    bottom: 70%;
-  }
+.player-left {
+  left: 30%;
+  bottom: 70%;
+}
   
-  .player-left {
-    left: 30%;
-    bottom: 70%;
-  }
-  
-  /* Players name tags */
+/* Players name tags */
 .player-left h3, .player-right h3, .player-top h3, .main-player-void-cards h3 {
   position: absolute;
   color: #f9e3fc;

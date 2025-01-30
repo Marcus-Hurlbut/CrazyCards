@@ -27,7 +27,7 @@ export default {
 
 .passingPhasePrompt {
   position: fixed;
-  bottom: 25vh;
+  bottom: 27vh;
   background: linear-gradient(to bottom right, #294ffc, red);
   color: rgb(0, 0, 0);
   font-family: 'FancyFont', sans-serif;
