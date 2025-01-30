@@ -193,9 +193,9 @@ export default {
     SDCHSort() {
       const suitOrder = {
         'SPADE': 0,
-        'DIAMOND': 12,
-        'CLUB': 25,
-        'HEART': 38
+        'DIAMOND': 13,
+        'CLUB': 26,
+        'HEART': 39
       }
       let sortedCards = this.handleSort(suitOrder);
       this.storeHand(sortedCards);
@@ -203,9 +203,9 @@ export default {
     CHSDSort() {
       const suitOrder = {
         'CLUB': 0,
-        'HEART': 12,
-        'SPADE': 25,
-        'DIAMOND': 38
+        'HEART': 13,
+        'SPADE': 26,
+        'DIAMOND': 39
       };
       let sortedCards = this.handleSort(suitOrder);
       this.storeHand(sortedCards);
@@ -213,9 +213,9 @@ export default {
     DCHSSort() {
       const suitOrder = {
         'DIAMOND': 0,
-        'CLUB': 12,
-        'HEART': 25,
-        'SPADE': 38
+        'CLUB': 13,
+        'HEART': 26,
+        'SPADE': 39
       };
       let sortedCards = this.handleSort(suitOrder);
       this.storeHand(sortedCards);
@@ -223,9 +223,9 @@ export default {
     HSDCSort() {
       const suitOrder = {
         'HEART': 0,
-        'SPADE': 12,
-        'DIAMOND': 25,
-        'CLUB': 38
+        'SPADE': 13,
+        'DIAMOND': 26,
+        'CLUB': 39
       };
       let sortedCards = this.handleSort(suitOrder);
       this.storeHand(sortedCards);
@@ -233,9 +233,9 @@ export default {
     CDSHSort() {
       const suitOrder = {
         'CLUB': 0,
-        'DIAMOND': 12,
-        'SPADE': 25,
-        'HEART': 38
+        'DIAMOND': 13,
+        'SPADE': 26,
+        'HEART': 39
       };
       let sortedCards = this.handleSort(suitOrder);
       this.storeHand(sortedCards);
@@ -243,9 +243,9 @@ export default {
     SHCDSort() {
       const suitOrder = {
         'SPADE': 0,
-        'HEART': 12,
-        'CLUB': 25,
-        'DIAMOND': 38
+        'HEART': 13,
+        'CLUB': 26,
+        'DIAMOND': 39
       };
       let sortedCards = this.handleSort(suitOrder);
       this.storeHand(sortedCards);
@@ -253,9 +253,9 @@ export default {
     DHCSSort() {
       const suitOrder = {
         'DIAMOND': 0,
-        'HEART': 12,
-        'CLUB': 25,
-        'SPADE': 38
+        'HEART': 13,
+        'CLUB': 26,
+        'SPADE': 39
       };
       let sortedCards = this.handleSort(suitOrder);
       this.storeHand(sortedCards);

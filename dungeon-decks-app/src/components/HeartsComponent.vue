@@ -207,7 +207,6 @@ export default {
         let hand = JSON.parse(message.body);
         this.playerCards = {}
 
-        // let index = 0;
         for (const [id, card] of Object.entries(hand)) {
           this.playerCards[id] = {
             id: id,
@@ -217,7 +216,6 @@ export default {
             imgPath: card.imgPath,
             order: id
           };
-          // index += 1;
         }
 
         this.storeHand(this.playerCards);
@@ -234,8 +232,7 @@ export default {
           this.subscribeNotifyPassCardsReceived();
         } else {
           console.log('Passed Cards received: ', passedCards);
-          
-          // let index = 0;
+
           for (const [id, card] of Object.entries(passedCards)) {
             this.playerCards[id] = {
               id: id,
@@ -244,7 +241,6 @@ export default {
               imgPath: card.imgPath,
               order: -1
             };
-            // index += 1;
           }
           this.storeHand(this.playerCards);
         }
@@ -324,7 +320,6 @@ export default {
       this.stompClient.subscribe(subscription, message => {
         let passedCards = JSON.parse(message.body);
 
-        // let index = 0;
         for (const [id, card] of Object.entries(passedCards)) {
           console.log(`Assigning imgPath for card ID ${id}:`, card.imgPath);
           this.playerCards[id] = {
@@ -335,7 +330,6 @@ export default {
             imgPath: card.imgPath,
             order: -1
           };
-          // index += 1;
         }
         this.storeHand(this.playerCards);
       });
@@ -345,8 +339,6 @@ export default {
       this.stompClient.subscribe(subscription, message => {
         let name = JSON.parse(message.body);
         console.log(`[topic/hearts/notifyEndOfTrick/${this.gameID.toString()}] - trick winner name received: `, name);
-        
-        // this.voidCardsInPlay = {}
         this.announceTrickWinner(name)
       })
     },
@@ -385,7 +377,6 @@ export default {
 
       }
       else if (this.selectedCards.includes(cardID)) {
-        // If already selected, remove from selectedCards
         this.selectedCards = this.selectedCards.filter(id => id !== cardID);
         this.playerPassCards = this.playerPassCards.filter(id => id !== cardID);
       } else if (this.selectedCards.length < 3) {
