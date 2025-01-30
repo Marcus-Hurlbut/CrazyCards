@@ -103,8 +103,6 @@ export default {
 
         this.storeGameID(gameID)
         this.startGame(this.$route.query.game);
-
-        // this.$router.push('/hearts');
       })
     },
     startGame(gameName) {
@@ -146,7 +144,7 @@ export default {
         let dest = "/app/" + this.$route.query.game + "/newLobby";
         this.stompClient.publish({
           destination: dest,
-          body: JSON.stringify({'ID': this.$store.getters.playerID, 'username': this.displayName})
+          body: JSON.stringify({'playerID': this.$store.getters.playerID, 'username': this.displayName})
         })
       }
     }

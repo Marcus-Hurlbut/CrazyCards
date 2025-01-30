@@ -1,7 +1,7 @@
 
 <template>
   <div class="joinGame">
-    <form class="joinGameForm" @submit.prevent="start(lobbyID, displayName)">
+    <form class="joinGameForm" @submit.prevent="join(lobbyID, displayName)">
       <label for="lobbyID">Enter the Game Code</label><br>
       <input type="text" id="lobbyID" v-model="lobbyID" name="lobbyID"><br>
       <label for="displayName">Enter your Display Name</label><br>
@@ -39,7 +39,7 @@
     methods: {
       ...mapActions(['storeIsLobbyCreated', 'storeStompClient', 'storePlayerID', 'storeUsername', 'storeOtherPlayer', 'storeLobbyID', 'storePlayerIndex']),
 
-      start(lobbyID, displayName) {
+      join(lobbyID, displayName) {
         if (this.connected || this.connecting) return; 
         this.connecting = true;
         this.lobbyID = lobbyID
@@ -97,7 +97,7 @@
           let dest = "/app/" + this.$route.query.game + "/joinLobby"
           this.stompClient.publish({
             destination: dest,
-            body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID': this.lobbyID, 'cardIDs':"", 'name': this.$store.getters.username})
+            body: JSON.stringify({'playerID': this.$store.getters.playerID, 'lobbyID': this.lobbyID, 'username': this.$store.getters.username})
           })
         }
       },

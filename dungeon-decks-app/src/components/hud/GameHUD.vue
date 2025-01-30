@@ -100,6 +100,7 @@
   
 <script>
 import { mapActions } from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
   name: "GameHUD",
@@ -107,12 +108,12 @@ export default {
     return {
       selectedOption: 'Default',
       nameOrder: {
-        'ACE': 11,
-        'KING': 10,
-        'QUEEN': 9,
-        'JACK': 8,
-        'TEN': 17,
-        'NINE': 6,
+        'ACE': 12,
+        'KING': 11,
+        'QUEEN': 10,
+        'JACK': 9,
+        'TEN': 8,
+        'NINE': 7,
         'EIGHT': 6,
         'SEVEN': 5,
         'SIX': 4,
@@ -122,6 +123,9 @@ export default {
         'TWO': 0
       },
     }
+  },
+  computed: {
+    ...mapState(['hand'])
   },
   props: {
     username: String,

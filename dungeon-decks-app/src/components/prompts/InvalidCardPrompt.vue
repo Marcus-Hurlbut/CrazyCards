@@ -39,7 +39,7 @@
   bottom: 25vh;
   background: linear-gradient(to bottom right, #294ffc, red);
   color: black;
-  text-shadow: 0px 0px 2px #f6f8f8, 0px 0px 2px #ffffff;
+  text-shadow: 0px 0px 3px #f6f8f8, 0px 0px 3px #ffffff;
   font-family: 'FancyFont', sans-serif;
   font-size: 20px;
   font-weight: 600;
@@ -71,9 +71,9 @@
 }
 
 .invalidTurnPrompt p {
-  font-size: 18px;
-  margin-top: 8px;
-  opacity: 0.9;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 20px;
+  margin-top: 4px;
 }
 
 .invalidTurnPrompt:hover {

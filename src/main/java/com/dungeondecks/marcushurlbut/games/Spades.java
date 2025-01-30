@@ -314,7 +314,7 @@ public class Spades extends Game {
             int won = (combinedTricks.keySet().size() / 4);
 
             if (won >= guess) {
-                bags = guess - guess;
+                bags = won - guess;
                 score = (guess * 10) + bags;
                 player.setScore(score);
                 player.bags += bags;

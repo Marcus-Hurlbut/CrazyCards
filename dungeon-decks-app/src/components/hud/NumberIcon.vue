@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="value > 0" class="number-icon">
+    <div v-if="value >= 0" class="number-icon">
       <p> {{ title }} {{ value }} </p>
     </div>
   </div>
