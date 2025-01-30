@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -21,41 +20,46 @@ import com.dungeondecks.marcushurlbut.PassingPhase;
 import com.dungeondecks.marcushurlbut.Player;
 import com.dungeondecks.marcushurlbut.games.Hearts;
 import com.dungeondecks.marcushurlbut.games.card.Card;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.dungeondecks.marcushurlbut.message.LobbyMessage;
+import com.dungeondecks.marcushurlbut.message.PassMessage;
+import com.dungeondecks.marcushurlbut.message.TurnMessage;
+import com.dungeondecks.marcushurlbut.utils.Utils;
 
 @Controller
 public class HeartsController {
     public final SimpMessagingTemplate messagingTemplate;
+    Messenger messenger;
 
     @Autowired
     public HeartsController(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
+        messenger = new Messenger(messagingTemplate);
     }
 
     @MessageMapping("/hearts/newLobby")
-    public void newLobby(Player player) throws Exception {
-        String playerID = player.getPlayerID().toString();
-        Player newPlayer = new Player(player.getPlayerID(), player.getUsername());
-        Integer roomID = GameManager.newLobby(newPlayer, GameType.Hearts);
+    public void newLobby(LobbyMessage message) throws Exception {
+        UUID playerID = UUID.fromString(message.getPlayerID());
+        String username = message.getUsername();
+
+        Player host = new Player(playerID, username);
+        Integer roomID = GameManager.newLobby(host, GameType.Hearts);
 
         String destination = "/topic/hearts/newLobby/" + playerID;
-        messagingTemplate.convertAndSend(destination, toJSON(roomID));
+        messagingTemplate.convertAndSend(destination, Utils.toJSON(roomID));
     }
 
     @MessageMapping("/hearts/joinLobby")
-    public void joinLobby(Message message) throws Exception {
+    public void joinLobby(LobbyMessage message) throws Exception {
         UUID playerID = UUID.fromString(message.getPlayerID());
-        int roomID = Integer.parseInt(message.getRoomID());
-        String username = message.getName();
+        int lobbyID = Integer.parseInt(message.getLobbyID());
+        String username = message.getUsername();
 
-        // Add to lobby
         Player player = new Player(playerID, username);
-        boolean gameFull = GameManager.joinLobby(player, roomID, GameType.Hearts);
-        Lobby lobby = GameManager.retreiveLobby(roomID);
+        boolean gameFull = GameManager.joinLobby(player, lobbyID, GameType.Hearts);
+        Lobby lobby = GameManager.retreiveLobby(lobbyID);
 
         // Notify others in lobby
-        notifyPlayerJoined(player, roomID);
+        notifyPlayerJoined(player, lobbyID);
 
         Player[] currentPlayers = lobby.players;
         ArrayList<String> otherPlayerNames = new ArrayList<>();
@@ -68,12 +72,11 @@ public class HeartsController {
         }
 
         String destination = "/topic/hearts/joinLobby/" + playerID.toString(); 
-        messagingTemplate.convertAndSend(destination, toJSON(otherPlayerNames));
+        messagingTemplate.convertAndSend(destination, Utils.toJSON(otherPlayerNames));
         
-        // Start Game & notify game start
         if (gameFull) {
             Executors.newSingleThreadScheduledExecutor().schedule(() -> {
-                notifyGameStart(lobby.gameID, roomID);
+                notifyGameStart(lobby.gameID, lobbyID);
             }, 1000, TimeUnit.MILLISECONDS);
         }
     }
@@ -85,24 +88,14 @@ public class HeartsController {
             userScores.put(player.getUsername(), String.valueOf(player.getScore()));
         }
         String destination = "/topic/hearts/updateScoreboard/" + gameID.toString();
-        messagingTemplate.convertAndSend(destination, toJSON(userScores));
+        messagingTemplate.convertAndSend(destination, Utils.toJSON(userScores));
     }
 
-    @SuppressWarnings("unchecked")
     @MessageMapping("/hearts/playTurn")
-    public void playTurn(Message message) throws Exception {
+    public void playTurn(TurnMessage message) throws Exception {
         UUID playerID = UUID.fromString(message.getPlayerID());
-        UUID gameID = UUID.fromString(message.getRoomID());
-        String strCardIDs = message.getCardIDs();
-
-        // Format from JSON to to Int
-        // TODO: Cleanup/simplify handling
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<String> cardsList = objectMapper.readValue(strCardIDs, List.class);
-        List<Integer> cardIDs = cardsList.stream().map(Integer::parseInt).collect(Collectors.toList());
-        Integer cardID = cardIDs.get(0);
-
-        System.out.println("[/topic/hearts/playTurn] - playerID: " + message.getPlayerID() + " CardID: " + cardID);
+        UUID gameID = UUID.fromString(message.getGameID());
+        int cardID = Integer.parseInt(message.getCard());
         
         Hearts hearts = (Hearts) GameManager.retreiveGame(gameID);
         int playerIDindex = hearts.playerIDtoInt.get(playerID);
@@ -112,14 +105,15 @@ public class HeartsController {
         GameManager.updateGame(gameID, hearts);
 
         String destination = "/topic/hearts/playTurn/" + playerID.toString();
-        messagingTemplate.convertAndSend(destination, toJSON(validTurn));
+        messagingTemplate.convertAndSend(destination, Utils.toJSON(validTurn));
 
         if (validTurn) {
             notifyVoidCards(gameID, cardToBePlayed, hearts.players[playerIDindex].getUsername());
 
             // Need to re-shuffle first & pass
             if (!hearts.endOfRound) {
-                notifyPlayersTurn(gameID, hearts.players[hearts.playerInTurn].ID, hearts.players[hearts.playerInTurn].getUsername());
+                notifyPlayersTurn(gameID, hearts.players[hearts.playerInTurn].getPlayerID());
+                notifyNameInTurn(gameID, hearts.players[hearts.playerInTurn].getUsername());
             }
 
             if (hearts.endOfTrick) {
@@ -136,7 +130,8 @@ public class HeartsController {
                     hearts.onEndOfPassingPhase();
                     GameManager.updateGame(gameID, hearts);
                     notifyPassingPhase(gameID, false);
-                    notifyPlayersTurn(gameID, hearts.players[hearts.playerInTurn].ID, hearts.players[hearts.playerInTurn].getUsername());
+                    notifyPlayersTurn(gameID, hearts.players[hearts.playerInTurn].getPlayerID());
+                    notifyNameInTurn(gameID, hearts.players[hearts.playerInTurn].getUsername());
                 }
             }
 
@@ -155,24 +150,19 @@ public class HeartsController {
         int index = hearts.playerIDtoInt.get(playerID);
         
         HashMap<Integer, Card> playerHand = hearts.players[index].getHand();
-        String json = toJSON(playerHand);
+        String json = Utils.toJSON(playerHand);
 
         String destination = "/topic/hearts/getHand/" + playerID.toString(); 
         messagingTemplate.convertAndSend(destination, json);
     }
 
-    @SuppressWarnings("unchecked")
     @MessageMapping("/hearts/passCards")
-    public void passCards(Message message) throws Exception {
+    public void passCards(PassMessage message) throws Exception {
         UUID playerID = UUID.fromString(message.getPlayerID());
-        UUID gameID = UUID.fromString(message.getRoomID());
-        String strCardIDs = message.getCardIDs();
-        System.out.println("Passing cards for player ID: " + playerID.toString());
+        UUID gameID = UUID.fromString(message.getGameID());
+        String strCardIDs = message.getCards();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<String> cardsList = objectMapper.readValue(strCardIDs, List.class);
-        List<Integer> cardIDs = cardsList.stream().map(Integer::parseInt).collect(Collectors.toList());
-
+        List<Integer> cardIDs = Utils.intListFromJSON(strCardIDs);
         Hearts hearts = (Hearts) GameManager.retreiveGame(gameID);
 
         int playerIDInt = hearts.playerIDtoInt.get(playerID);
@@ -194,18 +184,15 @@ public class HeartsController {
         int playerIDIndex = hearts.playerIDtoInt.get(playerID);
         String destination = "/topic/hearts/passCards/" + playerID.toString();
 
-        // Return this player's passed cards if they've been received else
+        // Pass cards for player are receieved
         if (hearts.players[playerIDIndex].didReceiveCards) {
             HashMap<Integer, Card> playerPassedCards = hearts.players[playerIDIndex].passedCards;
-            String json = toJSON(playerPassedCards);
-
-            System.out.println("Sending player's received passed cards for playerID: " + playerID.toString());
+            String json = Utils.toJSON(playerPassedCards);
             messagingTemplate.convertAndSend(destination, json);
         }
-        // send false to notify them to listen on the notifyPassCardsReceived event
+        // Passed cards must be received later
         else {
-            System.out.println("Returning False for " + playerID.toString() + " - must receive cards on notifyPassCardsReceived event");
-            messagingTemplate.convertAndSend(destination, toJSON(false));
+            messagingTemplate.convertAndSend(destination, Utils.toJSON(false));
         }
 
         Boolean passingPhaseOver = true;
@@ -217,127 +204,52 @@ public class HeartsController {
         }
 
         if (passingPhaseOver) {
-            System.out.println("\nPassing phase has ended.\n");
             hearts = (Hearts) GameManager.retreiveGame(gameID);
             hearts.onEndOfPassingPhase();
             GameManager.updateGame(gameID, hearts);
             notifyPassingPhase(gameID, false);
-            notifyPlayersTurn(gameID, hearts.players[hearts.playerInTurn].ID, hearts.players[hearts.playerInTurn].getUsername());
+            notifyPlayersTurn(gameID, hearts.players[hearts.playerInTurn].getPlayerID());
+            notifyNameInTurn(gameID, hearts.players[hearts.playerInTurn].getUsername());
         }
     }
 
-    public void notifyPlayersTurn(UUID gameID, UUID playerID, String name) {
-        try {
-            String destination = "/topic/hearts/notifyPlayersTurn/" + gameID.toString() + "/" + playerID.toString();
-            System.out.println("\nNotifying playerID " + playerID + " it's their turn\n - destination: "  + destination);
-            messagingTemplate.convertAndSend(destination, toJSON(true));
+    public void notifyNameInTurn(UUID gameID, String name) {
+        messenger.notifyNameInTurn("hearts", gameID, name);
+    }
 
-            String destination2 = "/topic/hearts/notifyNameInTurn/" + gameID.toString();
-            messagingTemplate.convertAndSend(destination2, toJSON(name));
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+    public void notifyPlayersTurn(UUID gameID, UUID playerID) {
+        messenger.notifyPlayersTurn("hearts", gameID, playerID);
     }
 
     public void notifyVoidCards(UUID gameID,  Card voidCard, String playedByName) {
-        try {
-            System.out.println("Void Card for notifying: " + voidCard);
-            HashMap<Integer, Card> idToCard = new HashMap<Integer, Card>();
-            HashMap<String, Object> nameToContent = new HashMap<String, Object>();
-
-            String destination = "/topic/hearts/notifyVoidCards/" + gameID.toString();
-
-            int cardID = voidCard.getCardID(voidCard);
-            idToCard.put(cardID, voidCard);
-            nameToContent.put(playedByName, idToCard);
-
-            messagingTemplate.convertAndSend(destination, toJSON(nameToContent));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        messenger.notifyVoidCards("hearts", gameID, voidCard, playedByName);
     }
 
     public void notifyGameEnded(UUID gameID, String winnerName) {
-        try {
-            String destination = "/topic/hearts/notifyGameEnded/" + gameID.toString();
-            messagingTemplate.convertAndSend(destination, toJSON(winnerName));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        messenger.notifyGameEnded("hearts", gameID, winnerName);
     }
 
     public void notifyEndOfRound(UUID gameID) {
-        try {
-            System.out.println("Notifying end of round to players");
-            String destination = "/topic/hearts/notifyEndOfRound/" + gameID.toString();
-            messagingTemplate.convertAndSend(destination, toJSON(true));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        messenger.notifyEndOfRound("hearts", gameID);
     }
    
     public void notifyEndOfTrick(UUID gameID, String trickWinnerUsername) {
-        try {
-            System.out.println("Notifying end of trick to players");
-            String destination = "/topic/hearts/notifyEndOfTrick/" + gameID.toString();
-            messagingTemplate.convertAndSend(destination, toJSON(trickWinnerUsername));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        messenger.notifyEndOfTrick("hearts", gameID, trickWinnerUsername);
     }
 
     public void notifyPassingPhase(UUID gameID, boolean inPassPhase) {
-        try {
-            String destination = "/topic/hearts/notifyPassingPhase/" + gameID.toString();
-            messagingTemplate.convertAndSend(destination, toJSON(inPassPhase));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        messenger.notifyPassingPhase("hearts", gameID, inPassPhase);
     }
 
     public void notifyPassCardsReceived(UUID playerID, HashMap<Integer, Card> passedCards) {
-        try {
-            System.out.println("Notifying Player " + playerID + " of received passed cards in callback");
-            String destination = "/topic/hearts/notifyPassCardsReceived/" + playerID.toString();
-            String json = toJSON(passedCards);
-            messagingTemplate.convertAndSend(destination, json);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        messenger.notifyPassCardsReceived("hearts", playerID, passedCards);
     }
 
     public void notifyPlayerJoined(Player joinedPlayer, Integer lobbyID) {
-        try {
-            String destination = "/topic/hearts/notifyPlayerJoined/" + lobbyID.toString();
-            String json = toJSON(joinedPlayer);
-    
-            System.out.println("Player joined: " + json);
-            messagingTemplate.convertAndSend(destination, json);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        messenger.notifyPlayerJoined("hearts", joinedPlayer, lobbyID);
     }
 
     public void notifyGameStart(UUID gameID, Integer roomID) {
-        try {
-            String destination = "/topic/hearts/notifyGameStart/" + roomID.toString();
-            String json = toJSON(gameID);
-
-            System.out.println("destination: " + destination);
-            messagingTemplate.convertAndSend(destination, json);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String toJSON(Object obj) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            String jsonArray = objectMapper.writeValueAsString(obj);
-            return jsonArray;
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return "";
+        messenger.notifyGameStart("hearts", gameID, roomID);
     }
 }

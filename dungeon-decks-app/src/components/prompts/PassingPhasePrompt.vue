@@ -31,7 +31,7 @@ export default {
   background: linear-gradient(to bottom right, #294ffc, red);
   color: rgb(0, 0, 0);
   font-family: 'FancyFont', sans-serif;
-  text-shadow: 0px 0px 2px #f6f8f8, 0px 0px 2px #ffffff;
+  text-shadow: 0px 0px 3px #f6f8f8, 0px 0px 3px #ffffff;
   padding: 5px;
   border-radius: 8px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
@@ -58,7 +58,7 @@ export default {
 }
 
 .passingPhasePrompt p {
-  font-family:Arial, Helvetica, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 20px;
   margin-top: 4px;
 }

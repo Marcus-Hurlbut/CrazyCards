@@ -207,7 +207,7 @@ export default {
         let hand = JSON.parse(message.body);
         this.playerCards = {}
 
-        let index = 0;
+        // let index = 0;
         for (const [id, card] of Object.entries(hand)) {
           this.playerCards[id] = {
             id: id,
@@ -215,9 +215,9 @@ export default {
             suit: card.suit,
             value: card.value,
             imgPath: card.imgPath,
-            order: index
+            order: id
           };
-          index += 1;
+          // index += 1;
         }
 
         this.storeHand(this.playerCards);
@@ -234,16 +234,19 @@ export default {
           this.subscribeNotifyPassCardsReceived();
         } else {
           console.log('Passed Cards received: ', passedCards);
-
+          
+          // let index = 0;
           for (const [id, card] of Object.entries(passedCards)) {
             this.playerCards[id] = {
               id: id,
               suit: card.suit,
               value: card.value,
               imgPath: card.imgPath,
-          };
+              order: -1
+            };
+            // index += 1;
+          }
           this.storeHand(this.playerCards);
-        }
         }
       });
     },
@@ -321,7 +324,7 @@ export default {
       this.stompClient.subscribe(subscription, message => {
         let passedCards = JSON.parse(message.body);
 
-        let index = 0;
+        // let index = 0;
         for (const [id, card] of Object.entries(passedCards)) {
           console.log(`Assigning imgPath for card ID ${id}:`, card.imgPath);
           this.playerCards[id] = {
@@ -330,9 +333,9 @@ export default {
             suit: card.suit,
             value: card.value,
             imgPath: card.imgPath,
-            order: index
+            order: -1
           };
-          index += 1;
+          // index += 1;
         }
         this.storeHand(this.playerCards);
       });
@@ -396,13 +399,13 @@ export default {
         console.log("Passing cards: ", this.selectedCards);
         delete this.playerCards[card1];
         delete this.playerCards[card2];
-        delete this.playerCards[card3]; 
+        delete this.playerCards[card3];
 
         this.storeHand(this.playerCards);
 
         this.stompClient.publish({
           destination: "/app/hearts/passCards",
-          body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card1, card2, card3])})
+          body: JSON.stringify({'playerID': this.$store.getters.playerID, 'gameID':this.gameID, 'cards': JSON.stringify([card1, card2, card3])})
         });
 
         this.selectedCards = [];
@@ -426,7 +429,7 @@ export default {
         if (this.trickWinnerName == null) {
           this.stompClient.publish({
             destination: "/app/hearts/playTurn",
-            body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card])})
+            body: JSON.stringify({'playerID': this.$store.getters.playerID, 'gameID':this.gameID, 'card': card})
           });
         }
       }

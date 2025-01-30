@@ -30,7 +30,7 @@ public class GameManager {
     public static boolean joinLobby(Player player, Integer lobbyID, GameType type) {
         Lobby lobby = retreiveLobby(lobbyID);
 
-        if (type != lobby.type) {
+        if (type != lobby.type || lobby == null) {
             return false;
         }
 

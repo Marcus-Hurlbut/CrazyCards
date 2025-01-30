@@ -124,7 +124,7 @@ import NumberIcon from '../hud/NumberIcon.vue';
         playersBidTurn: false,
         playerNameInTurn: '',
         
-        bidValue: 0,
+        bidValue: -1,
         playerBidValues: [],
 
         team: -1,
@@ -156,7 +156,7 @@ import NumberIcon from '../hud/NumberIcon.vue';
       this.subscribeGetHand();
       this.subscribeSelectTeammate();
       this.subscribeNotifySelectTeammate();
-      this.subscribeNotifyTeams();
+      this.subscribeNotifyTeamsChosen();
 
       this.subscribeBroadcastBid();
       this.subscribeNotifyBiddingPhase();
@@ -262,8 +262,8 @@ import NumberIcon from '../hud/NumberIcon.vue';
           this.needToSelectTeammate = true;
         });
       },
-      subscribeNotifyTeams() {
-        let subscription = "/topic/spades/notifyTeams/" + this.gameID.toString();
+      subscribeNotifyTeamsChosen() {
+        let subscription = "/topic/spades/notifyTeamsChosen/" + this.gameID.toString();
         this.stompClient.subscribe(subscription, message => {
           let teams = JSON.parse(message.body)
           console.log('Player Teams: ', teams);
@@ -446,9 +446,7 @@ import NumberIcon from '../hud/NumberIcon.vue';
         let subscription = '/topic/spades/notifyEndOfTrick/' + this.gameID.toString();
         this.stompClient.subscribe(subscription, message => {
           let name = JSON.parse(message.body);
-          console.log(`[topic/notifyEndOfTrick/${this.gameID.toString()}] - trick winner name received: `, name);
-          
-          // this.voidCardsInPlay = {}
+          console.log(`Trick winner: `, name);
           this.announceTrickWinner(name)
         })
       },
@@ -456,8 +454,8 @@ import NumberIcon from '../hud/NumberIcon.vue';
         let subscription = '/topic/spades/notifyEndOfRound/' + this.gameID.toString();
         this.stompClient.subscribe(subscription, message => {
           let isEndOfRound = JSON.parse(message.body);
-          console.log(`[topic/notifyEndOfRound/${this.gameID.toString()}] - message received: `, isEndOfRound)
-          
+          console.log(`End of round: `, isEndOfRound)
+          this.bidValue = -1;
           this.publishGetHand();
         })
       },
@@ -465,7 +463,7 @@ import NumberIcon from '../hud/NumberIcon.vue';
         let subscription = '/topic/spades/updateScoreboard/' + this.gameID.toString();
         this.stompClient.subscribe(subscription, message => {
           let scoreboardMap = JSON.parse(message.body);
-          console.log(`[topic/updateScoreboard/${this.gameID.toString()}] - message received: `, scoreboardMap)
+          console.log(`Score board update: `, scoreboardMap)
           this.usernameToScore = scoreboardMap;
         })
       },
@@ -473,7 +471,7 @@ import NumberIcon from '../hud/NumberIcon.vue';
         let subscription = '/topic/spades/notifyGameEnded/' + this.gameID.toString();
         this.stompClient.subscribe(subscription, message => {
           this.winnerName = JSON.parse(message.body);
-          console.log(`[topic/subscribeNotifyEndOfGame/${this.gameID.toString()}] - winner name: `, this.winnerName)
+          console.log(`Gameover - winner: `, this.winnerName)
         })
       },
       toggleCardSelection(cardID) {
@@ -500,7 +498,7 @@ import NumberIcon from '../hud/NumberIcon.vue';
           if (this.trickWinnerName == null) {
             this.stompClient.publish({
               destination: "/app/spades/playTurn",
-              body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card])})
+              body: JSON.stringify({'playerID': this.$store.getters.playerID, 'gameID':this.gameID, 'card': card})
             });
           }
         }
@@ -510,7 +508,7 @@ import NumberIcon from '../hud/NumberIcon.vue';
         this.teammateName = teammateName.trim();
         this.stompClient.publish({
           destination: "/app/spades/selectTeammate",
-          body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID': this.gameID, 'cardIDs': JSON.stringify([teammateName])})
+          body: JSON.stringify({'playerID': this.$store.getters.playerID, 'gameID': this.gameID, 'teammate': teammateName})
         })
       },
       publishOrientationChange(orientationRing) {
@@ -520,8 +518,6 @@ import NumberIcon from '../hud/NumberIcon.vue';
         })
       },
       publishPlaceBid(bid) {
-        console.log("Publishing bid: ", bid);
-        console.log("bidPhase: ", this.bidPhase)
         console.log("playersBid: ", this.playersBidTurn)
 
         if (this.playersBidTurn && this.bidPhase) {
@@ -529,7 +525,7 @@ import NumberIcon from '../hud/NumberIcon.vue';
           this.bidValue = bid;
           this.stompClient.publish({
             destination: "/app/spades/placeBid",
-            body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID': this.gameID, 'cardIDs': JSON.stringify([this.bidValue])})
+            body: JSON.stringify({'playerID': this.$store.getters.playerID, 'gameID': this.gameID, 'bid': this.bidValue})
           })
         }
       }
