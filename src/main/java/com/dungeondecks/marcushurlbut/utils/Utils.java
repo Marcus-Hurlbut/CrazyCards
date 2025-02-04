@@ -1,11 +1,12 @@
 package com.dungeondecks.marcushurlbut.utils;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.dungeondecks.marcushurlbut.games.card.Card;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Utils {
@@ -33,4 +34,19 @@ public class Utils {
         }
         return new ArrayList<>();
     }
+
+    public static List<Card> cardFromJSON(String str) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<Card> cards = objectMapper.readValue(str, new TypeReference<List<Card>>(){});
+            return cards;
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return new ArrayList<Card>();
+    }
+
+
+
 }

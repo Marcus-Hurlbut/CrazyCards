@@ -4,6 +4,7 @@ public class LobbyMessage {
     private String lobbyID;
     private String playerID;
     private String username;
+    private String count;
 
     public LobbyMessage() {}
 
@@ -18,6 +19,13 @@ public class LobbyMessage {
         this.username = username;
     }
 
+    public LobbyMessage(String playerID, String lobbyID, String username, String count) {
+        this.playerID = playerID;
+        this.lobbyID = lobbyID;
+        this.username = username;
+        this.count = count;
+    }
+
     public String getLobbyID() {
         return lobbyID;
     }
@@ -28,5 +36,9 @@ public class LobbyMessage {
 
     public String getUsername() {
         return username;
+    }
+
+    public String getCount() {
+        return count;
     }
 }

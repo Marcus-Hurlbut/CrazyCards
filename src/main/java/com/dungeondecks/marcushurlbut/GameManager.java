@@ -12,6 +12,28 @@ public class GameManager {
     private static Map<Integer, GameType> gameType = new ConcurrentHashMap<>();
     private static Map<Integer, Lobby> lobbies = new ConcurrentHashMap<>();
     private static Map<UUID, Game> gameSessions = new ConcurrentHashMap<>();
+
+    public static int newLobby(Player player, GameType gameSelected, int count) {
+        int lobbyID = generateLobbyID();
+        Lobby lobby = new Lobby();
+
+        lobby.type = gameSelected;
+        lobby.setGameObject(gameSelected, count);
+
+        gameType.put(lobbyID, gameSelected);
+        lobby.addPlayerToLobby(player);
+
+        lobbies.put(lobbyID, lobby);
+
+        if (lobby.isLobbyFull()) {
+            startGameSession(lobby);
+            Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+                updateLobby(lobbyID, new Lobby());
+            }, 5000, TimeUnit.MILLISECONDS);
+        }
+
+        return lobbyID;
+    }
     
     public static int newLobby(Player player, GameType gameSelected) {
         int lobbyID = generateLobbyID();
@@ -22,26 +44,22 @@ public class GameManager {
 
         gameType.put(lobbyID, gameSelected);
         lobby.addPlayerToLobby(player);
-
         lobbies.put(lobbyID, lobby);
         return lobbyID;
     }
 
     public static boolean joinLobby(Player player, Integer lobbyID, GameType type) {
         Lobby lobby = retreiveLobby(lobbyID);
-
         if (type != lobby.type || lobby == null) {
             return false;
         }
 
         lobby.addPlayerToLobby(player);
         updateLobby(lobbyID, lobby);
-
         boolean full = lobby.isLobbyFull();
 
         if (full) {
             startGameSession(lobby);
-
             Executors.newSingleThreadScheduledExecutor().schedule(() -> {
                 updateLobby(lobbyID, new Lobby());
             }, 5000, TimeUnit.MILLISECONDS);
@@ -59,6 +77,15 @@ public class GameManager {
     }
 
     public static UUID startGameSession(Lobby lobby) {
+        Game game = lobby.game;
+
+        game.initialize(lobby.players);
+        gameSessions.put(game.gameID, game);
+
+        return game.gameID;
+    }
+
+    public static UUID startGameSession(Lobby lobby, int count) {
         Game game = lobby.game;
 
         game.initialize(lobby.players);

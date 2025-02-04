@@ -79,7 +79,7 @@ export default {
     left: 50%;
     transform: translateX(-50%);
     /* background: #9C27B0; */
-    /* padding: 15px; */
+    padding: 15px;
     border-radius: 30px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }

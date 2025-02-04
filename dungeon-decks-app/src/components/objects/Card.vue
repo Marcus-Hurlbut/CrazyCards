@@ -3,7 +3,7 @@
     <img 
       class="card" 
       :src="imageSrc"
-      :class="{'selected-card': isSelected}" 
+      :class="{'selected-card': isSelected}"
     />
   </div>
 </template>
@@ -32,7 +32,7 @@ export default {
 .card {
   display: inline-block;
   z-index: 0;
-  width: 7vw;
+  width: 6.5vw;
   height: 16vh;
   max-width: 180px;
   max-height: 600px;

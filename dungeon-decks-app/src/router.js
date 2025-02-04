@@ -6,11 +6,13 @@ import LobbyComponent from './components/LobbyComponent.vue';
 import CreateLobbyForm from './components/forms/CreateLobbyForm.vue';
 import MainMenu from './components/MainMenu.vue';
 import BugReport from './components/index/BugReport.vue';
+import SpiderSolitaireComponent from './components/games/SpiderSolitaireComponent.vue';
 
 const routes = [
   { path: '/', component: MainMenu },
   { path: '/hearts', component: HeartsComponent },
   { path: '/spades', component: SpadesComponent },
+  { path: '/spiderSolitaire', component: SpiderSolitaireComponent },
 
   { path: '/joinLobby', component: JoinLobby },
   { path: '/createLobby', component: CreateLobbyForm },

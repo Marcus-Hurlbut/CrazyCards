@@ -1,16 +1,12 @@
 <template>
   <div>
+    <!-- Thank you, avstorm! -->
     <!-- https://twitter.com/avstorm/status/1620087443927228417 -->
     <div class="voltage-button">
-    
-    <!-- <button> {{ title }}</button> -->
-     <!-- Default slot for button -->
      <slot name="button">
-        <!-- Default button if none is passed -->
         <button>{{ title }}</button>
       </slot>
     
-    <!-- SVG Party -->
     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 234.6 61.3" preserveAspectRatio="none" xml:space="preserve">
         <filter id="glow">
         <fegaussianblur class="blur" result="coloredBlur" stddeviation="2"></fegaussianblur>
@@ -51,13 +47,6 @@ export default {
 </script>
 
 <style scoped>
-/* body {
-  background:black;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-} */
 .voltage-button {
   position: relative;
 
@@ -85,7 +74,7 @@ export default {
     width: calc(100% + 0.5em);
     height: calc(100% + 1.5em);
     pointer-events: none;
-    opacity: 1; /* Make sure the SVG is always visible */
+    opacity: 1;
     transition: opacity 0.4s;
     path {
       stroke-dasharray: 100;

@@ -11,8 +11,8 @@ public class Deck {
 
     private Stack<Card> deck = new Stack<Card>();
 
-    public List<Card> getDeck() {
-        return deck;
+    public int getSize() {
+        return this.deck.size();
     }
 
     public void shuffleDeck() {
@@ -23,9 +23,38 @@ public class Deck {
         Collections.shuffle(deck);
     }
 
+    public void shuffleDeck(int numSuits) {
+        if (numSuits == 1) {
+            initializeSuit(Suit.SPADE);
+            initializeSuit(Suit.SPADE);
+            initializeSuit(Suit.SPADE);
+            initializeSuit(Suit.SPADE);
+        } else if (numSuits == 2) {
+            initializeSuit(Suit.SPADE);
+            initializeSuit(Suit.SPADE);
+            initializeSuit(Suit.DIAMOND);
+            initializeSuit(Suit.DIAMOND);
+        } else {
+            initializeSuit(Suit.HEART);
+            initializeSuit(Suit.DIAMOND);
+            initializeSuit(Suit.SPADE);
+            initializeSuit(Suit.CLUB);
+        }
+        Collections.shuffle(deck);
+    }
+
     public Card popDeck() {
         return deck.pop();
     }
+
+    public void addToDeck(Card card) {
+        deck.add(card);
+    }
+
+    public boolean isEmpty() {
+        return deck.empty();
+    }
+
 
     public void dealDeck(Player[] players) {
         for (int n = 0; n < 52; n++) {
@@ -115,22 +144,23 @@ public class Deck {
                     break;
                 case 11:
                     card.name = Name.JACK;
-                    card.value = 10;
+                    card.value = 11;
                     card.imgPath = "jack_of_" + imgPathSuffix;
                     break;
                 case 12:
                     card.name = Name.QUEEN;
-                    card.value = 10;
+                    card.value = 12;
                     card.imgPath = "queen_of_" + imgPathSuffix;
                     break;
                 case 13:
                     card.name = Name.KING;
-                    card.value = 10;
+                    card.value = 13;
                     card.imgPath = "king_of_" + imgPathSuffix;
                     break;
                 default:
                     break;
             }
+            card.id = card.getCardID(card);
             deck.push(card);
         }
     }

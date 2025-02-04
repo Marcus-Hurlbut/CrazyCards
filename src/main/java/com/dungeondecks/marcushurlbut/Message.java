@@ -31,11 +31,6 @@ public class Message {
         this.name = name;
     }
 
-    // public Message(String playerID, String name, String object) {
-    //     this.playerID = playerID;
-    //     this.name = name;
-    // }
-    
     public String getContent() {
         return content;
     }
