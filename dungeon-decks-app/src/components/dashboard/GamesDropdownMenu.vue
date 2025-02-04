@@ -27,15 +27,17 @@
         </div>
       </li>
 
-      <!-- <li class="game-item" @click="toggleGameDropdown('spirder_solitare')"> -->
-      <li class="game-item">
+      <li class="game-item" @click="toggleGameDropdown('spiderSolitaire')">
         Spider Solitare
-        <div v-if="activeDropdown === 'spider-solitare'" class="submenu-dropdown">
-          <router-link :to="{ path: '/createLobby', query: { game: 'spades' } }">
-            <button class="menu-button">Create Lobby</button>
+        <div v-if="activeDropdown === 'spiderSolitaire'" class="submenu-dropdown">
+          <router-link :to="{ path: '/createLobby', query: { game: 'spiderSolitaire' , suits: '1' } }">
+            <button class="menu-button">1 Suit</button>
           </router-link>
-          <router-link :to="{ path: '/joinLobby', query: { game: 'spades' } }">
-            <button class="menu-button">Join Lobby</button>
+          <router-link :to="{ path: '/createLobby', query: { game: 'spiderSolitaire' , suits: '2' } }">
+            <button class="menu-button">2 Suits</button>
+          </router-link>
+          <router-link :to="{ path: '/createLobby', query: { game: 'spiderSolitaire' , suits: '4' } }">
+            <button class="menu-button">4 Suits</button>
           </router-link>
         </div>
       </li>
@@ -87,12 +89,13 @@ export default {
 }
 
 .games-list {
+  position: relative;
   list-style-type: none;
-  padding: 0;
+  padding: 5px;
   margin: 0;
   text-align: center;
   font-family: 'GameVaultFont', sans-serif;
-  max-height: 35vh;
+  max-height: 45vh;
   scroll-behavior: auto;
   overflow-y: auto;
   overflow-x: hidden;
@@ -122,6 +125,7 @@ export default {
 }
 
 .menu-button {
+  display: inline-flex;
   background: #0c0c0c;
   color: #ffffff;
   border: 2px solid #ffffff;

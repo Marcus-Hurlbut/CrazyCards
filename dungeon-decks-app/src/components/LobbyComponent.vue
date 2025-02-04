@@ -1,7 +1,7 @@
 
 <template>
   <div class="heartsLobby">
-    <div v-if="isLobbyCreated" class="lobbyPlayerList" >
+    <div v-if="isLobbyCreated && this.$route.query.game != 'spiderSolitaire'" class="lobbyPlayerList" >
       <h1>Waiting for other players...</h1>
       <h3>Game Code</h3>
       <h2>{{ lobbyID }}</h2>
@@ -115,6 +115,9 @@ export default {
       else if (gameName == 'spades') {
         this.$router.push('/spades');
       }
+      else if (gameName == 'spiderSolitaire') {
+        this.$router.push('/spiderSolitaire');
+      }
     },
     subscribeNotifyPlayerJoined() {
       let subscription = '/topic/' + this.$route.query.game + '/notifyPlayerJoined/'+ this.lobbyID.toString();
@@ -141,12 +144,18 @@ export default {
       });
     },
     publishNewLobby(playerID) {
-      if (this.connected) {
-        console.log('Creating Lobby with playerID: ', playerID);
+      console.log('Creating Lobby with playerID: ', playerID);
+      if (this.connected && this.$route.query.suits == null) {
         let dest = "/app/" + this.$route.query.game + "/newLobby";
         this.stompClient.publish({
           destination: dest,
           body: JSON.stringify({'playerID': this.$store.getters.playerID, 'username': this.displayName})
+        })
+      } else if (this.connected) {
+        let dest = "/app/" + this.$route.query.game + "/newLobby";
+        this.stompClient.publish({
+          destination: dest,
+          body: JSON.stringify({'playerID': this.$store.getters.playerID, 'username': this.displayName, 'lobbyID':'', 'count': this.$route.query.suits})
         })
       }
     }

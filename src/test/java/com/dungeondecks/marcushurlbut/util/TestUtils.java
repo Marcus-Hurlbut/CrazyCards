@@ -37,7 +37,7 @@ public class TestUtils {
 
     public void populateFakeDeck(Player[] players) {
         players[0].addCardToHand(new Card(Suit.HEART, Name.SEVEN, 7, "7_of_hearts.png"));
-        players[0].addCardToHand(new Card(Suit.HEART, Name.KING, 10, "king_of_hearts.png"));
+        players[0].addCardToHand(new Card(Suit.HEART, Name.KING, 13, "king_of_hearts.png"));
         players[0].addCardToHand(new Card(Suit.HEART, Name.ACE, 1, "ace_of_hearts.png"));
         players[0].addCardToHand(new Card(Suit.DIAMOND, Name.EIGHT, 8, "8_of_diamonds.png"));
         players[0].addCardToHand(new Card(Suit.DIAMOND, Name.NINE, 9, "9_of_diamonds.png"));
@@ -47,7 +47,7 @@ public class TestUtils {
         players[0].addCardToHand(new Card(Suit.SPADE, Name.TEN, 10, "10_of_spades.png"));
         players[0].addCardToHand(new Card(Suit.CLUB, Name.NINE, 9, "9_of_clubs.png"));
         players[0].addCardToHand(new Card(Suit.CLUB, Name.TEN, 10, "10_of_clubs.png"));
-        players[0].addCardToHand(new Card(Suit.CLUB, Name.JACK, 10, "jack_of_clubs.png"));
+        players[0].addCardToHand(new Card(Suit.CLUB, Name.JACK, 11, "jack_of_clubs.png"));
         players[0].addCardToHand(new Card(Suit.CLUB, Name.TWO, 2, "2_of_clubs.png"));
 
 
@@ -57,33 +57,33 @@ public class TestUtils {
         players[1].addCardToHand(new Card(Suit.HEART, Name.TEN, 10, "10_of_hearts.png"));
         players[1].addCardToHand(new Card(Suit.DIAMOND, Name.SIX, 6, "6_of_diamonds.png"));
         players[1].addCardToHand(new Card(Suit.DIAMOND, Name.TEN, 10, "10_of_diamonds.png"));
-        players[1].addCardToHand(new Card(Suit.DIAMOND, Name.JACK, 10, "jack_of_diamonds.png"));
-        players[1].addCardToHand(new Card(Suit.DIAMOND, Name.QUEEN, 10, "queen_of_diamonds.png"));
+        players[1].addCardToHand(new Card(Suit.DIAMOND, Name.JACK, 11, "jack_of_diamonds.png"));
+        players[1].addCardToHand(new Card(Suit.DIAMOND, Name.QUEEN, 12, "queen_of_diamonds.png"));
         players[1].addCardToHand(new Card(Suit.SPADE, Name.FOUR, 4, "4_of_spades.png"));
-        players[1].addCardToHand(new Card(Suit.SPADE, Name.QUEEN, 10, "queen_of_spades.png"));
-        players[1].addCardToHand(new Card(Suit.SPADE, Name.KING, 10, "king_of_spades.png"));
+        players[1].addCardToHand(new Card(Suit.SPADE, Name.QUEEN, 12, "queen_of_spades.png"));
+        players[1].addCardToHand(new Card(Suit.SPADE, Name.KING, 13, "king_of_spades.png"));
         players[1].addCardToHand(new Card(Suit.SPADE, Name.ACE, 1, "ace_of_spades.png"));
         players[1].addCardToHand(new Card(Suit.CLUB, Name.THREE, 3, "3_of_clubs.png"));
 
 
         players[2].addCardToHand(new Card(Suit.HEART, Name.FIVE, 5, "5_of_hearts.png"));
         players[2].addCardToHand(new Card(Suit.HEART, Name.SIX, 6, "6_of_hearts.png"));
-        players[2].addCardToHand(new Card(Suit.HEART, Name.QUEEN, 10, "queen_of_hearts.png"));
+        players[2].addCardToHand(new Card(Suit.HEART, Name.QUEEN, 12, "queen_of_hearts.png"));
         players[2].addCardToHand(new Card(Suit.DIAMOND, Name.TWO, 2, "2_of_diamonds.png"));
         players[2].addCardToHand(new Card(Suit.DIAMOND, Name.THREE, 3, "3_of_diamonds.png"));
         players[2].addCardToHand(new Card(Suit.DIAMOND, Name.FOUR, 4, "4_of_diamonds.png"));
-        players[2].addCardToHand(new Card(Suit.DIAMOND, Name.KING, 10, "king_of_diamonds.png"));
+        players[2].addCardToHand(new Card(Suit.DIAMOND, Name.KING, 13, "king_of_diamonds.png"));
         players[2].addCardToHand(new Card(Suit.DIAMOND, Name.ACE, 1, "ace_of_diamonds.png"));
         players[2].addCardToHand(new Card(Suit.SPADE, Name.TWO, 2, "2_of_spades.png"));
-        players[2].addCardToHand(new Card(Suit.SPADE, Name.JACK, 10, "jack_of_spades.png"));
+        players[2].addCardToHand(new Card(Suit.SPADE, Name.JACK, 11, "jack_of_spades.png"));
         players[2].addCardToHand(new Card(Suit.CLUB, Name.SEVEN, 7, "7_of_clubs.png"));
         players[2].addCardToHand(new Card(Suit.CLUB, Name.FIVE, 5, "5_of_clubs.png"));
-        players[2].addCardToHand(new Card(Suit.CLUB, Name.QUEEN, 10, "queen_of_clubs.png"));
+        players[2].addCardToHand(new Card(Suit.CLUB, Name.QUEEN, 12, "queen_of_clubs.png"));
 
         
         players[3].addCardToHand(new Card(Suit.HEART, Name.THREE, 3, "3_of_hearts.png"));
         players[3].addCardToHand(new Card(Suit.HEART, Name.FOUR, 4, "4_of_hearts.png"));
-        players[3].addCardToHand(new Card(Suit.HEART, Name.JACK, 10, "jack_of_hearts.png"));
+        players[3].addCardToHand(new Card(Suit.HEART, Name.JACK, 11, "jack_of_hearts.png"));
         players[3].addCardToHand(new Card(Suit.DIAMOND, Name.FIVE, 5, "5_of_diamonds.png"));
         players[3].addCardToHand(new Card(Suit.DIAMOND, Name.SEVEN, 7, "7_of_diamonds.png"));
         players[3].addCardToHand(new Card(Suit.SPADE, Name.SEVEN, 7, "7_of_spades.png"));
@@ -92,7 +92,7 @@ public class TestUtils {
         players[3].addCardToHand(new Card(Suit.CLUB, Name.FOUR, 4, "4_of_clubs.png"));
         players[3].addCardToHand(new Card(Suit.CLUB, Name.SIX, 6, "6_of_clubs.png"));
         players[3].addCardToHand(new Card(Suit.CLUB, Name.EIGHT, 8, "8_of_clubs.png"));
-        players[3].addCardToHand(new Card(Suit.CLUB, Name.KING, 10, "king_of_clubs.png"));
+        players[3].addCardToHand(new Card(Suit.CLUB, Name.KING, 13, "king_of_clubs.png"));
         players[3].addCardToHand(new Card(Suit.CLUB, Name.ACE, 1, "ace_of_clubs.png"));
     }
 

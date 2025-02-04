@@ -20,6 +20,7 @@ public class Game {
     public int playerInTurn = -1;
 
     public void initialize(Player[] players) {}
+    public void initialize(Player[] players, int count) {}
 
     public int getCardID(Card card) {
         int offset = 0;

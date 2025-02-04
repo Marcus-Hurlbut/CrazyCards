@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import com.dungeondecks.marcushurlbut.games.Hearts;
 import com.dungeondecks.marcushurlbut.games.Spades;
+import com.dungeondecks.marcushurlbut.games.SpiderSolitaire;
 
 public class Lobby {
     private int id;
@@ -27,6 +28,18 @@ public class Lobby {
                 maxPlayers = 4;
                 break;
         
+            default:
+                break;
+        }
+    }
+
+    public void setGameObject(GameType type, int count) {
+        switch (type) {
+            case SpiderSolitaire:
+                game = (SpiderSolitaire) new SpiderSolitaire(gameID, count);
+                maxPlayers = 1;
+                break;
+                
             default:
                 break;
         }
