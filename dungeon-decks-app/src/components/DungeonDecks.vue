@@ -43,7 +43,21 @@
                   </router-link>
                 </ul>
               </li>
+              <li class="has-sublist">Spider Solitaire
+                <ul class="second-sublist">
+                  <router-link :to="{ path: '/createLobby', query: { game: 'spiderSolitaire' , suits: '1' } }">
+                    <li>1 Suit</li>
+                  </router-link>
+                  <router-link :to="{ path: '/createLobby', query: { game: 'spiderSolitaire' , suits: '2' } }">
+                    <li>2 Suits</li>
+                  </router-link>
+                  <router-link :to="{ path: '/createLobby', query: { game: 'spiderSolitaire' , suits: '4' } }">
+                    <li>4 Suits</li>
+                  </router-link>
+                </ul>
+              </li>
             </ul>
+            
           </li>
           <li>About</li>
           <router-link to="/bugReport">
