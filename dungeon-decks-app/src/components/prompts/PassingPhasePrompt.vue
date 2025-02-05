@@ -67,4 +67,16 @@ export default {
   /* transform: translateY(-5px); */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
+
+@media (max-width: 767px) {
+  .passingPhasePrompt {
+    transform: translateY(20%);
+  }
+  .passingPhasePrompt h3 {
+    font-size: 1em;
+  }
+  .passingPhasePrompt p {
+    font-size: 1em;
+  }
+}
 </style>

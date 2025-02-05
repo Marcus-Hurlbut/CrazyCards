@@ -1,7 +1,7 @@
 
 <template>
   <div class="joinGame">
-    <form class="joinGameForm" @submit.prevent="join(lobbyID, displayName)">
+    <form class="lobbyForm" @submit.prevent="join(lobbyID, displayName)">
       <div class="game-code-section">
         <label for="lobbyID">Enter Game Code</label>
         <input type="text" id="lobbyID" v-model="lobbyID" name="lobbyID">
@@ -12,7 +12,6 @@
       </div>
       <button type="submit">Join Lobby</button>
     </form>
-    <BubbleBackground />
   </div>
 </template>
   
@@ -20,15 +19,12 @@
   import { Stomp } from '@stomp/stompjs';
   import { mapActions } from 'vuex';
   import { mapState } from 'vuex';
-  import BubbleBackground from './animations/BubbleBackground.vue';
   import { v4 as uuidv4 } from 'uuid';
   import '@/assets/styles/global.css';
+  import '@/components/lobby/css/styles.css';
 
   export default {
     name: 'JoinLobby',
-    components: {
-      BubbleBackground,
-    },
     computed: {
       ...mapState(['playerID', 'username'])
     },
@@ -50,7 +46,7 @@
         this.lobbyID = lobbyID
 
         const socketUrl = process.env.NODE_ENV === 'development'
-          ? 'ws://localhost:8080/dungeon-decks-websocket'
+          ? 'ws://192.168.86.37:8080/dungeon-decks-websocket'
           : 'wss://dungeondecks.net/dungeon-decks-websocket'
         this.stompClient = Stomp.over(() => new WebSocket(socketUrl));
         
@@ -111,92 +107,32 @@
 </script>
   
 <style scoped>
-.joinGameForm {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: inline-block;
-  padding: 30px 50px;
-  background: linear-gradient(135deg, #1b479a ,#6a1b9a, #ff1744);
-  border-radius: 15px;
-  border: 3px solid #ffffff;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  width: 400px;
-  transition: all 0.3s ease-in-out;
-  z-index: 100;
-  align-items: center;
-}
-
 .display-name-section , .game-code-section {
   padding: 10% 10%;
-  transform: translateX(-05%);
+  transform: translateX(-5%);
 }
 
 .game-code-section {
   margin-bottom: 10%;
 }
   
-.joinGameForm label {
-  font-family: 'FancyFont', sans-serif;
-  font-size: 2.2em;
-  margin-bottom: 10px;
-  display: block;
-  font-weight: bold;
-  color: black;
-  text-shadow: 0px 0px 2px #f6f8f8, 0px 0px 2px #ffffff;
+.lobbyForm label {
   transform: translateX(5%);
 }
-  
-.joinGameForm input {
-  width: 100%;
-  padding: 20px;
-  border-radius: 8px;
-  border: 1px solid #fff;
-  font-size: 1em;
-  background: rgba(255, 255, 255, 0.3);
-  color: #fff;
-  text-align: center;
-  transition: 0.3s ease;
-  align-items: center;
 
-}
-  
-.joinGameForm input::placeholder {
-  color: #ccc;
-}
-  
-.joinGameForm input:focus {
-  outline: none;
-  background: rgba(255, 255, 255, 0.5);
-}
-  
-.joinGameForm button {
-  font-family: 'FancyFont', sans-serif;
-  font-weight: bold;
-  font-size: 2em;
-  width: 100%;
-  padding: 20px;
-  border-radius: 8px;
-  background-color: rgba(201, 84, 201, 0.507);
-  color: black;
-  border: none;
-  cursor: pointer;
-  transition: 0.3s ease, transform 0.2s ease;
-  text-shadow: 0px 0px 1px #ffffff, 0px 0px 1px #ffffff;
-  align-items: center;
-}
-  
-.joinGameForm button:hover {
-  background-color: rgba(35, 68, 214, 0.507);
-  transform: scale(1.05);
-  animation: neonGlowingBorder 2s infinite alternate;
-}
-  
-.joinGameForm button:active {
-  background-color: rgba(120, 101, 233, 0.507);
-}
+@media (max-width: 767px) {
+  .lobbyForm label {
+    margin-bottom: 0vh;
+    transform: translateX(12%);
+  }
 
+  .lobbyForm input {
+    transform: translateX(12%);
+  }
+
+  .display-name-section , .game-code-section {
+    transform: translateX(-12%);
+  }
+}
 </style>
   

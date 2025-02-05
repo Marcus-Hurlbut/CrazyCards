@@ -35,3 +35,15 @@
       box-shadow: 0 0 15px rgb(60, 137, 224), 0 0 10px rgb(0, 183, 255);
     }
 }
+
+@keyframes purpleGlowingBorder {
+  0% {
+    box-shadow: 0 0 10px rgb(60, 137, 224), 0 0 10px rgb(0, 110, 255);
+  }
+  50% {
+    box-shadow: 0 0 20px rgb(186, 48, 221), 0 0 20px rgb(186, 48, 221);
+  }
+  100% {
+    box-shadow: 0 0 15px rgb(26, 51, 196), 0 0 50px rgb(26, 51, 196);
+  }
+}

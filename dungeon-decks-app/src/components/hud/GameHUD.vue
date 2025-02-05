@@ -368,5 +368,10 @@ input[type="radio"] {
 .card_color_select:hover {
   border: 1px solid gold;
 }
+@media (max-width: 767px) {
+  .game-hud {
+    display: none;
+  }
+}
 </style>
   

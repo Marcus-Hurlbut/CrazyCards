@@ -72,14 +72,14 @@
 <script>
 import { mapActions } from 'vuex';
 import { mapState } from 'vuex';
-import WinnerPrompt from './prompts/WinnerPrompt.vue';
-import PassingPhasePrompt from './prompts/PassingPhasePrompt.vue';
-import InvalidCardPrompt from './prompts/InvalidCardPrompt.vue';
-import Scoreboard from './hud/Scoreboard.vue';
-import YourTurnPrompt from './prompts/YourTurnPrompt.vue';
-import Card from './objects/Card.vue'
-import SquaresBackground from './animations/SquaresBackground.vue';
-import GameHUD from './hud/GameHUD.vue';
+import WinnerPrompt from '../prompts/WinnerPrompt.vue';
+import PassingPhasePrompt from '../prompts/PassingPhasePrompt.vue';
+import InvalidCardPrompt from '../prompts/InvalidCardPrompt.vue';
+import Scoreboard from '../hud/Scoreboard.vue';
+import YourTurnPrompt from '../prompts/YourTurnPrompt.vue';
+import Card from '../objects/Card.vue'
+import SquaresBackground from '../animations/SquaresBackground.vue';
+import GameHUD from '../hud/GameHUD.vue';
 
 export default {
   name: 'HeartsComponent',
@@ -441,14 +441,6 @@ export default {
   align-items: center; 
 }
 
-.playerIDDisplay {
-  position: absolute;
-  top: 18%;
-  left: 1%;
-  color: wheat;
-  background-color: black;
-}
-
 .gameArea {
   position: relative;
   width: 100%;
@@ -478,12 +470,11 @@ export default {
 
 /* Players hand stacking formatting */
 .hand {
-  width: 50px;
-  height: 70px;
+  width: 2.5vw;
+  height: 3.5vh;
   border-radius: 5px;
   margin: 5px;
   display: inline-block;
-  z-index: 0;
 }
 
 .main-player-void-cards {
@@ -548,5 +539,34 @@ export default {
   transition: all 0.3s ease;
   animation: glowingBorder 5s infinite alternate;
   border: 1px solid gold;
+}
+
+@media (max-width: 767px) {
+  .player-left h3, .player-right h3, .player-top h3, .main-player-void-cards h3 {
+    font-size: .75em;
+  }
+  .player-top, .player-right, .player-left {
+    width: 1vw;
+    height: 1vh;
+  }
+
+  .player-top {
+    top: 12%;
+  }
+
+  .player-right {
+    right: 15%;
+    bottom: 70%;
+  }
+
+  .player-left {
+    left: 15%;
+    bottom: 70%;
+  }
+
+  .main-player-hand {
+    transform: translate(-15%, -80%);
+  }
+
 }
 </style>

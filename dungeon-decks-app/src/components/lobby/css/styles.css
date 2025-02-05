@@ -1,0 +1,87 @@
+
+.lobbyForm {
+    background-image: url('@/assets/texture-img/texture1.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    font-family: 'FancyFont', sans-serif;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: inline-block;
+    border: 2px solid #000000;
+    /* background: linear-gradient(135deg, #1b479a ,#6a1b9a, #ff1744); */
+    border-radius: 15px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    width: 25vw;
+    padding: 6vh 5vw;
+    text-align: center;
+    align-items: center;
+    z-index: 100;
+}
+.lobbyForm label {
+    font-size: 2em;
+    display: block;
+    color: black;
+    position: relative;
+    text-shadow: 0px 0px 2px #f6f8f8, 0px 0px 2px #ffffff;
+}
+.lobbyForm input {
+    width: 100%;
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px solid #fff;
+    font-size: 1em;
+    background: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    text-align: center;
+    transition: 0.3s ease;
+    align-items: center;
+}
+.lobbyForm button {
+    font-family: 'FancyFont', sans-serif;
+    font-weight: bold;
+    font-size: 2em;
+    width: 100%;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: rgba(201, 84, 201, 0.507);
+    color: black;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s ease, transform 0.2s ease;
+    text-shadow: 0px 0px 1px #ffffff, 0px 0px 1px #ffffff;
+    align-items: center;
+}
+.lobbyForm input::placeholder {
+    color: #ccc;
+} 
+.lobbyForm input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.5);
+}
+.lobbyForm button:hover {
+    background-color: rgba(35, 68, 214, 0.507);
+    transform: scale(1.05);
+    animation: neonGlowingBorder 2s infinite alternate;
+}
+.lobbyForm button:active {
+    background-color: rgba(120, 101, 233, 0.507);
+
+}
+@media (max-width: 767px) {
+    .lobbyForm {
+        width: 70vw;
+    }
+    .lobbyForm input {
+        padding: 2vh 1vw;
+        font-size: .5em;
+    }
+    .lobbyForm label {
+        font-size: 1.5em;
+    }
+    .lobbyForm button {
+        font-size: 1.5em;
+      }
+}

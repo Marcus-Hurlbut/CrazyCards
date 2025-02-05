@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin(origins = "http://192.168.86.37:8081")
 
 @RestController
 public class BugReportAPI {

@@ -7,10 +7,7 @@
           <span></span>
           <span></span>
           Dungeon Decks
-        <!-- <img alt="Crazy Cards logo" src="@/assets/card_icon.png" class="banner-logo" /> -->
-
-        <!-- <span></span> -->
-        <FlameAnimation />
+        <FlameAnimation class="flame-right"/>
       </h1>
       <BirdsAnimation />
       <div class="dropdown-container">
@@ -121,10 +118,14 @@ html, body {
 
 .dungeon-decks {
   background: linear-gradient(to bottom right, #b40e2a,  #b40e40, #b0278e, #3D5AFE, #3D5AFE);
+  background-image: url('@/assets/texture-img/texture1.webp');
+  background-size: cover;
+  background-position: center;
   animation: gradientAnimation 10s ease-in-out infinite;
   color: rgb(10, 10, 10);
   text-align: center;
   text-shadow: 0px 0px 10px #00ffff, 0px 0px 20px #00ffff;
+  border: 3px solid black;
 }
 
 .dashboard {
@@ -136,32 +137,16 @@ html, body {
 }
 
 .app-title {
-  position: relative;
-  color: linear-gradient(to bottom right, #b40e2a,  #b40e40, #b0278e, #3D5AFE, #3D5AFE);
+  position: ab;
+  color: linear-gradient(to bottom right, #b40e2a,  #b40e40, #b0278e, #3D5AFE, #e73dfe);
   font-size: 3em;
-  text-shadow: 0 0 5px rgb(60, 137, 224), 0 0 10px rgb(0, 183, 255);
+  text-shadow: 0 0 5px rgb(255, 0, 0), 0 0 10px rgb(67, 78, 233);
   font-family: 'DungeonDecksFont', sans-serif;
-  text-align: center;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 1vw;
 }
 
-.app-title h1 {
-  position: absolute;
-  font-size: 20px;
-}
-
-.banner-logo {
-  height: 60px;
-  width: auto;
-}
-.flame-left {
-  position: a;
-  transform: translateX(50%);
-}
-
-/* Dropdown styles */
 .dropdown-container {
   position: absolute;
   top: 10px;
@@ -173,10 +158,14 @@ html, body {
   background-color: transparent;
   border: none;
   cursor: pointer;
+  font-size: 1.5em;
 }
 
 .menu-icon {
-  height: 70px;
+  position: absolute;
+  height: 5vh;
+  left: 0%;
+  top: 0%;
 }
 
 .options-menu {
@@ -257,7 +246,6 @@ html, body {
   background-color: #8e24aa;
   padding: 10px;
   border-radius: 5px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   list-style-type: none;
   margin: 0;
   padding: 4px;
@@ -273,4 +261,44 @@ html, body {
 .second-sublist li:hover {
   background-color: #b40e40;
 }
+
+@media (max-width: 767px) {
+  .app-title {
+    font-size: 1em;
+    gap: 10px;
+  }
+
+  .menu-icon {
+    transform: translateY(-20%);
+  }
+
+  .options-menu {
+    width: 100%;
+    position: relative;
+  }
+
+  .sublist,
+  .second-sublist {
+    width: 100%;
+    position: relative;
+    top: auto;
+    left: auto;
+    background-color: #9c27b0;
+    margin: 0;
+    padding: 10px;
+  }
+
+  .flame-left {
+    opacity: 0;
+  }
+
+  .flame-right {
+    opacity: 0;
+  }
+
+  .dropdown-button {
+    font-size: 1.5em;
+  }
+}
+
 </style>
