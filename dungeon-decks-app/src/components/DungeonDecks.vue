@@ -106,8 +106,6 @@ export default {
 @font-face {
   font-family: 'DungeonDecksFont';
   src: url('@/assets/ttf/Romantiques.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
 }
 
 html, body {
@@ -122,9 +120,9 @@ html, body {
   background-size: cover;
   background-position: center;
   animation: gradientAnimation 10s ease-in-out infinite;
-  color: rgb(10, 10, 10);
+  color: rgb(247, 215, 215);
   text-align: center;
-  text-shadow: 0px 0px 10px #00ffff, 0px 0px 20px #00ffff;
+  text-shadow: 0px 0px 10px #00ffff, 0px 0px 20px #0099ff;
   border: 3px solid black;
 }
 
@@ -140,7 +138,7 @@ html, body {
   position: ab;
   color: linear-gradient(to bottom right, #b40e2a,  #b40e40, #b0278e, #3D5AFE, #e73dfe);
   font-size: 3em;
-  text-shadow: 0 0 5px rgb(255, 0, 0), 0 0 10px rgb(67, 78, 233);
+  text-shadow: 0 0 5px rgb(162, 0, 255), 0 0 10px rgb(169, 4, 245);
   font-family: 'DungeonDecksFont', sans-serif;
   display: flex;
   align-items: center;
@@ -290,10 +288,12 @@ html, body {
 
   .flame-left {
     opacity: 0;
+    display: none;
   }
 
   .flame-right {
     opacity: 0;
+    display: none;
   }
 
   .dropdown-button {

@@ -27,7 +27,6 @@ export default {
 }
 
 .game-vault-btn {
-  background: linear-gradient(to right, #000000, #D50032, #3D5AFE, #000000);
   background-image: url('@/assets/texture-img/texture1.webp');
   background-size: cover;
   background-position: center;
@@ -44,7 +43,7 @@ export default {
   position: relative;
   text-transform: uppercase;
   letter-spacing: 2px;
-  text-shadow: 0px 0px 3px #3D5AFE, 0px 0px 3px #ffffff;
+  text-shadow: 0px 0px 3px #ffffff, 0px 0px 10px #c709f7;
 }
 
 .game-vault-btn:hover {

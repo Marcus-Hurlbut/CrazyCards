@@ -21,11 +21,12 @@
     z-index: 100;
 }
 .lobbyForm label {
+    font-family: 'Standard', sans-serif;
     font-size: 2em;
     display: block;
-    color: black;
+    color: rgb(252, 205, 205);
     position: relative;
-    text-shadow: 0px 0px 2px #f6f8f8, 0px 0px 2px #ffffff;
+    text-shadow: 0px 0px 4px #b700ff, 0px 0px 4px #a304ff;
 }
 .lobbyForm input {
     width: 100%;
@@ -51,7 +52,7 @@
     border: none;
     cursor: pointer;
     transition: 0.3s ease, transform 0.2s ease;
-    text-shadow: 0px 0px 1px #ffffff, 0px 0px 1px #ffffff;
+    text-shadow: 0px 0px 2px #ffffff, 0px 0px 2px #ffffff;
     align-items: center;
 }
 .lobbyForm input::placeholder {

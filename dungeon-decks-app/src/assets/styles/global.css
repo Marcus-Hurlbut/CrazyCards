@@ -6,11 +6,18 @@
 }
 
 @font-face {
-    font-family: 'GatsbyFont';
-    src: url('@/assets/ttf/HeraldSquareTwoNF.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
+  font-family: 'GatsbyFont';
+  src: url('@/assets/ttf/HeraldSquareTwoNF.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Standard';
+  src: url('@/assets/ttf/ChrustyRock.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 @keyframes goldGlowingBorder {
     0% {

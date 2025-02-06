@@ -13,7 +13,6 @@
       </ul>
     </div>
   </div>
-  <BubbleBackground />
 </template>
 
 <script>
@@ -62,7 +61,7 @@ export default {
       this.displayName = displayName
       this.storeUsername(displayName)
 
-      if (this.stompClient && this.stompClient.connected) return;
+      // if (this.stompClient && this.stompClient.connected) return;
       this.connecting = true;
 
       const socketUrl = process.env.NODE_ENV === 'development'
@@ -169,10 +168,10 @@ export default {
 }
 
 h1, h3 {
-  color: black;
+  color: #f7d8ff;
   font-family: 'GatsbyFont';
   animation: glowingBorder 2s infinite alternate;
-  text-shadow: 0px 0px 8px rgb(253, 253, 253), 0px 0px 3px rgb(0, 68, 255);
+  text-shadow: 0px 0px 5px rgb(228, 26, 255), 0px 0px 10px rgb(140, 0, 255);
 }
 
 h1, h2 {
@@ -182,9 +181,9 @@ h1, h2 {
 }
 
 h2 {
-  color: rgb(3, 12, 53);
+  color: rgb(5, 5, 5);
   font-family: 'FancyFont';
-  text-shadow: 0px 0px 4px rgb(253, 253, 253), 0px 0px 3px rgb(0, 68, 255);
+  text-shadow: 0px 0px 5px rgb(253, 253, 253), 0px 0px 5px rgb(255, 254, 255);
 }
 
 h3 {
@@ -200,16 +199,16 @@ ul {
 }
 
 ul li {
-  font-family: 'FancyFont';
+  font-family: 'Standard';
   animation: purpleGlowingBorder 2s infinite alternate;
   font-size: 2em;
-  color: black;
+  color: rgb(253, 195, 250);
   padding: 10px;
   margin: 8px 0;
   background: rgba(0, 0, 0, 0.4);
   border-radius: 10px;
   transition: background-color 0.3s, transform 0.3s;
-  text-shadow: 0px 0px 2px #ffffff, 0px 0px 5px #ffffff;
+  text-shadow: 0px 0px 2px #b413ff, 0px 0px 5px #ea00ff;
 }
 
 ul li:hover {

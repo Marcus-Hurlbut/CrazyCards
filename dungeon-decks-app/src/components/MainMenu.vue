@@ -9,21 +9,18 @@
           </ul>
         </li>
       </ul>
-      <!-- <BubbleBackground /> -->
     </div> 
 </template>
   
 <script>
 import GamesDropdownMenu from './dashboard/GamesDropdownMenu.vue';
 import GameVaultButton from './dashboard/GameVaultButton.vue'
-// import BubbleBackground from './animations/BubbleBackground.vue';
   
 export default {
     name: 'MainMenu',
     components: {
       GamesDropdownMenu,
       GameVaultButton,
-      // BubbleBackground
     },
     props: {
       msg: String
@@ -41,8 +38,8 @@ export default {
   .dungeon-decks {
     background-image: url('../assets/texture-img/texture1.webp');
     background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+    background-position: center;
+    background-repeat: no-repeat;
     animation: gradientAnimation 10s ease-in-out infinite;
     color: white;
     text-align: center;

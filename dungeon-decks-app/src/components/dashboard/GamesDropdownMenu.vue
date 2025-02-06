@@ -42,7 +42,6 @@
         </div>
       </li>
     </ul>
-    <BubbleBackground />
   </div>
 </template>
 
@@ -85,7 +84,7 @@ export default {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3ba1f5;
+  background: red;
 }
 
 .games-list {
@@ -109,13 +108,13 @@ export default {
   border-radius: 15px;
   letter-spacing: 2px;
   transition: 0.3s ease, transform 0.3s ease;
-  text-shadow: 0px 0px 10px #e91442, 0px 0px 20px #e91442;
+  text-shadow: 0px 0px 10px #e91442, 0px 0px 5px #e91442;
 }
 
 .game-item:hover {
   padding-bottom: 1em;
   transform: scale(1.05);
-  text-shadow: 0px 0px 10px #008cff, 0px 0px 20px #3ba1f5;
+  text-shadow: 0px 0px 10px rgb(162, 0, 255), 0px 0px 5px rgb(162, 0, 255)
 }
 
 /* Submenu Dropdown for Create/Join Lobby */
@@ -139,13 +138,13 @@ export default {
   font-size: .8em;
   letter-spacing: 1px;
   text-shadow: 0px 0px 10px #ff0000, 0px 0px 20px #ff0000;
-  box-shadow: 0 0 10px rgba(253, 1, 198, 0.815), 0 0 20px rgba(255, 0, 34, 0.8);
+  box-shadow: 0 0 10px rgba(253, 1, 198, 0.815), 0 0 5px rgba(255, 0, 34, 0.8);
 }
 
 .menu-button:hover {
   transform: translateY(-3px);
-  text-shadow: 0px 0px 10px #00ffff, 0px 0px 20px #3ba1f5;
-  box-shadow: 0 0 10px rgba(0, 102, 255, 0.8), 0 0 20px #3ba1f5;
+  text-shadow: 0px 0px 10px #c430ff, 0px 0px 5px #c430ff;
+  box-shadow: 0 0 10px 0044ff, 0 0 20px #0044ff;
 }
 
 @media (max-width: 767px) {

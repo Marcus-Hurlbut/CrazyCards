@@ -11,6 +11,9 @@
         <input type="text" id="displayName" v-model="displayName" name="displayName">
       </div>
       <button type="submit">Join Lobby</button>
+      <div v-if="errorMsg != null">
+        <ErrorAlert :msg="errorMsg"/>
+      </div>
     </form>
   </div>
 </template>
@@ -22,11 +25,15 @@
   import { v4 as uuidv4 } from 'uuid';
   import '@/assets/styles/global.css';
   import '@/components/lobby/css/styles.css';
+  import ErrorAlert from '../alerts/ErrorAlert.vue';
 
   export default {
     name: 'JoinLobby',
     computed: {
       ...mapState(['playerID', 'username'])
+    },
+    components: {
+      ErrorAlert,
     },
     data() {
       return {
@@ -35,13 +42,15 @@
         stompClient: null,
         connected: false,
         connecting: false,
+        errorMsg: null,
       }
     },
     methods: {
       ...mapActions(['storeIsLobbyCreated', 'storeStompClient', 'storePlayerID', 'storeUsername', 'storeOtherPlayer', 'storeLobbyID', 'storePlayerIndex']),
 
       join(lobbyID, displayName) {
-        if (this.connected || this.connecting) return; 
+        console.log('join');
+        // if (this.connected || this.connecting) return;
         this.connecting = true;
         this.lobbyID = lobbyID
 
@@ -73,10 +82,17 @@
       subscribeJoinLobby() {
         let subscription = '/topic/' + this.$route.query.game + '/joinLobby/' + this.$store.getters.playerID
         this.stompClient.subscribe(subscription, message => {
-          let otherNames = JSON.parse(message.body);
-          console.log('Joined lobby successfully - Other player names: ', otherNames)
+          let msg = JSON.parse(message.body);
           let index = 0;
+          console.log("message received: ", msg);
+          if (msg === false) {
+            this.errorMsg = 'Unable to find lobby';
+            setTimeout(() => {this.errorMsg = null}, 3000);
+            return;
+          }
 
+          let otherNames = msg;
+          console.log('Joined lobby successfully - Other player names: ', otherNames)
           otherNames.forEach(playerName => {
             console.log("storing username: ", playerName)
             this.storeOtherPlayer(playerName)
@@ -85,6 +101,7 @@
 
           this.storePlayerIndex(index);
           this.storeIsLobbyCreated(true);
+
           this.$router.push({
             path: '/lobby',
             query: {

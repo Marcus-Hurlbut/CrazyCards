@@ -110,6 +110,7 @@ public class SpiderSolitaireController {
         }
 
         notifyCardsTransferredTableau(gameID, playerID, cards, to);
+
         if (spiderSolitaire.revealedCard != null) {
             notifyNewRevealedCard(gameID, playerID, spiderSolitaire.revealedCard, from);
         }
