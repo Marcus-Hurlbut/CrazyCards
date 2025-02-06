@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import HeartsComponent from './components/HeartsComponent.vue';
+import HeartsComponent from './components/games/HeartsComponent.vue';
 import SpadesComponent from './components/games/SpadesComponent.vue';
-import JoinLobby from './components/JoinLobby.vue';
-import LobbyComponent from './components/LobbyComponent.vue';
-import CreateLobbyForm from './components/forms/CreateLobbyForm.vue';
+import JoinLobby from './components/lobby/JoinLobby.vue';
+import LobbyComponent from './components/lobby/LobbyComponent.vue';
+import CreateLobbyForm from './components/lobby/CreateLobbyForm.vue';
 import MainMenu from './components/MainMenu.vue';
 import BugReport from './components/index/BugReport.vue';
 import SpiderSolitaireComponent from './components/games/SpiderSolitaireComponent.vue';

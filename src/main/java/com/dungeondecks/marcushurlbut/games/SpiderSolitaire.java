@@ -168,6 +168,7 @@ public class SpiderSolitaire extends Game {
     public void addCardsToTableau(List<Card> cards, int column) {
         cards.sort((card1, card2) -> Integer.compare(card2.value, card1.value));
         for (Card card : cards) {
+            card.setHidden(false);
             tableau[column].add(card);
         }
     }

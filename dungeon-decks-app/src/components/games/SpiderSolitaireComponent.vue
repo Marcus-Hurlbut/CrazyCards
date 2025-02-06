@@ -156,12 +156,13 @@
             let destinationToCard = JSON.parse(message.body);
             console.log('Revealed Card: ', destinationToCard);
 
-            setTimeout(() => {
+          setTimeout(() => {
             for (const [column, card] of Object.entries(destinationToCard)) {
               let replaceTop = true;
-              this.addCardToTableau(card, column, replaceTop);
+              let objCard = ({id: card.id, suit: card.suit, name: card.name, value: card.value, imgPath: card.imgPath});
+              this.addCardToTableau(objCard, column, replaceTop);
             }
-          }, 250);
+          }, 500);
         });
       },
       subscribeHitDeck() {
@@ -221,7 +222,7 @@
             // If top card needs to be revealed, reveal now
             for (const [index, topCard] of Object.entries(locationToTopcard)) {
               column = index;
-              if (topCard.id == null) {
+              if (topCard.id == null || topCard.name == null) {
                   card = ({id: -1, name: null, suit: null, value: -1, imgPath: 'card_back_red.png'});
               } else {
                   card = ({id: topCard.id, name: topCard.name, suit: topCard.suit, value: topCard.value, imgPath: topCard.imgPath});
@@ -230,9 +231,9 @@
 
             // Remove cards from tableau & add to foundation
             for (let i = 0; i < 13; i++) {
-              let card = this.tableau[column].pop();
-              console.log('removing card: ', card);
-              this.foundation[this.foundationsWon].push(card);
+              let foundationCard = this.tableau[column].pop();
+              console.log('removing card: ', foundationCard);
+              this.foundation[this.foundationsWon].push(foundationCard);
             }
 
             this.foundationsWon += 1;
@@ -262,6 +263,7 @@
       publishPlayTurn(cards, to, from) {
         this.from = from;
         this.to = to;
+        console.log('Playing turn with cards: ', cards);
         this.cardsPlayed = cards;
         this.stompClient.publish({
           destination: "/app/spiderSolitaire/playTurn",

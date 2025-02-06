@@ -54,6 +54,13 @@ public class HeartsController {
         int lobbyID = Integer.parseInt(message.getLobbyID());
         String username = message.getUsername();
 
+        boolean exists = GameManager.checkLobbyExists(lobbyID, GameType.Hearts);
+        if (!exists) {
+            String destination = "/topic/hearts/joinLobby/" + playerID.toString();
+            messagingTemplate.convertAndSend(destination, false);
+            return;
+        }
+
         Player player = new Player(playerID, username);
         boolean gameFull = GameManager.joinLobby(player, lobbyID, GameType.Hearts);
         Lobby lobby = GameManager.retreiveLobby(lobbyID);

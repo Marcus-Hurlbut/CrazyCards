@@ -144,5 +144,11 @@
     width: 50px;
     text-align: center;
   }
+
+  @media (max-width: 767px) {
+  .scoreboard {
+    display: none;
+  }
+}
   </style>
   

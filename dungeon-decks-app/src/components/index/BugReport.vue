@@ -19,12 +19,10 @@
         <h3>Your email was received!</h3>
       </div>
     </div>
-    <BubbleBackground />
 </template>
   
 <script>
 import axios from 'axios';
-import BubbleBackground from '../animations/BubbleBackground.vue';
 
   export default {
     name: "BugReport",
@@ -32,9 +30,6 @@ import BubbleBackground from '../animations/BubbleBackground.vue';
       return {
         emailSuccess: false,
       }
-    },
-    components: {
-        BubbleBackground,
     },
     methods: {
       async sendEmailReport() {
@@ -44,7 +39,7 @@ import BubbleBackground from '../animations/BubbleBackground.vue';
           this.bugReport = ""
 
           const url = process.env.NODE_ENV === 'development'
-          ? 'http://localhost:8080/api/bugReport'
+          ? 'http://192.168.86.37:8080/api/bugReport'
           : 'https://dungeondecks.net/api/bugReport'
 
           // Make the POST request to the backend

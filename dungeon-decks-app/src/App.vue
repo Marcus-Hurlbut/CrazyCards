@@ -38,11 +38,10 @@ html, body {
 }
 
 body {
-  background-color: rgb(12, 11, 11);
+  background-image: url('@/assets/background/dungeon-background-colorful.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  color: #fff;
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
   font-weight: bold;

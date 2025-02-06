@@ -50,7 +50,7 @@ public class GameManager {
 
     public static boolean joinLobby(Player player, Integer lobbyID, GameType type) {
         Lobby lobby = retreiveLobby(lobbyID);
-        if (type != lobby.type || lobby == null) {
+        if (lobby == null || type != lobby.type) {
             return false;
         }
 
@@ -66,6 +66,11 @@ public class GameManager {
         }
 
         return full;
+    }
+
+    public static boolean checkLobbyExists(Integer lobbyID, GameType gameType) {
+        Lobby lobby = retreiveLobby(lobbyID);
+        return (lobby != null && lobby.type == gameType);
     }
 
     public static Lobby retreiveLobby(Integer lobbyID) {

@@ -13,7 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // Apply to all endpoints
                 .allowedOriginPatterns("*") // Allow all origins
-                .allowedOrigins("http://localhost:8080", "http://dungeondecks.net")
+                .allowedOrigins("http://192.168.86.37:8080", "http://dungeondecks.net")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Specify allowed methods
                 .allowedHeaders("*") // Allow all headers
                 .allowCredentials(true); // Allow credentials if needed
